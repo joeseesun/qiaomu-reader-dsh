@@ -29,6 +29,7 @@ import { TocPanel } from './toc.js';
 import { HighlightsPanel } from './panel-highlights.js';
 import { SearchPanel } from './panel-search.js';
 import { SettingsPanel } from './panel-settings.js';
+import { PromptManager } from './prompt-manager.js';
 
 const h = React.createElement;
 /** 相邻两列之间的间距 */
@@ -195,6 +196,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const chapterIndex = ui.useSel((state) => Number(state.chapterIndex) || 0);
   const chapterCount = ui.useSel((state) => Number(state.chapterCount) || 0);
   const panel = ui.useSel((state) => state.panel);
+  const promptManagerOpen = ui.useSel((state) => !!state.promptManagerOpen);
   const selection = ui.useSel((state) => state.selection);
   const searchQuery = ui.useSel((state) => state.searchQuery);
   const searchIndex = ui.useSel((state) => Number(state.searchIndex));
@@ -208,6 +210,25 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const chapterBusy = ui.useSel((state) => state.chapterBusy);
   const bookState = ui.useSel((state) => (state.states || {})[bookId] || null);
   const narrow = useMediaQuery('(max-width: 900px)');
+  const workareaRef = React.useRef(null);
+  const companionDragging = React.useRef(false);
+  const [companionWidth, setCompanionWidth] = React.useState(() => {
+    const saved = Number(localStorage.getItem('qmr.companionWidth'));
+    return Number.isFinite(saved) && saved >= 25 && saved <= 75 ? saved : 44;
+  });
+  const companionWidthRef = React.useRef(companionWidth);
+  const [chromeVisible, setChromeVisible] = React.useState(true);
+  const chromeTimerRef = React.useRef(null);
+  const showChrome = React.useCallback(() => {
+    setChromeVisible(true);
+    clearTimeout(chromeTimerRef.current);
+    chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
+  }, []);
+  React.useEffect(() => {
+    showChrome();
+    return () => clearTimeout(chromeTimerRef.current);
+  }, [showChrome]);
+  React.useEffect(() => { ui.store.set({ companionSelection: null }); }, [bookId, chapterIndex]);
 
   const book = ui.bookOf(bookId);
   const sectionUnit = book?.format === 'pdf' ? '页' : book?.format === 'txt' ? '部分' : '章';
@@ -316,17 +337,22 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       const computed = window.getComputedStyle ? window.getComputedStyle(viewport) : null;
       const padLeft = computed ? parseFloat(computed.paddingLeft) || 0 : 0;
       const padRight = computed ? parseFloat(computed.paddingRight) || 0 : 0;
-      const width = Math.max(140, viewport.clientWidth - padLeft - padRight);
+      const width = Math.max(1, viewport.clientWidth - padLeft - padRight);
       const paginated = settings.flow !== 'scroll';
       const perPage = paginated && settings.spread && width >= 900 ? 2 : 1;
       const gap = COLUMN_GAP;
-      const columnWidth = Math.max(90, (width - (perPage - 1) * gap) / perPage);
+      const columnWidth = (width - (perPage - 1) * gap) / perPage;
       flow.style.width = `${width}px`;
-      flow.style.height = paginated ? '100%' : 'auto';
+      flow.style.height = paginated ? `${Math.max(1, viewport.clientHeight)}px` : 'auto';
       if (paginated) {
         flow.style.columnWidth = `${columnWidth}px`;
+        flow.style.columnCount = String(perPage);
         flow.style.columnGap = `${gap}px`;
         flow.style.columnFill = 'auto';
+      } else {
+        flow.style.columnCount = 'auto';
+        flow.style.columnWidth = 'auto';
+        flow.style.transform = 'none';
       }
       let pages = 1;
       if (paginated) {
@@ -335,6 +361,11 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         pages = Math.max(1, Math.ceil(columns / perPage));
       }
       measureRef.current = { pages, perPage, columnWidth, gap };
+      // Resize can leave the page count unchanged; always realign the current page.
+      const currentPage = Math.min(liveRef.current.page || 0, pages - 1);
+      flow.style.transition = 'none';
+      flow.style.transform = paginated ? `translateX(${-currentPage * perPage * (columnWidth + gap)}px)` : 'none';
+      if (paginated) viewport.scrollLeft = 0;
       setPageCount(pages);
       setPage((value) => value);
       return measureRef.current;
@@ -342,6 +373,22 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       return measureRef.current;
     }
   }, [settings.flow, settings.spread, setPage]);
+
+  /** 分页定位必须翻页，不能让浏览器横向滚动裁切容器。 */
+  const revealNode = React.useCallback((node) => {
+    if (!node) return;
+    if (settings.flow === 'scroll') {
+      node.scrollIntoView?.({ block: 'center', inline: 'nearest' });
+      return;
+    }
+    const flow = flowRef.current;
+    const rect = node.getClientRects()[0];
+    if (!flow || !rect) return;
+    const meta = measureRef.current;
+    const x = Math.max(0, rect.left - flow.getBoundingClientRect().left);
+    const column = Math.floor((x + 1) / (meta.columnWidth + meta.gap));
+    setPage(Math.floor(column / meta.perPage));
+  }, [settings.flow, setPage]);
 
   // ------------------------------------------------------------- 应用 DOM（划线/搜索）
 
@@ -454,14 +501,14 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           target.classList.add('is-focused');
           if (lastFocusRef.current !== focusKey) {
             lastFocusRef.current = focusKey;
-            if (target.scrollIntoView) target.scrollIntoView({ block: 'center', inline: 'nearest' });
+            revealNode(target);
           }
         } else if (lastFocusRef.current !== focusKey) {
           requestAnimationFrame(() => {
             const settled = flow.querySelector(`[data-qmr-hl="${key}"]`);
             if (settled) {
               settled.classList.add('is-focused');
-              settled.scrollIntoView?.({ block: 'center', inline: 'nearest' });
+              revealNode(settled);
             } else if (lastFocusRef.current !== focusKey) {
               ui.toast('这条划线在当前页面找不到对应文字', 'warn');
             }
@@ -474,7 +521,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       const searchKey = `${searchFocusToken}:${searchIndex}:${chapterIndex}:${searchQuery}`;
       if (current && lastSearchFocusRef.current !== searchKey) {
         lastSearchFocusRef.current = searchKey;
-        if (current.scrollIntoView) current.scrollIntoView({ block: 'center', inline: 'nearest' });
+        revealNode(current);
       }
     } catch (_error) {
       /* 忽略 */
@@ -489,6 +536,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     focusToken,
     focusHighlightId,
     chapterBusy,
+    revealNode,
   ]);
 
   // 平移当前页
@@ -502,7 +550,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const meta = measureRef.current;
     const offset = page * (meta.perPage || 1) * ((meta.columnWidth || 320) + (meta.gap || COLUMN_GAP));
     flow.style.transform = `translateX(${-offset}px)`;
-    flow.style.transition = 'transform .18s ease';
+    flow.style.transition = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'none' : 'transform .18s ease';
   }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin]);
 
   // 尺寸变化重新测量
@@ -525,8 +573,11 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       observer = null;
     }
     window.addEventListener('resize', measureNow);
+    const measuredFlow = flowRef.current;
+    measuredFlow?.addEventListener('load', measureNow, true);
     return () => {
       window.removeEventListener('resize', measureNow);
+      measuredFlow?.removeEventListener('load', measureNow, true);
       if (observer) {
         try {
           observer.disconnect();
@@ -535,7 +586,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         }
       }
     };
-  }, [measure, html]);
+  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify]);
 
   // ------------------------------------------------------------- 位置上报
 
@@ -857,7 +908,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   const onAsk = () => {
     const current = ui.store.get().selection;
-    if (current) ui.store.set({ companionSelection: { text: current.text, chapterHref: current.chapterHref } });
+    if (current && ui.store.get().panel !== 'companion') ui.store.set({ companionSelection: { text: current.text, chapterHref: current.chapterHref, id: Date.now() } });
     if (ui.store.get().panel !== 'companion') ui.setPanel('companion');
     else ui.clearSelection();
   };
@@ -866,10 +917,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   const viewportClass = `qmr-page-viewport`;
   const contentStyle = settings.flow === 'scroll'
-    ? { padding: `${Math.round(settings.margin * 0.55)}px ${settings.margin}px 28px` }
-    : { padding: `24px ${settings.margin}px 30px` };
+    ? { padding: `56px min(${settings.margin}px, 6vw) 48px` }
+    : { padding: `64px min(${settings.margin}px, 6vw) 48px` };
   contentStyle.width = '100%';
-  contentStyle.maxWidth = settings.spread ? '1160px' : '880px';
+  contentStyle.maxWidth = settings.spread ? '1280px' : '860px';
   contentStyle.marginInline = 'auto';
   const flowStyle = {
     fontFamily: fontStackOf(settings.fontFamily),
@@ -900,38 +951,34 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     {
       key,
       type: 'button',
-      className: `qmr-btn${active ? ' is-active' : ''}`,
+      className: `qmr-btn qmr-btn-icon${active ? ' is-active' : ''}`,
       'aria-label': label,
+      title: label,
       'aria-pressed': active ? 'true' : undefined,
       onClick,
     },
     icon,
-    h('span', { className: 'qmr-toolbar-label' }, label),
   );
 
-  return h(
-    'div',
-    { className: 'qmr-reader', 'data-qmr-theme': settings.theme, style: themeVars },
-    h(
+  const topBar = h(
       'div',
-      { className: 'qmr-topbar' },
+      { className: `qmr-topbar${chromeVisible ? '' : ' qmr-chrome-hidden'}` },
       h('button', {
         type: 'button',
         className: 'qmr-btn qmr-btn-icon',
-        'aria-label': '返回书库',
+        'aria-label': '返回书库', title: '返回书库',
         onClick: () => ui.backToLibrary(),
       }, h(IconBack, { width: 16, height: 16 })),
       h(
         'div',
-        { className: 'qmr-topbar-title' },
+        { className: 'qmr-topbar-title', title: [title, author, chapterLabel].filter(Boolean).join(' · ') },
         h('div', { className: 'qmr-title' }, title),
         h('div', { className: 'qmr-subtitle' },
-          [author, chapterLabel, formatPercent(progress)].filter(Boolean).join(' · ')),
+          [chapterLabel !== title ? chapterLabel : '', formatPercent(progress)].filter(Boolean).join(' · ')),
       ),
       h(
         'div',
         { className: 'qmr-actions' },
-        toolbarButton('toc', h(IconToc, { width: 16, height: 16 }), '目录', () => ui.setPanel('toc'), panel === 'toc'),
         toolbarButton('search', h(IconSearch, { width: 16, height: 16 }), '搜索', () => ui.setPanel('search'), panel === 'search'),
         toolbarButton('hl', h(IconHighlight, { width: 16, height: 16 }), '划线', () => ui.setPanel('highlights'), panel === 'highlights' || panel === 'notes'),
         toolbarButton('ai', h(IconSparkles, { width: 16, height: 16 }), 'AI 伴读', () => ui.setPanel('companion'), panel === 'companion'),
@@ -939,75 +986,25 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         h('button', {
           type: 'button',
           className: 'qmr-btn qmr-btn-icon',
-          'aria-label': '全屏',
+          'aria-label': '全屏', title: '全屏',
           onClick: () => ui.toggleFullscreen(),
         }, h(IconFullscreen, { width: 16, height: 16 })),
         h('button', {
           type: 'button',
           className: 'qmr-btn qmr-btn-icon',
-          'aria-label': '关闭阅读器',
+          'aria-label': '关闭阅读器', title: '关闭阅读器',
           onClick: () => ui.closeOverlay(),
         }, h(IconClose, { width: 16, height: 16 })),
       ),
-    ),
-    h(
+    );
+  const bottomBar = h(
       'div',
-      { className: 'qmr-reader-main' },
-      h(
-        'div',
-        {
-          className: `qmr-reader-content${settings.flow === 'scroll' ? ' qmr-flow-scroll' : ''}`,
-        },
-        settings.flow !== 'scroll'
-          ? h('button', {
-            type: 'button',
-            className: 'qmr-page-zone qmr-page-zone-prev',
-            'aria-label': '上一页',
-            onClick: () => ui.turnPage(-1),
-          })
-          : null,
-        h(
-          'div',
-          { className: viewportClass, ref: viewportRef, style: contentStyle },
-          h('div', {
-            className: 'qmr-page-flow qmr-paper-body',
-            ref: flowRef,
-            style: flowStyle,
-            onClick: onContentClick,
-            onScroll: undefined,
-          }),
-        ),
-        settings.flow !== 'scroll'
-          ? h('button', {
-            type: 'button',
-            className: 'qmr-page-zone qmr-page-zone-next',
-            'aria-label': '下一页',
-            onClick: () => ui.turnPage(1),
-          })
-          : null,
-        settings.flow !== 'scroll'
-          ? h('div', { className: 'qmr-page-count' }, `第 ${page + 1} / ${pageCount} 页`)
-          : null,
-        chapterBusy ? h('div', { className: 'qmr-chapter-loading' }, '正在排版…') : null,
-        renderError
-          ? h('div', { className: 'qmr-errorbox' },
-            h('div', { className: 'qmr-errorbox-title' }, `这一${sectionUnit}渲染失败`),
-            h('div', { className: 'qmr-errorbox-text' }, renderError),
-            h('button', {
-              type: 'button',
-              className: 'qmr-btn qmr-btn-sm',
-              onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 }),
-            }, '重试'))
-          : null,
-        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk }) : null,
-      ),
-      panelNode
-        ? h('div', { className: `qmr-panel${panel === 'companion' ? ' qmr-panel-companion' : ''}${narrow ? ' qmr-panel-overlay' : ''}` }, panelNode)
-        : null,
-    ),
-    h(
-      'div',
-      { className: 'qmr-bottombar' },
+      { className: `qmr-bottombar${chromeVisible ? '' : ' qmr-chrome-hidden'}` },
+      h('button', {
+        type: 'button', className: `qmr-icon-btn${panel === 'toc' ? ' is-active' : ''}`,
+        'aria-label': '目录', 'aria-pressed': panel === 'toc', title: '目录',
+        onClick: () => ui.setPanel('toc'),
+      }, h(IconToc, { width: 16, height: 16 })),
       h('button', {
         type: 'button',
         className: 'qmr-icon-btn',
@@ -1050,6 +1047,102 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         'aria-label': '下一页',
         onClick: () => ui.turnPage(1),
       }, h(IconNext, { width: 16, height: 16 })),
+    );
+
+  return h(
+    'div',
+    { className: 'qmr-reader', 'data-qmr-theme': settings.theme, style: themeVars },
+    h(
+      'div',
+      { className: `qmr-reader-main${panel === 'companion' ? ' qmr-has-companion' : ''}`, ref: workareaRef, style: { '--qmr-companion-width': `${companionWidth}%` } },
+      h(
+        'div',
+        {
+          className: `qmr-reader-content${settings.flow === 'scroll' ? ' qmr-flow-scroll' : ''}`,
+          onPointerMoveCapture: showChrome,
+          onPointerDownCapture: showChrome,
+          onWheelCapture: showChrome,
+          onFocusCapture: showChrome,
+          onKeyDownCapture: showChrome,
+        },
+        topBar,
+        settings.flow !== 'scroll'
+          ? h('button', {
+            type: 'button',
+            className: 'qmr-page-zone qmr-page-zone-prev',
+            'aria-label': '上一页',
+            onClick: () => ui.turnPage(-1),
+          })
+          : null,
+        h(
+          'div',
+          { className: 'qmr-page-frame', style: contentStyle },
+          h('div', { className: viewportClass, ref: viewportRef }, h('div', {
+            className: 'qmr-page-flow qmr-paper-body',
+            ref: flowRef,
+            style: flowStyle,
+            onClick: onContentClick,
+            onScroll: undefined,
+          })),
+        ),
+        settings.flow !== 'scroll'
+          ? h('button', {
+            type: 'button',
+            className: 'qmr-page-zone qmr-page-zone-next',
+            'aria-label': '下一页',
+            onClick: () => ui.turnPage(1),
+          })
+          : null,
+        settings.flow !== 'scroll'
+          ? h('div', { className: 'qmr-page-count' }, `第 ${page + 1} / ${pageCount} 页`)
+          : null,
+        chapterBusy ? h('div', { className: 'qmr-chapter-loading' }, '正在排版…') : null,
+        renderError
+          ? h('div', { className: 'qmr-errorbox' },
+            h('div', { className: 'qmr-errorbox-title' }, `这一${sectionUnit}渲染失败`),
+            h('div', { className: 'qmr-errorbox-text' }, renderError),
+            h('button', {
+              type: 'button',
+              className: 'qmr-btn qmr-btn-sm',
+              onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 }),
+            }, '重试'))
+          : null,
+        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk }) : null,
+        bottomBar,
+      ),
+      panel === 'companion' ? h('div', {
+        className: 'qmr-companion-divider', role: 'separator', tabIndex: 0,
+        'aria-label': '调整正文与伴读宽度', 'aria-orientation': narrow ? 'horizontal' : 'vertical',
+        'aria-valuemin': 25, 'aria-valuemax': 75, 'aria-valuenow': companionWidth,
+        onPointerDown: (event) => { event.preventDefault(); companionDragging.current = true; event.currentTarget.setPointerCapture(event.pointerId); event.currentTarget.dataset.dragging = 'true'; },
+        onPointerMove: (event) => {
+          if (!companionDragging.current) return;
+          const rect = workareaRef.current?.getBoundingClientRect();
+          if (!rect) return;
+          const vertical = getComputedStyle(workareaRef.current).flexDirection === 'column';
+          const total = vertical ? rect.height : rect.width;
+          const span = vertical ? rect.bottom - event.clientY : rect.right - event.clientX;
+          const minimum = Math.min(320, total * .3);
+          const amount = Math.max(minimum, Math.min(span, total - minimum));
+          companionWidthRef.current = Math.round(amount / total * 100);
+          setCompanionWidth(companionWidthRef.current);
+        },
+        onPointerUp: (event) => { companionDragging.current = false; event.currentTarget.dataset.dragging = 'false'; localStorage.setItem('qmr.companionWidth', String(companionWidthRef.current)); },
+        onPointerCancel: (event) => { companionDragging.current = false; event.currentTarget.dataset.dragging = 'false'; },
+        onKeyDown: (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+          event.preventDefault();
+          const step = event.shiftKey ? 10 : 2;
+          const next = Math.max(25, Math.min(75, companionWidth + (['ArrowLeft', 'ArrowUp'].includes(event.key) ? step : -step)));
+          companionWidthRef.current = next; setCompanionWidth(next); localStorage.setItem('qmr.companionWidth', String(next));
+        },
+        onDoubleClick: () => { companionWidthRef.current = 44; setCompanionWidth(44); localStorage.setItem('qmr.companionWidth', '44'); },
+      }) : null,
+      panelNode
+        ? h('div', { className: `qmr-panel${panel === 'companion' ? ' qmr-panel-companion' : ''}${narrow && panel !== 'companion' ? ' qmr-panel-overlay' : ''}` }, panelNode)
+        : null,
     ),
+    promptManagerOpen ? h(PromptManager, { onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null,
+
   );
 }

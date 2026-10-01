@@ -1,6 +1,6 @@
 {
   "name": "qiaomu-reader-dsh",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
   "description": "乔木阅读：DeepSeek Harness 的 EPUB、PDF、TXT 阅读器，支持书库、划线、批注、Markdown 阅读笔记和 AI 伴读。",

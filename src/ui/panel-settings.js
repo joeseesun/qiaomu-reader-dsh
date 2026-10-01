@@ -47,7 +47,7 @@ export function SettingsPanel({ ui }) {
         style: { background: theme.bg, color: theme.text },
         'aria-hidden': 'true',
       }, '文'),
-      h('span', null, theme.label),
+      h('span', null, id === 'white' ? ui.t('themeWhite', theme.label) : theme.label),
     );
   });
 
@@ -205,7 +205,7 @@ export function SettingsPanel({ ui }) {
         }, '恢复默认'),
       ),
       h('p', { className: 'qmr-muted qmr-small', style: { marginTop: 10 } },
-        '设置随这本书保存；纸张颜色只改变书页，工具栏跟随宿主主题。'),
+        '主题应用于书页、阅读工具栏与 AI 伴读；设置随这本书保存。'),
     ),
   );
 }

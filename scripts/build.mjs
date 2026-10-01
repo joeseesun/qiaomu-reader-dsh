@@ -113,7 +113,7 @@ async function buildClient() {
     ].join('\n'),
     'utf8',
   );
-  // 第一步：打成自包含的 CJS（react 之外全部内联）。
+  // 第一步：打成自包含的 CJS（平台 React 模块之外全部内联）。
   await build({
     entryPoints: [entry],
     outfile: raw,
@@ -145,7 +145,7 @@ async function summary() {
   check(`index.js 导出 inject`, /export\s*\{[^}]*\binject\b/.test(host) || /export const inject/.test(host));
   check(`client.js 使用 __ModuleLoader__.load`, client.includes('__ModuleLoader__.load('));
   check(`client.js 注册 id 为 ${CLIENT_ID}`, client.includes(`id: "${CLIENT_ID}"`));
-  check('client.js 只外部化 react', !/require\("@deepseek-ai/.test(client));
+  check('client.js 不外部化 DSH 服务模块', !/require\("@deepseek-ai/.test(client));
   process.stdout.write(`\n  index.js  ${host.length.toLocaleString()} 字节\n  client.js ${client.length.toLocaleString()} 字节\n`);
 }
 

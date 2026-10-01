@@ -687,6 +687,7 @@ export function createController(getProps, store) {
     uiStore.set({
       panel: next,
       selection: null,
+      ...(next === 'companion' && !uiStore.get().selection ? { companionSelection: null } : {}),
       ...(next === 'search' ? {} : { searchQuery: '', searchResults: [], searchIndex: -1, searchBusy: false }),
     });
   }
@@ -810,7 +811,7 @@ export function createController(getProps, store) {
 
   function setSelection(selection) {
     uiStore.set({ selection: selection || null,
-      ...(selection && uiStore.get().panel === 'companion' ? { companionSelection: { text: selection.text, chapterHref: selection.chapterHref } } : {}),
+      ...(selection && uiStore.get().panel === 'companion' ? { companionSelection: { text: selection.text, chapterHref: selection.chapterHref, id: Date.now() } } : {}),
     });
   }
 

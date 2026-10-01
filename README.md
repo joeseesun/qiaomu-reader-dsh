@@ -4,9 +4,9 @@
 
 在 DeepSeek Harness 里打开一本书，读到值得记住的地方就划线、写批注，再把问题交给旁边的 AI。阅读进度和 Markdown 笔记留在本地，下一次继续读。
 
-![真实书库：封面、继续阅读、筛选与导入](docs/screenshots/library.png)
+![真实书库：封面、继续阅读、筛选与导入](docs/qa/library-desktop.png)
 
-> DeepSeek Harness 0.2.0-rc.2 独立 Web profile 的真实截图，使用内置示例书。[截图说明](docs/SCREENSHOTS.md)
+> 新版书库实际组件预览，使用内置公版书与测试文件；Harness 桌面安装版也已确认界面、搜索与更多菜单。[验证说明](docs/RELEASE-VALIDATION.md)
 
 ## 为什么装它
 
@@ -22,16 +22,25 @@
 
 EPUB 适合按章节阅读，TXT 支持文本分章，PDF 使用 PDF.js 展示页面与可提取文本。复杂排版、扫描型 PDF 和 DRM 加密电子书不属于本轮验证范围；不提供 DRM 解密或 OCR。
 
+## v1.0.2 更新
+
+- C「清晰书目」书库：分类导航、小封面、对齐的进度与更多菜单。
+- 新增真正的纯白主题（`#ffffff`），与暖色「纸白」分别选择。
+- 划线只保留柔和底色，聚焦与跨行时没有围框，夜间文字继承阅读主题。
+- 阅读工具栏自动隐藏、目录置于底部、可拖动 AI 分屏与更紧凑的伴读标题。
+
+![纯白主题与无边框划线：隔离 Harness 中安装发布包后的真实界面](docs/qa/white-borderless-harness.png)
+
 ## 安装后，先读一章
 
 需要 **DeepSeek Harness 0.2.0-rc.2** 和 `dsh` CLI。使用预构建安装包无需自行构建源码；目前未发布 npm。
 
-1. 从 [v1.0.1 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.0.1) 下载 `.tgz` 与 `.sha256`。
+1. 从 [v1.0.2 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.0.2) 下载 `.tgz` 与 `.sha256`。
 2. 在下载目录执行：
 
 ```bash
-shasum -a 256 -c qiaomu-reader-dsh-1.0.1.tgz.sha256
-dsh plugin --profile desktop add "$PWD/qiaomu-reader-dsh-1.0.1.tgz"
+shasum -a 256 -c qiaomu-reader-dsh-1.0.2.tgz.sha256
+dsh plugin --profile desktop add "$PWD/qiaomu-reader-dsh-1.0.2.tgz"
 ```
 
 3. 重启对应的 Harness profile，点击侧栏「乔木阅读」，打开《道德经》或通过「导入书籍」选择自己的文件。
@@ -75,7 +84,7 @@ Node.js 22+。`src/core/` 是书籍解析与阅读状态，`src/client/` 是界�
 
 **Read a book without leaving your Harness workflow.** Qiaomu Reader brings EPUB, PDF and TXT into a local library, with reading progress, chapter navigation, search, highlights, annotations, Markdown notes and an AI companion backed by the host conversation. Six classic starter books let you try it immediately.
 
-The screenshots above show the real installed plugin in an isolated Harness Web profile. **Install:** download the tarball and checksum from [v1.0.1](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.0.1), run the checksum and installation commands above, then restart your profile and open **Qiaomu Reader**. Replace `desktop` with your profile name. No source build is required; there is no npm release.
+The library screenshot shows the actual component using starter books and test fixtures; the desktop host library has also been checked. The reading screenshot comes from an isolated Harness Web profile. **Install:** download the tarball and checksum from [v1.0.2](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.0.2), run the checksum and installation commands above, then restart your profile and open **Qiaomu Reader**. Replace `desktop` with your profile name. No source build is required; there is no npm release.
 
 Reading does not require a model key. AI companion actions require a configured Harness model and send the relevant reading context to that provider. Library files remain on the host under `乔木阅读`: the root is configured `workspaceRoot`, then `DSH_WORKSPACE`, then the host process working directory. Back up the entire folder before migrating. No independent cloud sync is provided.
 

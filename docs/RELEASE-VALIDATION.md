@@ -17,3 +17,14 @@ Screenshots were captured from this environment. No model key was configured; li
 ## Distribution
 
 PR checks and merge are visible on GitHub. Releases include a prebuilt tarball and SHA256 file. Public download and reinstall evidence is recorded in the Release notes after publication. Topics and prepared marketplace metadata do not mean marketplace acceptance. No marketplace submission or npm publication is claimed.
+
+
+## v1.0.2 — 2026-10-01
+
+Build, 47 existing tests and the package export/README/license guard passed. Client activation fixtures were synchronized with the existing React DOM portal dependency and the reading-context Remote descriptor.
+
+Installed the prebuilt v1.0.2 tarball into an independent Web profile with separate DSH_HOME and DSH_WORKSPACE directories. The installed package is a pnpm tarball installation, not a link to the source checkout. The composed profile contains the qiaomu-reader-dsh bundle and the full Harness host starts successfully.
+
+In the installed UI: six starter books appeared; Tao Te Ching opened; Pure white was available beside Paper; choosing it made the page and reading header rgb(255,255,255). Selected a three-line passage in chapter three using the mouse, created a pink highlight, clicked it to open the annotation panel, and observed is-focused=true, border=0px, outline=none and box-shadow=none. The host saved theme=white and one highlight in the isolated book state file. See docs/qa/white-borderless-harness.png, which contains only a default test workspace and public-domain book.
+
+Source release preparation covers the prior library and companion UI refinements too. Live AI inference, real user-file imports and other operating systems were not exercised in this release pass. GitHub CI, Release upload and public asset checksum are checked separately at publication time.

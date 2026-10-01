@@ -85,6 +85,7 @@ export const IconBack = makeIcon('Back', [p('M19 12H5', 'a'), p('M11 6l-6 6 6 6'
 export const IconPrev = makeIcon('Prev', [p('M14.5 5.5L8 12l6.5 6.5', 'a')]);
 export const IconNext = makeIcon('Next', [p('M9.5 5.5L16 12l-6.5 6.5', 'a')]);
 export const IconClose = makeIcon('Close', [p('M6 6l12 12', 'a'), p('M18 6L6 18', 'b')]);
+export const IconPlus = makeIcon('Plus', [p('M12 5v14', 'a'), p('M5 12h14', 'b')]);
 export const IconFullscreen = makeIcon('Fullscreen', [
   p('M4 9V4h5', 'a'),
   p('M20 15v5h-5', 'b'),

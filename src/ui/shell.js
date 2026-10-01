@@ -192,6 +192,8 @@ export function ReaderOverlay(props) {
       const state = store.get();
       if (!state.visible) return;
       const target = event.target;
+      // Let the catalogue menu consume Escape before closing the reader shell.
+      if (target?.closest?.('.qmr-book-more')?.querySelector('[aria-expanded="true"]')) return;
       const inField = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT');
       if (inField && state.panel === 'search') return; // 搜索面板自己处理
       if (state.selection) {

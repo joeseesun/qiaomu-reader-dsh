@@ -1,3 +1,4 @@
+import { LIBRARY_MESSAGES } from '../ui/library-locale.js';
 /**
  * 乔木阅读 · 客户端半入口（bootstrap）
  *
@@ -27,7 +28,7 @@ const remoteCodec = () => ({
 });
 const REMOTE = {
   package: 'qiaomu-reader-dsh',
-  descriptors: ['info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes'].map((method) => ({
+  descriptors: ['info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
     id: `qiaomu-reader-dsh#qiaomuReader/${method}`,
     service: 'qiaomuReader', namespace: 'qiaomuReader', method,
     invocation: { kind: 'direct' },
@@ -346,8 +347,8 @@ export function apply(ctx) {
   // 子上下文等待语言服务就绪，并在服务或本插件卸载时回收字典。
   ctx.inject(['locale'], (child) => {
     return child.locale.register(NS, {
-      zh: { open: '乔木阅读', library: '书库', reader: '阅读' },
-      en: { open: 'Qiaomu Reader', library: 'Library', reader: 'Reader' },
+      zh: { open: '乔木阅读', library: '书库', reader: '阅读', themeWhite: '纯白', ...LIBRARY_MESSAGES.zh },
+      en: { open: 'Qiaomu Reader', library: 'Library', reader: 'Reader', themeWhite: 'Pure white', ...LIBRARY_MESSAGES.en },
     });
   });
 
@@ -363,12 +364,14 @@ export function apply(ctx) {
       ctx.inject(['remote.qiaomuReader'], (ready) => {
         connected = true;
         clearTimeout(pending);
+        chatApi.bindReadingContext((request) => ready.remote.qiaomuReader.setReadingContext(request));
         void data.setHost(remoteHostApi(ready)).then(() => {
           store.set({ lastError: '' });
         }).catch((error) => {
           store.set({ lastError: `宿主书库连接失败：${error?.message || error}` });
           console.warn('[乔木阅读] 宿主书库连接失败', error);
         });
+        return () => chatApi.bindReadingContext(null);
       });
     }).catch((error) => {
       store.set({ lastError: `阅读服务挂载失败：${error?.message || error}` });

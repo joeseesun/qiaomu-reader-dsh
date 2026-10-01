@@ -12,8 +12,8 @@ function harness() {
   vm.runInNewContext(bundle, {
     window: { __ModuleLoader__: { load({ factory }) {
       plugin = factory((id) => {
-        assert.equal(id, 'react');
-        return { createElement() {}, Component: class {} };
+        assert.ok(['react', 'react-dom'].includes(id), `unexpected external module: ${id}`);
+        return id === 'react-dom' ? { createPortal() {} } : { createElement() {}, Component: class {} };
       });
     } } },
     console: { warn() {}, error() {} },
@@ -102,7 +102,7 @@ test('client mounts Reader Remote descriptors when Harness remote is available',
   await Promise.resolve();
   assert.equal(descriptor.package, 'qiaomu-reader-dsh');
   assert.deepEqual(Array.from(descriptor.descriptors, (item) => item.method), [
-    'info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes',
+    'info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext',
   ]);
   app.dispose();
 });
