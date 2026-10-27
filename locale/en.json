@@ -1,12 +1,12 @@
 {
   "title": "Qiaomu Reader",
-  "description": "An EPUB reader inside DSH: library, highlights, annotations, reading notes, progress sync and in-book search.",
+  "description": "Read EPUB, PDF, TXT, Markdown and HTML with speech, vocabulary, notes and native AI sessions.",
   "catalog": {
     "all": "All books",
     "reading": "Reading",
     "finished": "Finished",
     "highlighted": "Highlighted",
-    "deleteConfirm": "Remove “{title}” from your library?\nOnly the library copy will be removed; the original file is kept.",
+    "deleteConfirm": "Remove “{title}” from your library?\nFiles, progress and notes are kept. Restore it from Removed books.",
     "justStarted": "Just started",
     "unread": "Unread",
     "opening": "Opening…",
@@ -44,12 +44,69 @@
     "noResults": "No matching books",
     "empty": "Start with your first book",
     "noResultsHelp": "Try another keyword or clear the filters.",
-    "emptyHelp": "Import an EPUB, PDF or TXT to start reading.",
+    "emptyHelp": "Import EPUB, PDF, TXT, Markdown or HTML to start reading.",
     "clear": "Clear filters",
     "titleAuthor": "Title / Author",
     "format": "Format",
     "progress": "Reading progress",
-    "annotations": "Highlights"
+    "annotations": "Highlights",
+    "removedBooks": "Removed books",
+    "restore": "Restore to library",
+    "removed": "Removed; reading data kept",
+    "restored": "Restored to library"
   },
-  "themeWhite": "Pure white"
+  "themeWhite": "Pure white",
+  "speech": {
+    "title": "Read aloud",
+    "close": "Close panel",
+    "provider": "Speech source",
+    "browser": "Browser system voices",
+    "macos": "macOS system voices",
+    "voice": "Voice",
+    "default": "System default",
+    "rate": "Speed",
+    "follow": "Follow reading position",
+    "pause": "Pause",
+    "resume": "Resume",
+    "here": "Read from this page",
+    "back": "Back to speech",
+    "idle": "Choose a voice to start",
+    "playing": "Reading aloud",
+    "loading": "Preparing audio…",
+    "paused": "Paused",
+    "ended": "Book finished",
+    "error": "Speech failed; retry"
+  },
+  "lookup": {
+    "title": "Dictionary and translation",
+    "close": "Close lookup",
+    "meaning": "Meaning (editable)",
+    "generate": "Explain selection",
+    "save": "Save word",
+    "saved": "Word saved",
+    "vocabulary": "Vocabulary",
+    "export": "Export Markdown",
+    "empty": "Select text and look it up to save a word.",
+    "back": "Return to source",
+    "anki": "Send to Anki",
+    "ankiSaved": "Sent to Anki",
+    "unavailable": "Choose a workspace and model in Harness first",
+    "saveFailed": "Unable to save source position"
+  },
+  "discover": {
+    "title": "Find books · Project Gutenberg",
+    "query": "Title or author",
+    "search": "Search",
+    "offline": "Connect the host to search for books",
+    "searching": "Searching…",
+    "downloading": "Downloading and validating EPUB…",
+    "importing": "Adding to library…",
+    "added": "Added to library",
+    "empty": "No matching books",
+    "owned": "In library",
+    "download": "Download EPUB"
+  },
+  "navigation": {
+    "return": "Back before jump"
+  }
 }

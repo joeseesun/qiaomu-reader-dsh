@@ -41,6 +41,9 @@ function makeIcon(name, children, options = {}) {
 
 const p = (d, key) => h('path', { d, key });
 
+export const IconAudio = makeIcon('Audio', [p('M11 5 6 9H3v6h3l5 4V5Z', 'a'), p('M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14', 'b')]);
+export const IconLanguages = makeIcon('Languages', [p('m5 8 6 6m-7 0 6-6 2-5H2m5 0V1m7 20 4-10 4 10m-6-4h4', 'a')]);
+
 export const IconLibrary = makeIcon('Library', [
   p('M4 4h3v16H4z', 'a'),
   p('M10 4h3v16h-3z', 'b'),

@@ -4,7 +4,7 @@
  */
 import * as React from 'react';
 import { HIGHLIGHT_COLORS, HIGHLIGHT_COLOR_LABELS, highlightPaint } from './theme.js';
-import { IconClose, IconCopy, IconHighlight, IconNote, IconSparkles } from './icons.js';
+import { IconClose, IconCopy, IconHighlight, IconNote, IconSparkles, IconLanguages } from './icons.js';
 
 const h = React.createElement;
 
@@ -37,7 +37,7 @@ export function computeMenuPosition(anchor, size) {
  * @param {()=>void} props.onNote 写批注
  * @returns {React.ReactElement|null}
  */
-export function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk }) {
+export function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk, onLookup }) {
   const elementRef = React.useRef(null);
   const [position, setPosition] = React.useState(() => computeMenuPosition(selection.anchor));
   const themeId = ui.settingsOf(ui.useSel((state) => state.bookId)).theme;
@@ -72,6 +72,7 @@ export function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk }) {
     },
     h('span', { className: 'qmr-swatches', 'aria-label': '划线颜色' }, swatches),
     h('span', { className: 'qmr-selmenu-sep', 'aria-hidden': 'true' }),
+    h('button', { type: 'button', className: 'qmr-selmenu-btn', 'aria-label': ui.t('lookup.title', '查词与翻译'), onClick: onLookup }, h(IconLanguages, { width: 16, height: 16 })),
     h('button', {
       type: 'button',
       className: 'qmr-selmenu-btn',

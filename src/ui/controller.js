@@ -19,6 +19,9 @@ import {
 import { createUiStore } from './store.js';
 import { UI_SETTING_DEFAULTS, READER_THEMES } from './theme.js';
 import { chapterIndexForHref, copyText, formatPercent, localId, normalizePercent, toMarkdown } from './format.js';
+import { readCompanionAppearance, saveCompanionAppearance } from './companion-appearance.js';
+import { vocabularyEntry, upsertVocabulary } from '../core/vocabulary.js';
+import { percentLocation } from '../core/location.js';
 
 const SAVE_DEBOUNCE_MS = 500;
 const NOTICE_MS = 3200;
@@ -80,6 +83,7 @@ function emptyState(id) {
 function normalizeState(id, raw) {
   if (!raw || typeof raw !== 'object') return emptyState(id);
   return {
+    ...raw,
     bookId: String(id),
     locator: raw.locator && typeof raw.locator === 'object' ? { ...raw.locator } : emptyState(id).locator,
     highlights: Array.isArray(raw.highlights) ? raw.highlights.filter(Boolean) : [],
@@ -97,6 +101,14 @@ function normalizeState(id, raw) {
  */
 export function createController(getProps, store) {
   const uiStore = looksLikeStore(store) ? store : createUiStore();
+  // 伴读独立外观：注入的 store 可能没有这个键，补上全局持久化值。
+  if (uiStore.get().companionAppearance === undefined) {
+    uiStore.set({ companionAppearance: readCompanionAppearance() });
+  }
+  /** 更新伴读独立外观；null 回到跟随正文 */
+  function setCompanionAppearance(value) {
+    uiStore.set({ companionAppearance: saveCompanionAppearance(value) });
+  }
   const saveTimers = new Map();
   const noticeTimer = { id: null };
   /** bookId -> Map(zipPath -> dataURL) */
@@ -137,18 +149,17 @@ export function createController(getProps, store) {
     }
   }
 
-  /** 书库数组（每次现取，不缓存快照） */
+  const EMPTY_BOOKS = [];
+  let previousBooks, cleanBooks = EMPTY_BOOKS;
+  let indexedBooks, indexedRemoved, bookIndex = new Map();
+  /** Data arrays are immutable; preserve identity so render/filter work can be memoized. */
   function books() {
     const p = props();
-    try {
-      if (typeof p.getBooks === 'function') {
-        const list = p.getBooks();
-        if (Array.isArray(list)) return list.filter(Boolean);
-      }
-    } catch (_error) {
-      /* 回退 */
-    }
-    return Array.isArray(p.books) ? p.books.filter(Boolean) : [];
+    let list;
+    try { list = typeof p.getBooks === 'function' ? p.getBooks() : p.books; } catch {}
+    if (!Array.isArray(list)) list = EMPTY_BOOKS;
+    if (list !== previousBooks) { previousBooks = list; cleanBooks = list.filter(Boolean); }
+    return cleanBooks;
   }
 
   /** 书库加载状态 */
@@ -173,7 +184,12 @@ export function createController(getProps, store) {
   /** 取书库条目 */
   function bookOf(id) {
     if (id == null) return null;
-    return books().find((book) => book && String(book.id) === String(id)) || null;
+    const active = books(), removed = props().data?.getLibrary()?.removedBooks || EMPTY_BOOKS;
+    if (active !== indexedBooks || removed !== indexedRemoved) {
+      indexedBooks = active; indexedRemoved = removed;
+      bookIndex = new Map([...removed, ...active].filter(Boolean).map(book => [String(book.id), book]));
+    }
+    return bookIndex.get(String(id)) || null;
   }
 
   /** 取阅读引擎（每次从 props 现取） */
@@ -291,7 +307,7 @@ export function createController(getProps, store) {
         const fn = actions().saveState;
         if (typeof fn !== 'function') return;
         try {
-          const result = fn(id, state);
+          const result = fn(id, stateOfBook(id) || state);
           if (result && typeof result.then === 'function') result.then(() => {}, () => {});
         } catch (_error) {
           /* 持久化失败不打断阅读 */
@@ -367,17 +383,11 @@ export function createController(getProps, store) {
 
   /** 阅读进度 0~1：宿主 progressOf 与本地估算取较大值（进度不回退） */
   function progressOfBook(id) {
-    let external = 0;
+    if (stateOfBook(id)) return localProgress(id);
+    const summary = bookOf(id)?.readProgress;
+    if (Number.isFinite(summary)) return normalizePercent(summary);
     const fn = props().progressOf;
-    if (typeof fn === 'function') {
-      try {
-        const value = fn(id);
-        if (Number.isFinite(Number(value))) external = normalizePercent(value);
-      } catch (_error) {
-        external = 0;
-      }
-    }
-    return Math.max(external, localProgress(id));
+    try { return typeof fn === 'function' ? normalizePercent(fn(id)) : 0; } catch { return 0; }
   }
 
   const progressTextOf = (id) => formatPercent(progressOfBook(id));
@@ -385,14 +395,14 @@ export function createController(getProps, store) {
   /** 划线数量 */
   function highlightCountOf(id) {
     const state = stateOfBook(id);
-    return state && Array.isArray(state.highlights) ? state.highlights.length : 0;
+    return state && Array.isArray(state.highlights) ? state.highlights.length : Number(bookOf(id)?.highlightCount) || 0;
   }
 
   /** 阅读状态：new | reading | finished */
   function readingStateOf(id) {
     const state = stateOfBook(id);
     if (progressOfBook(id) >= 0.995) return 'finished';
-    if (state && (state.updatedAt || (state.locator && Number(state.locator.chapterIndex) > 0))) return 'reading';
+    if (bookOf(id)?.openedAt || state && (state.updatedAt || (state.locator && Number(state.locator.chapterIndex) > 0))) return 'reading';
     return 'new';
   }
 
@@ -547,6 +557,8 @@ export function createController(getProps, store) {
    */
   async function openBook(id) {
     if (id == null) return false;
+    id = props().data?.resolveBookId?.(id) || id;
+    uiStore.set({ jumpReturn: null });
     uiStore.set({ busyBookId: String(id), lastError: null });
     try {
       const state = await loadState(id);
@@ -645,8 +657,10 @@ export function createController(getProps, store) {
   function goPercent(fraction) {
     const state = uiStore.get();
     const count = Number(state.chapterCount) || chapterCountOf(state.bookId) || 1;
-    const ratio = Math.min(1, Math.max(0, Number(fraction) || 0));
-    goChapter(Math.round(ratio * (count - 1)));
+    if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
+    const location = percentLocation(fraction, count);
+    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, jumpToken: (state.jumpToken || 0) + 1 });
+    updateLocator(state.bookId, location);
   }
 
   /** 更新 locator 并持久化 */
@@ -930,6 +944,12 @@ export function createController(getProps, store) {
 
   async function removeBook(id) {
     const book = bookOf(id);
+    const timer = saveTimers.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      saveTimers.delete(id);
+      await callAction('saveState', id, stateOr(id));
+    }
     const result = await callAction('removeBook', id);
     if (result && result.ok === false) {
       toast(result.error || '删除失败', 'error');
@@ -941,7 +961,14 @@ export function createController(getProps, store) {
     setStates(states);
     uiStore.set({ lastError: null });
     await refreshLibrary();
-    toast(`已删除《${(book && book.title) || id}》`, 'ok');
+    toast(t('catalog.removed', '已移除，阅读数据已保留'), 'ok');
+    return result;
+  }
+
+  async function restoreBook(id) {
+    const result = await callAction('restoreBook', id);
+    if (result?.ok === false) toast(result.error, 'error');
+    else { await refreshLibrary(); toast(t('catalog.restored', '已恢复到书库'), 'ok'); }
     return result;
   }
 
@@ -1006,7 +1033,22 @@ export function createController(getProps, store) {
     loadState,
     isLoaded,
     patchState,
+    flushState(id) {
+      clearTimeout(saveTimers.get(id)); saveTimers.delete(id);
+      return callAction('saveState', id, stateOr(id));
+    },
     replaceState,
+    async saveVocabulary(id, input) {
+      await loadState(id);
+      const highlight = addHighlight(id, { text: input.term, chapterHref: input.chapterHref, textOffset: input.textOffset, color: 'blue', percent: input.percent });
+      if (!highlight) throw new Error(t('lookup.saveFailed', '无法保存原文位置'));
+      const entry = vocabularyEntry(id, { ...input, highlightId: highlight.id });
+      patchState(id, { vocabulary: upsertVocabulary(stateOr(id).vocabulary, entry) });
+      clearTimeout(saveTimers.get(id)); saveTimers.delete(id);
+      const result = await callAction('saveState', id, stateOr(id));
+      if (result?.ok === false) throw new Error(result.error);
+      return entry;
+    },
     settingsOf,
     updateSettings,
     chapterCountOf,
@@ -1028,6 +1070,12 @@ export function createController(getProps, store) {
     turnPage,
     goChapter,
     goPercent,
+    returnFromJump() {
+      const state = uiStore.get();
+      if (!state.jumpReturn) return;
+      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
+      updateLocator(state.bookId, state.jumpReturn);
+    },
     updateLocator,
     reportPosition,
     setPanel,
@@ -1045,7 +1093,10 @@ export function createController(getProps, store) {
     refreshLibrary,
     importBook,
     removeBook,
+    restoreBook,
+    removedBooks: () => props().data?.getLibrary()?.removedBooks || [],
     exportNotes,
+    setCompanionAppearance,
     copy,
     attachOverlay,
     toggleFullscreen,

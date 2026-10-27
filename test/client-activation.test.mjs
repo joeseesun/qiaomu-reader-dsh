@@ -78,6 +78,8 @@ for (const timing of ['before', 'after', 'absent']) {
     const dictionaries = new Set();
     const locale = { register(namespace, translations) {
       assert.equal(translations.en.open, 'Qiaomu Reader');
+      assert.equal(typeof translations.en['speech.idle'], 'string');
+      assert.equal(typeof translations.zh['catalog.restore'], 'string');
       dictionaries.add(namespace);
       return () => dictionaries.delete(namespace);
     } };
@@ -101,8 +103,9 @@ test('client mounts Reader Remote descriptors when Harness remote is available',
   app.start();
   await Promise.resolve();
   assert.equal(descriptor.package, 'qiaomu-reader-dsh');
+  assert.equal(descriptor.descriptors.find(item => item.method === 'speechVoices').parameters.length, 0);
   assert.deepEqual(Array.from(descriptor.descriptors, (item) => item.method), [
-    'info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext',
+    'info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext',
   ]);
   app.dispose();
 });

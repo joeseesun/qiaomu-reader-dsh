@@ -1,4 +1,4 @@
-import { LIBRARY_MESSAGES } from '../ui/library-locale.js';
+import { LIBRARY_MESSAGES, flatMessages } from '../ui/library-locale.js';
 /**
  * 乔木阅读 · 客户端半入口（bootstrap）
  *
@@ -28,11 +28,11 @@ const remoteCodec = () => ({
 });
 const REMOTE = {
   package: 'qiaomu-reader-dsh',
-  descriptors: ['info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
+  descriptors: ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
     id: `qiaomu-reader-dsh#qiaomuReader/${method}`,
     service: 'qiaomuReader', namespace: 'qiaomuReader', method,
     invocation: { kind: 'direct' },
-    parameters: ['info', 'library'].includes(method) ? [] : [{ name: 'request', wire: 'request', source: 'json', codec: remoteCodec() }],
+    parameters: ['info', 'library', 'speechVoices'].includes(method) ? [] : [{ name: 'request', wire: 'request', source: 'json', codec: remoteCodec() }],
     result: { mode: 'src-json' }, cancellation: { parameter: 'signal' },
   })),
 };
@@ -193,9 +193,11 @@ export function apply(ctx) {
       },
 
       /** 持久化阅读状态（进度 / 划线 / 设置都由它落盘）。 */
+      restoreBook: (bookId) => data.restoreBook(bookId),
       async saveState(bookId, nextState) {
         try {
           data.persistState(bookId, nextState);
+          await data.flushStateWrites(bookId);
           return { ok: true };
         } catch (error) {
           return { ok: false, error: error instanceof Error ? error.message : String(error) };
@@ -347,8 +349,8 @@ export function apply(ctx) {
   // 子上下文等待语言服务就绪，并在服务或本插件卸载时回收字典。
   ctx.inject(['locale'], (child) => {
     return child.locale.register(NS, {
-      zh: { open: '乔木阅读', library: '书库', reader: '阅读', themeWhite: '纯白', ...LIBRARY_MESSAGES.zh },
-      en: { open: 'Qiaomu Reader', library: 'Library', reader: 'Reader', themeWhite: 'Pure white', ...LIBRARY_MESSAGES.en },
+      zh: { open: '乔木阅读', library: '书库', reader: '阅读', themeWhite: '纯白', ...flatMessages(LIBRARY_MESSAGES.zh) },
+      en: { open: 'Qiaomu Reader', library: 'Library', reader: 'Reader', themeWhite: 'Pure white', ...flatMessages(LIBRARY_MESSAGES.en) },
     });
   });
 

@@ -20,6 +20,7 @@ import {
 } from '../core/state.js';
 import { STARTER_BOOKS, decodeStarterBook, starterCatalog } from '../../media/starter-books.js';
 import { toMarkdown } from '../ui/format.js';
+import { formatOf, TEXT_FORMATS, BOOK_FORMATS } from './text-formats.js';
 import {
   clearLocalData,
   loadBookBytes as loadCachedBytes,
@@ -62,16 +63,6 @@ function bookIdOf(bytes) {
     h2 = (h2 + bytes[i] * (i + 1)) >>> 0;
   }
   return `c${h1.toString(16).padStart(8, '0')}${h2.toString(16).padStart(8, '0')}`;
-}
-
-/** 由文件名猜格式。 */
-function formatOf(filename) {
-  const name = String(filename ?? '').toLowerCase();
-  if (name.endsWith('.epub')) return 'epub';
-  if (name.endsWith('.pdf')) return 'pdf';
-  if (name.endsWith('.txt')) return 'txt';
-  if (name.endsWith('.fb2')) return 'fb2';
-  return 'epub';
 }
 
 /** 把内置书元数据变成 UI 需要的书本记录。 */
@@ -138,7 +129,7 @@ export function createDataLayer(options = {}) {
   async function setHost(api) {
     host = api;
     const cached = normalizeLibrary(await loadLocalLibrary().catch(() => null));
-    const candidates = new Map([...cached.books, ...library.books]
+    const candidates = new Map([...cached.books, ...(cached.removedBooks || []), ...library.books, ...(library.removedBooks || [])]
       .filter((book) => book && !STARTER_BY_ID.has(book.id) && (book.source === 'local' || book.source === 'local-offline'))
       .map((book) => [book.id, book]));
     for (const book of candidates.values()) {
@@ -148,7 +139,8 @@ export function createDataLayer(options = {}) {
         const result = await api.import({
           filename: `${book.title || book.id}.${book.format}`,
           base64: bytesToBase64(bytes), title: book.title, author: book.author,
-          chapterCount: book.chapterCount, language: book.language, identifier: book.identifier,
+          chapterCount: book.chapterCount, language: book.language, identifier: book.identifier, textLayout: book.textLayout || 1,
+          localId: book.id,
         });
         const nextId = result?.book?.id;
         if (!nextId) continue;
@@ -160,6 +152,8 @@ export function createDataLayer(options = {}) {
           states.set(nextId, merged);
         }
         await saveBookBytes(nextId, bytes).catch(() => undefined);
+        if (book.removedAt) await api.remove(nextId);
+        library.bookAliases = { ...(cached.bookAliases || {}), ...(library.bookAliases || {}), [book.id]: nextId };
         migratedLocalIds.add(book.id);
       } catch (error) {
         console.warn('[乔木阅读] 本地书迁移到宿主失败', book.id, error);
@@ -191,6 +185,7 @@ export function createDataLayer(options = {}) {
   /** 首次加载：宿主优先，客户端缓存兜底，最后叠加内置书。 */
   async function refreshLibrary() {
     setStatus('loading');
+    const sessionAliases = library.bookAliases || {};
     let fetched = null;
     let failure = '';
     if (host !== null) {
@@ -211,8 +206,13 @@ export function createDataLayer(options = {}) {
     const localOnly = Array.isArray(cached?.books) ? cached.books.filter((book) =>
       book && (book.source === 'local' || book.source === 'local-offline')
       && !STARTER_BY_ID.has(book.id) && !remoteIds.has(book.id) && !migratedLocalIds.has(book.id)) : [];
-    const source = fetched ? { ...fetched, books: [...remoteBooks, ...localOnly] } : cached ?? null;
+    const localRemoved = (cached?.removedBooks || []).filter(book => ['local', 'local-offline'].includes(book.source) && !migratedLocalIds.has(book.id));
+    const source = fetched ? { ...fetched, books: [...remoteBooks, ...localOnly], removedBooks: [...(fetched.removedBooks || []), ...localRemoved] } : cached ?? null;
     library = mergeStarter(normalizeLibrary(source));
+    library.bookAliases = { ...(cached?.bookAliases || {}), ...sessionAliases, ...(source?.bookAliases || {}) };
+    for (const book of [...library.books, ...(library.removedBooks || [])]) {
+      for (const alias of book.aliases || []) library.bookAliases[alias] = book.id;
+    }
     // 回写缓存，保证离线下次也有同样的书单。
     try {
       await saveLocalLibrary(library);
@@ -234,14 +234,9 @@ export function createDataLayer(options = {}) {
         raw = null;
       }
     }
-    if (raw === null) {
-      try {
-        raw = await loadLocalState(bookId);
-      } catch {
-        raw = null;
-      }
-    }
-    const state = normalizeState(raw, bookId);
+    const local = await loadLocalState(bookId).catch(() => null);
+    // A failed host sync must not replace a newer local reading session on restart.
+    const state = normalizeState(local && (!raw || local.updatedAt > raw.updatedAt) ? local : raw || local, bookId);
     states.set(bookId, state);
     return state;
   }
@@ -251,11 +246,13 @@ export function createDataLayer(options = {}) {
     const state = { ...nextState, bookId };
     states.set(bookId, state);
     emit();
-    const writes = [saveLocalState(bookId, state).catch(() => undefined)];
-    if (host !== null) writes.push(host.saveState(bookId, state).catch(() => undefined));
-    const pending = Promise.all(writes);
+    const previous = pendingStateWrites.get(bookId) || Promise.resolve();
+    const pending = previous.catch(() => {}).then(async () => {
+      await saveLocalState(bookId, state);
+      if (host !== null) await host.saveState(bookId, state);
+    });
     pendingStateWrites.set(bookId, pending);
-    void pending.finally(() => { if (pendingStateWrites.get(bookId) === pending) pendingStateWrites.delete(bookId); });
+    void pending.catch(error => setStatus('ready', `阅读数据暂未同步到宿主：${error?.message || error}`));
     return state;
   }
 
@@ -285,8 +282,8 @@ export function createDataLayer(options = {}) {
 
   /** 解析并缓存阅读引擎（超出上限时淘汰最早打开的）。 */
   async function openBook(bookId) {
-    const entry = library.books.find((book) => book.id === bookId);
-    if (entry && !['epub', 'pdf', 'txt'].includes(entry.format)) throw new Error(`不支持打开 ${entry.format.toUpperCase()}`);
+    const entry = [...library.books, ...(library.removedBooks || [])].find((book) => book.id === bookId);
+    if (entry && !BOOK_FORMATS.includes(entry.format)) throw new Error(`不支持打开 ${entry.format.toUpperCase()}`);
     if (engines.has(bookId)) return engines.get(bookId);
     if (opening.has(bookId)) return opening.get(bookId);
     const task = (async () => {
@@ -295,9 +292,9 @@ export function createDataLayer(options = {}) {
       if (entry?.format === 'pdf') {
         const { parsePdfBook } = await import('./pdf-book.js');
         record = await parsePdfBook(bytes, entry.title);
-      } else if (entry?.format === 'txt') {
+      } else if (TEXT_FORMATS.includes(entry?.format)) {
         const { parseTextBook } = await import('./text-book.js');
-        record = parseTextBook(bytes, entry.title);
+        record = parseTextBook(bytes, entry.title, entry.format, { layout: entry.textLayout || 1 });
       } else {
         const { parseEpub } = await import('../core/epub.js');
         const parsed = await parseEpub(bytes);
@@ -325,8 +322,8 @@ export function createDataLayer(options = {}) {
   async function importBook(file) {
     if (file === undefined || file === null) return { ok: false, error: '没有选择文件' };
     const filename = typeof file.name === 'string' ? file.name : 'book.epub';
-    const format = formatOf(filename);
-    if (!/\.(epub|pdf|txt)$/i.test(filename)) return { ok: false, error: '支持 EPUB、PDF 和 TXT 文件' };
+    let format;
+    try { format = formatOf(filename); } catch (error) { return { ok: false, error: error.message }; }
     let bytes;
     try {
       bytes = new Uint8Array(await file.arrayBuffer());
@@ -334,7 +331,10 @@ export function createDataLayer(options = {}) {
       return { ok: false, error: `读取文件失败：${error instanceof Error ? error.message : String(error)}` };
     }
     if (bytes.byteLength === 0) return { ok: false, error: '文件是空的' };
-    const fallbackId = bookIdOf(bytes);
+    const legacyId = bookIdOf(bytes);
+    const fallbackId = globalThis.crypto?.subtle
+      ? Array.from(new Uint8Array(await crypto.subtle.digest('SHA-1', bytes)), b => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
+      : legacyId;
     let meta = null;
     if (format === 'epub') {
       try {
@@ -356,10 +356,13 @@ export function createDataLayer(options = {}) {
       } catch (error) {
         return { ok: false, error: `解析 EPUB 失败：${error instanceof Error ? error.message : String(error)}` };
       }
-    } else if (format === 'txt') {
+    } else if (TEXT_FORMATS.includes(format)) {
       try {
         const { parseTextBook } = await import('./text-book.js');
-        meta = { chapterCount: parseTextBook(bytes, filename.replace(/\.[^.]+$/, '')).book.chapters.length };
+        const previous = [...library.books, ...(library.removedBooks || [])].find(book => book.id === fallbackId || book.id === legacyId);
+        const textLayout = previous ? previous.textLayout || 1 : 2;
+        const parsed = parseTextBook(bytes, filename.replace(/\.[^.]+$/, ''), format, { layout: textLayout }).book;
+        meta = { title: parsed.title, author: parsed.author, language: parsed.language, chapterCount: parsed.chapters.length, textLayout };
       } catch (error) {
         return { ok: false, error: error instanceof Error ? error.message : String(error) };
       }
@@ -373,6 +376,7 @@ export function createDataLayer(options = {}) {
         return { ok: false, error: error instanceof Error ? error.message : String(error) };
       }
     }
+    if (/^gutenberg:\d+$/.test(file.discoveryIdentifier || '')) meta = { ...meta, identifier: file.discoveryIdentifier };
     let book = null;
     let hostError = '';
     if (host !== null) {
@@ -399,7 +403,16 @@ export function createDataLayer(options = {}) {
         language: meta?.language ?? '',
         chapterCount: meta?.chapterCount ?? 0,
         identifier: meta?.identifier ?? '',
+        textLayout: meta?.textLayout,
       };
+    }
+    if (legacyId !== book.id) {
+      const legacyState = await loadLocalState(legacyId);
+      if (legacyState) {
+        const remote = await ensureState(book.id);
+        persistState(book.id, mergeStates(remote, normalizeState({ ...legacyState, bookId: book.id }, book.id)));
+        library.bookAliases = { ...(library.bookAliases || {}), [legacyId]: book.id };
+      }
     }
     // 无论宿主是否落盘，本机都留一份：脱机与跨版本时可读。
     await saveBookBytes(book.id, bytes).catch(() => undefined);
@@ -413,32 +426,52 @@ export function createDataLayer(options = {}) {
         /* 前面已经预解析成功过一次；这里失败也不影响入库 */
       }
     }
-    library = normalizeLibrary({ ...library, books: [...library.books.filter((entry) => entry.id !== book.id), book] });
+    library = normalizeLibrary({ ...library, books: [...library.books.filter((entry) => entry.id !== book.id && entry.id !== legacyId), book],
+      removedBooks: (library.removedBooks || []).filter(entry => entry.id !== book.id && entry.id !== legacyId) });
     await saveLocalLibrary(library).catch(() => undefined);
     if (hostError) setStatus('ready', hostError);
     emit();
     return { ok: true, book, hostError };
   }
 
-  /** 删除一本书及它的状态。 */
+  /** Remove membership only; a failed host operation leaves the local book intact. */
   async function removeBook(bookId) {
     if (STARTER_BY_ID.has(bookId)) return { ok: false, error: '内置书不能删除' };
-    let hostError = '';
-    if (host !== null) {
+    const book = library.books.find(entry => entry.id === bookId);
+    if (!book) return { ok: false, error: '书库中没有这本书' };
+    await pendingStateWrites.get(bookId);
+    const localOnly = ['local', 'local-offline'].includes(book.source);
+    if (!localOnly) {
       try {
+        if (!host) throw new Error('请连接宿主后再移除这本书');
         await host.remove(bookId);
       } catch (error) {
-        hostError = error instanceof Error ? error.message : String(error);
+        return { ok: false, error: error instanceof Error ? error.message : String(error) };
       }
     }
-    library = normalizeLibrary({ ...library, books: library.books.filter((book) => book.id !== bookId) });
-    states.delete(bookId);
+    library = normalizeLibrary({ ...library, books: library.books.filter((book) => book.id !== bookId),
+      removedBooks: [...(library.removedBooks || []).filter(entry => entry.id !== bookId), { ...book, removedAt: Date.now() }] });
+    await engines.get(bookId)?.engine?.dispose?.();
     engines.delete(bookId);
     await saveLocalLibrary(library).catch(() => undefined);
-    await removeLocalState(bookId).catch(() => undefined);
-    await removeBookBytes(bookId).catch(() => undefined);
     emit();
-    return { ok: true, hostError };
+    return { ok: true };
+  }
+
+  async function restoreBook(bookId) {
+    const book = library.removedBooks?.find(entry => entry.id === bookId);
+    if (!book) return { ok: false, error: '没有可恢复的书籍' };
+    if (!['local', 'local-offline'].includes(book.source)) {
+      try {
+        if (!host) throw new Error('请连接宿主后再恢复这本书');
+        await host.restore(bookId);
+      } catch (error) { return { ok: false, error: error instanceof Error ? error.message : String(error) }; }
+    }
+    library = normalizeLibrary({ ...library, books: [...library.books, { ...book, removedAt: null }],
+      removedBooks: library.removedBooks.filter(entry => entry.id !== bookId) });
+    await saveLocalLibrary(library);
+    emit();
+    return { ok: true };
   }
 
   /** 导出 Markdown 阅读笔记。 */
@@ -459,6 +492,9 @@ export function createDataLayer(options = {}) {
 
   return {
     setHost,
+    getHost: () => host,
+    resolveBookId: (id) => library.bookAliases?.[id] || id,
+    flushStateWrites: (bookId) => pendingStateWrites.get(bookId) || Promise.resolve(),
     /* --- 读取 --- */
     getLibrary: () => library,
     getStatus: () => ({ status, error: lastError }),
@@ -476,6 +512,7 @@ export function createDataLayer(options = {}) {
     openBook,
     importBook,
     removeBook,
+    restoreBook,
     exportNotes,
     clearLocalData,
 

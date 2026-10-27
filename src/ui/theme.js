@@ -490,6 +490,11 @@ export const UI_CSS = `
 .qmr-native-chat>[data-conversation-content]{flex:1;min-height:0}
 .qmr-native-chat [data-content-phase="hero"] [data-conversation-scroll]{justify-content:flex-end}
 .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){color:var(--qmr-ink)}
+/* 伴读独立外观（对照原版 4.5.10/4.5.12）：自定义模式下仅会话文字换字体与字号，
+   主题整套变量随 data-qmr-ai-appearance 挂在伴读面板上（inline style 注入）。 */
+.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-companion{font-family:var(--qmr-ai-font)}
+.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
+.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
 .qmr-prompt-backdrop{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(0,0,0,.35)}
 .qmr-prompt-dialog{width:min(560px,calc(100vw - 32px));max-height:min(740px,calc(100vh - 40px));overflow:auto;padding:18px;border:1px solid var(--qmr-border);border-radius:14px;background:var(--qmr-paper);color:var(--qmr-ink);box-shadow:0 18px 50px rgba(0,0,0,.2)}
 .qmr-prompt-dialog header{display:flex;align-items:center;justify-content:space-between;font-size:16px}
@@ -624,6 +629,28 @@ export const UI_CSS = `
 @media (prefers-reduced-motion:reduce){
   .qmr-reader-content>.qmr-topbar,.qmr-reader-content>.qmr-bottombar{transition:none}
 }
+.qmr-book-list-window .qmr-book-row{height:80px;min-height:80px;box-sizing:border-box}
+.qmr-discovery,.qmr-removed-books{margin:0 0 18px;font-size:13px}
+.qmr-discovery summary,.qmr-removed-books summary{cursor:pointer;padding:10px 0;color:var(--qmr-lib-muted)}
+.qmr-discovery form{margin:8px 0}
+.qmr-feature-panel{display:flex;flex-direction:column;gap:14px;padding:14px;color:var(--qmr-ink)}
+.qmr-feature-panel label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}
+.qmr-feature-panel label:has(textarea){display:block}
+.qmr-feature-panel :is(select,textarea),.qmr-discovery input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}
+.qmr-feature-panel select{appearance:none}
+.qmr-feature-panel :is(select,textarea):focus,.qmr-discovery input:focus{outline:1px solid var(--qmr-muted);outline-offset:1px;box-shadow:none}
+.qmr-feature-panel textarea{resize:vertical;margin-top:8px;line-height:1.5}
+.qmr-feature-panel input[type=range]{width:100%}
+.qmr-feature-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.qmr-discovery input{width:min(320px,65%);background:var(--qmr-lib-bg);color:var(--qmr-lib-ink);border-color:var(--qmr-lib-line)}
+.qmr-feature-panel p{white-space:pre-wrap;margin:0;font-size:13px;line-height:1.6}
+.qmr-feature-panel blockquote{margin:0;padding:0;color:var(--qmr-muted);font-size:12px;line-height:1.6}
+.qmr-vocabulary-entry{padding-bottom:18px;border-bottom:1px solid var(--qmr-border);display:flex;flex-direction:column;gap:10px}
+.qmr-lookup-card{position:fixed;z-index:30;display:flex;flex-direction:column;width:min(420px,calc(100vw - 16px));max-height:min(560px,calc(100vh - 16px));background:var(--qmr-paper);color:var(--qmr-ink);border:1px solid var(--qmr-border);border-radius:8px;box-shadow:0 10px 40px #0002;overflow:auto}
+.qmr-lookup-chat{min-height:230px;flex:1;overflow:auto;border-top:1px solid var(--qmr-border)}
+.qmr-lookup-card .qmr-feature-panel>strong{max-height:70px;overflow:auto;font-size:14px}
+.qmr-panel-content{display:flex;flex-direction:column;min-height:0;height:100%}
+@media(max-width:600px){.qmr-reader-content>.qmr-topbar .qmr-title{font-size:13px}.qmr-reader-content>.qmr-topbar .qmr-subtitle{display:none}.qmr-reader-content>.qmr-topbar [aria-label="全屏"]{display:none}}
 `;
 
 /**
