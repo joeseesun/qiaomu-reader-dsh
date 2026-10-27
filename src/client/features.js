@@ -26,7 +26,7 @@ export function createReaderFeaturesClient({data,store,language=()=> 'zh'}){
  };
  const library={async _importBooks(files){for(const file of files){const result=await data.importBook(file);if(!result.ok)throw Error(result.error);}return true;}};
 
- const api={reload,save,call,t:tx,
+ const api={reload,save,call,t:tx,saveNotes:patch=>call('notes.settings',patch),
   async findBooks(){await reload();const modal=new BookDiscoveryModal(plugin.app,plugin,library);dialogs.add(modal);modal.open();},
   async calibre(query=''){
    await reload();if(!current.settings.calibreLibraryPath){api.calibreSettings(()=>void api.calibre(query));return;}

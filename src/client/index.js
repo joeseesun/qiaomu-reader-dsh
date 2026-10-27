@@ -1,3 +1,4 @@
+import {createReaderNotes} from './notes.js';
 import {createReadingTime} from './reading-time.js';
 import {createReaderFonts} from './fonts.js';
 import {disposeNativeSurfaces} from './native-ui.js';
@@ -99,6 +100,8 @@ export function apply(ctx) {
 
   const features=createReaderFeaturesClient({data,store,language:()=>hostLanguage()});
   ctx.effect(()=>()=>features.dispose());
+  const notes=createReaderNotes(features,chatApi);
+  ctx.effect(()=>()=>notes.dispose());
   const readingTime=createReadingTime(features);
   ctx.effect(()=>()=>readingTime.dispose());
   const fonts=createReaderFonts(features);
@@ -308,7 +311,7 @@ export function apply(ctx) {
               actions,
               data,
               chatApi,
-              kindle,features,speech,fonts,readingTime,
+              kindle,features,speech,fonts,readingTime,notes,
             }),
           },
           ReaderPanel,

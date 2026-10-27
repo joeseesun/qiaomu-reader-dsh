@@ -136047,12 +136047,19 @@ var Control = class {
     this.el.disabled = value;
     return this;
   }
+  invoke(fn, value) {
+    try {
+      Promise.resolve(fn(value)).catch((error) => new Notice(error?.message || String(error)));
+    } catch (error) {
+      new Notice(error?.message || String(error));
+    }
+  }
   onChange(fn) {
-    this.el.addEventListener("change", () => void fn(this.getValue()));
+    this.el.addEventListener("change", () => this.invoke(fn, this.getValue()));
     return this;
   }
   onClick(fn) {
-    this.el.addEventListener("click", fn);
+    this.el.addEventListener("click", (event) => this.invoke(fn, event));
     return this;
   }
 };
@@ -136081,6 +136088,11 @@ var Setting = class {
       return control;
     };
     fn(control);
+    return this;
+  }
+  addTextArea(fn) {
+    const el = this.controlEl.createEl("textarea", { attr: { "aria-labelledby": this.nameEl.id } });
+    fn(new Control(el));
     return this;
   }
   addText(fn) {
@@ -136206,6 +136218,9 @@ var Menu2 = class {
   }
 };
 var FuzzySuggestModal = class extends Modal {
+  renderSuggestion({ item }, element2) {
+    element2.setText(this.getItemText(item));
+  }
   setPlaceholder(text4) {
     this.placeholder = text4;
   }
@@ -136230,6 +136245,541 @@ var FuzzySuggestModal = class extends Modal {
     queueMicrotask(() => this.input.isConnected && this.input.focus());
   }
 };
+
+// src/original/highlight-export-ui.js
+function openHighlightExport({ t: t2, highlights, noteText = "", noteName = "", toBook, toSeparate, onError }) {
+  const qiaomuReaderTranslate = t2;
+  const exportHighlightsToBookNote = (_app, _plugin, _book, selection) => void toBook(selection).catch(onError), exportHighlightsSeparate = (_app, _plugin, _book, selection) => void toSeparate(selection).catch(onError);
+  function normalizeHlText(s2) {
+    return String(s2 || "").replace(/<[^>]*>/g, " ").replace(/==+/g, " ").replace(/^\s*>+\s?/gm, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+  function splitExportedHighlights(noteText2, highlights2) {
+    const hay = normalizeHlText(noteText2);
+    const fresh = [], already = [];
+    for (const hl of highlights2 || []) {
+      const needle = normalizeHlText(hl && hl.text);
+      if (needle && hay && hay.includes(needle)) already.push(hl);
+      else fresh.push(hl);
+    }
+    return { fresh, already };
+  }
+  const HighlightExportModal = class extends Modal {
+    constructor(app, plugin, bookFile, highlights2, noteText2, noteName2) {
+      super(app);
+      this.plugin = plugin;
+      this.bookFile = bookFile;
+      this.noteName = noteName2 || "";
+      const split = splitExportedHighlights(noteText2, highlights2);
+      this.already = new Set(split.already);
+      this.items = highlights2.map((hl) => ({ hl, on: !split.already.includes(hl) }));
+      this.newCount = split.fresh.length;
+    }
+    onOpen() {
+      const body = this.contentEl;
+      body.addClass("qiaomu-reader-exp-modal");
+      body.createDiv("qiaomu-reader-info-title").setText(qiaomuReaderTranslate("what-to-copy-into-the-note"));
+      body.createDiv("qiaomu-reader-info-sub").setText(this._exportSubtitle());
+      const bar = body.createDiv("qiaomu-reader-exp-bar");
+      const counter = bar.createSpan({ cls: "qiaomu-reader-exp-count" });
+      const link = (label, apply2) => {
+        const el = bar.createSpan({ cls: "qiaomu-reader-exp-link", text: label });
+        el.addEventListener("click", () => {
+          apply2();
+          sync();
+        });
+        return el;
+      };
+      link(qiaomuReaderTranslate("select-all"), () => this.items.forEach((entry) => entry.on = true));
+      link(qiaomuReaderTranslate("clear-all"), () => this.items.forEach((entry) => entry.on = false));
+      if (this.already.size) link(qiaomuReaderTranslate("new-only"), () => this.items.forEach((entry) => entry.on = !this.already.has(entry.hl)));
+      const list = body.createDiv("qiaomu-reader-exp-list");
+      const rows = this.items.map((entry) => {
+        const rowEl = list.createDiv("qiaomu-reader-exp-row");
+        const checkbox = rowEl.createEl("input", { type: "checkbox" });
+        checkbox.addClass("qiaomu-reader-exp-box");
+        checkbox.checked = entry.on;
+        const cell = rowEl.createDiv("qiaomu-reader-exp-body");
+        const snippet = (entry.hl.text || "").replace(/\s+/g, " ").trim();
+        cell.createDiv("qiaomu-reader-exp-text").setText(snippet.length > 220 ? snippet.slice(0, 220) + "\u2026" : snippet);
+        if (this.already.has(entry.hl)) {
+          rowEl.addClass("qiaomu-reader-exp-done");
+          cell.createDiv("qiaomu-reader-exp-tag").setText(qiaomuReaderTranslate("already-in-the-note"));
+        }
+        const flip = () => {
+          entry.on = !entry.on;
+          checkbox.checked = entry.on;
+          sync();
+        };
+        checkbox.addEventListener("click", (e2) => {
+          e2.stopPropagation();
+          entry.on = checkbox.checked;
+          sync();
+        });
+        rowEl.addEventListener("click", flip);
+        return { entry, checkbox };
+      });
+      const sync = () => {
+        for (const r2 of rows) r2.checkbox.checked = r2.entry.on;
+        const n2 = this.items.filter((entry) => entry.on).length;
+        counter.setText(qiaomuReaderTranslate("ticked-0-of-1", n2, this.items.length));
+        toBookNote.disabled = !n2 || !this.noteName;
+        toSeparate2.disabled = !n2;
+      };
+      const foot = body.createDiv("qiaomu-reader-setup-foot");
+      const toBookNote = foot.createEl("button", { text: qiaomuReaderTranslate("into-the-book-s-note") });
+      toBookNote.addClass("qiaomu-reader-setup-btn", "qiaomu-reader-setup-btn-primary");
+      const toSeparate2 = foot.createEl("button", { text: qiaomuReaderTranslate("as-separate-notes") });
+      toSeparate2.addClass("qiaomu-reader-setup-btn");
+      const picked = () => this.items.filter((entry) => entry.on).map((entry) => entry.hl);
+      toBookNote.addEventListener("click", () => {
+        const selection = picked();
+        this.close();
+        exportHighlightsToBookNote(this.app, this.plugin, this.bookFile, selection);
+      });
+      toSeparate2.addEventListener("click", () => {
+        const selection = picked();
+        this.close();
+        exportHighlightsSeparate(this.app, this.plugin, this.bookFile, selection);
+      });
+      sync();
+    }
+    _exportSubtitle() {
+      if (!this.noteName) return qiaomuReaderTranslate("no-book-note-linked-separate-notes-only");
+      if (this.already.size) return qiaomuReaderTranslate("note-0-1-already-there-2-new-ones-ticked", this.noteName, this.already.size, this.newCount);
+      return qiaomuReaderTranslate("note-0-none-of-the-1-are-there-yet", this.noteName, this.items.length);
+    }
+    onClose() {
+      this.contentEl.empty();
+    }
+  };
+  const modal = new HighlightExportModal({}, null, null, highlights, noteText, noteName);
+  modal.open();
+  return modal;
+}
+
+// src/original/book-note-picker.js
+function openBookNotePicker(t2, files, onChoose) {
+  const qiaomuReaderTranslate = t2;
+  const BookNotePicker = class extends FuzzySuggestModal {
+    constructor(app, files2, onChoose2) {
+      super(app);
+      this._files = files2;
+      this._onChoose = onChoose2;
+      this.setPlaceholder(qiaomuReaderTranslate("book-note-for-links-start-typing-a-name"));
+    }
+    getItems() {
+      return this._files;
+    }
+    getItemText(f2) {
+      return f2.basename;
+    }
+    onChooseItem(f2) {
+      this._onChoose(f2);
+    }
+  };
+  const modal = new BookNotePicker({}, files, onChoose);
+  modal.open();
+  return modal;
+}
+
+// src/original/ai-note-title.js
+function plainText(value) {
+  return value.replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_2, path, label) => label || path).replace(/<[^>]*>/g, "").replace(/&(?:nbsp|amp|lt|gt|quot);/g, (entity) => ({ "&nbsp;": " ", "&amp;": "&", "&lt;": "", "&gt;": "", "&quot;": "" })[entity]).replace(/^\s*(?:>\s*)*(?:#{1,6}\s+|[-*+]\s+(?:\[[ xX]\]\s*)?|\d+[.)、]\s*)?/, "").replace(/[*_~`]/g, "").replace(/^[一二三四五六七八九十\d]+[、.．)）]\s*/, "").replace(/\s+/g, " ").trim();
+}
+function topic(value) {
+  return plainText(value).replace(/^(?:标题|主题|核心观点|一句话总结|总结|结论|回答|答案|title|summary|answer)\s*[:：]\s*/i, "").replace(/^(?:好的[，,。！!]?|当然[，,。！!]?)\s*/, "").replace(/^(?:这段(?:话|文字|内容)?(?:主要)?(?:讲的是|说的是|讨论的是)|核心观点是)\s*[:：]?\s*/, "").trim();
+}
+function meaningful(text4) {
+  return /[\p{L}\p{N}]/u.test(text4) && !/^(?:好的|当然|总结|结论|回答|答案|分析|解释|要点|核心观点|关键概念|为什么这样表达|值得追问|怎么理解|原文信息|一句话总结|举个例子|解释一下|总结要点|原文在讲什么|这段在说什么|一个可以接着想的问题|(?:内容|原文|选文)(?:分析|解读|总结)|summary|answer|analysis|conclusion|key takeaways|key concepts|introduction|overview)[:：。.!！?？\s]*$/i.test(text4);
+}
+function suggestAiNoteTitle(answer, { fallback = "AI reply", max = 60 } = {}) {
+  const lines = String(answer || "").replace(/^---\s*\n[\s\S]*?\n---\s*\n/, "").split(/\r?\n/);
+  const candidates = [];
+  const emphasized = [];
+  let fence = null;
+  for (let i2 = 0; i2 < lines.length; i2++) {
+    const line = lines[i2].trim();
+    const marker = line.match(/^(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1];
+      else if (marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = null;
+      continue;
+    }
+    if (fence || !line || /^\s*(?:\||[-=]{3,}\s*$|\[\^?[^\]]+\]:|https?:\/\/)/.test(line)) continue;
+    const text4 = topic(line);
+    if (!meaningful(text4)) continue;
+    const heading = /^#{1,6}\s+/.test(line) || /^\s*(?:={3,}|-{3,})\s*$/.test(lines[i2 + 1] || "");
+    candidates.push({ text: text4, heading });
+    for (const match of line.matchAll(/\*\*([^*\n]+)\*\*|__([^_\n]+)__/g)) {
+      const phrase = topic(match[1] || match[2]);
+      const length = Array.from(phrase).length;
+      if (meaningful(phrase) && length >= 6 && length <= 32) emphasized.push(phrase);
+    }
+  }
+  let result = candidates.find((item) => item.heading)?.text || emphasized[0] || candidates[0]?.text || fallback;
+  result = result.split(/[。！？!?]|\.(?:\s|$)/)[0].trim() || fallback;
+  result = result.replace(/[\\/:*?"<>|#^[\]]/g, " ").replace(/\s+/g, " ").trim();
+  const limit = /[\p{Script=Han}]/u.test(result) ? Math.min(max, 32) : max;
+  if (Array.from(result).length > limit) {
+    result = Array.from(result).slice(0, limit).join("");
+    const boundary = result.search(/[，,；;：:][^，,；;：:]*$/);
+    if (boundary >= limit / 2) result = result.slice(0, boundary);
+    else if (!/[\p{Script=Han}]/u.test(result) && result.lastIndexOf(" ") >= limit / 2) result = result.slice(0, result.lastIndexOf(" "));
+  }
+  return result.replace(/^[.\s“”「」]+|[.\s，,；;：:。!?！？…—–\-“”「」]+$/g, "") || fallback;
+}
+
+// src/core/backlink.js
+function highlightLink(bookId, highlightId) {
+  if (!bookId || !highlightId) return "";
+  return `#qmr-book=${encodeURIComponent(String(bookId))}&qmr-highlight=${encodeURIComponent(String(highlightId))}`;
+}
+function parseHighlightLink(href) {
+  if (typeof href !== "string" || !href.startsWith("#qmr-book=")) return null;
+  try {
+    const params = new URLSearchParams(href.slice(1));
+    const bookId = params.get("qmr-book");
+    const highlightId = params.get("qmr-highlight");
+    if (bookId && bookId.length <= 160 && params.has("qmr-chapter")) {
+      const chapterHref = params.get("qmr-chapter"), text4 = params.get("qmr-text"), offset = Number(params.get("qmr-offset"));
+      if (!chapterHref || chapterHref.length > 2048 || !text4 || text4.length > 200 || !Number.isSafeInteger(offset) || offset < 0) return null;
+      return { bookId, chapterHref, text: text4, offset };
+    }
+    if (!bookId || !highlightId || bookId.length > 160 || highlightId.length > 160) return null;
+    return { bookId, highlightId };
+  } catch {
+    return null;
+  }
+}
+function positionLink(bookId, chapterHref, text4, offset = 0) {
+  const params = new URLSearchParams({ "qmr-book": String(bookId), "qmr-chapter": String(chapterHref || ""), "qmr-text": String(text4 || "").slice(0, 200), "qmr-offset": String(Math.max(0, Math.floor(Number(offset) || 0))) });
+  return "#" + params.toString();
+}
+
+// src/original/note-primitives.js
+function originalNotePrimitives(t2, day) {
+  const qiaomuReaderTranslate = t2, window2 = { moment: () => ({ format: () => day() }) };
+  const RESERVED_NAMES = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+  function sanitizeNoteTitle(raw, max = 100) {
+    let t3 = (raw || "").replace(/[\\/:*?"<>|#^[\]]/g, "").replace(/[\x00-\x1F\x7F]/g, "").replace(/\s+/g, " ").trim();
+    t3 = t3.replace(/^[.\s]+/, "").replace(/[.\s]+$/, "");
+    if (t3.length > max) t3 = t3.slice(0, max).replace(/[.\s]+$/, "");
+    if (!t3) t3 = qiaomuReaderTranslate("note");
+    if (RESERVED_NAMES.test(t3)) t3 = `_${t3}`;
+    return t3;
+  }
+  function suggestNoteTitle(text4, max = 60) {
+    const flat = (text4 || "").replace(/\s+/g, " ").trim();
+    if (!flat) return "";
+    const tail = /[.,;:!?…\s]+$/;
+    if (flat.length <= max) return flat.replace(tail, "");
+    const sentence = flat.match(/^(.{10,}?[.!?…])(\s|$)/);
+    if (sentence && sentence[1].length <= max && /[\p{L}]{3}[.!?…]+$/u.test(sentence[1])) {
+      return sentence[1].replace(tail, "");
+    }
+    let cut = flat.slice(0, max + 1);
+    const gap = cut.lastIndexOf(" ");
+    if (gap > max * 0.5) cut = cut.slice(0, gap);
+    cut = cut.replace(/\s+[a-zа-яё]{1,2}$/i, "");
+    return cut.replace(/[.,;:!?…\-—\s]+$/, "");
+  }
+  function processTemplateManually(tplText, title) {
+    let today;
+    try {
+      today = window2.moment ? window2.moment().format("YYYY-MM-DD") : (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+    } catch {
+      today = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+    }
+    return tplText.replace(/<%[-_]?\s*tp\.file\.title\s*[-_]?%>/g, title).replace(/<%[-_]?\s*tp\.date\.now\([^)]*\)\s*[-_]?%>/g, today).replace(/<%[-_]?\s*tp\.file\.cursor\([^)]*\)\s*[-_]?%>/g, "").replace(/<%[\s\S]*?%>/g, "");
+  }
+  const QUOTE_TEMPLATE_DEFAULT = "> {text}\n\n\u2014 [[{book}]]{page}{link}";
+  function backlinkLabel() {
+    return "\u21A9";
+  }
+  function quoteMarkdown(plugin, hl, bookFile) {
+    const clean = String(hl && hl.text || "").replace(/[ \t]+/g, " ").replace(/\s*\n\s*/g, " ").trim();
+    if (!clean) return "";
+    const bookName = bookFile ? bookNoteLinkFor(plugin, bookFile) || bookFile.basename : "";
+    const page = hl && hl.page ? qiaomuReaderTranslate("p-0-2", hl.page) : "";
+    let link = "";
+    const uri = highlightBacklink(plugin.app.vault.getName(), bookFile?.path, hl);
+    if (plugin.settings.quoteBacklinks !== false && uri) {
+      link = ` [${backlinkLabel()}](${uri})`;
+    }
+    const commentText = hl && hl.comment ? String(hl.comment).trim() : "";
+    const comment = commentText ? `
+
+**${qiaomuReaderTranslate("comment-on-a-highlight")}\uFF1A** ${commentText.replace(/\n/g, "\n\n")}` : "";
+    const tpl = plugin.settings.quoteTemplate || QUOTE_TEMPLATE_DEFAULT;
+    return tpl.split("{text}").join(clean + comment).split("{book}").join(bookName).split("{page}").join(page).split("{link}").join(link).split("{comment}").join(commentText).trim();
+  }
+  let backlink = "";
+  const highlightBacklink = () => backlink, bookNoteLinkFor = (plugin, file) => String(plugin.settings.bookNoteLinks?.[file.path] || "").replace(/\.md$/, "");
+  return { sanitizeNoteTitle, suggestNoteTitle, processTemplateManually, formatQuote(settings, book, hl, link) {
+    backlink = link;
+    return quoteMarkdown({ settings, app: { vault: { getName: () => "" } } }, hl, { basename: book.title || book.id, path: book.id });
+  } };
+}
+
+// src/original/note-title-ui.js
+function openOriginalNoteTitle({ plugin, fragment, book, onDone, t: t2, kind = "selection" }) {
+  const qiaomuReaderTranslate = t2;
+  const { sanitizeNoteTitle, suggestNoteTitle } = originalNotePrimitives(t2, () => (/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
+  const notesFolderPath = () => plugin.settings.notesFolder || "notes", qiaomuReaderPath = (value) => String(value || "").replace(/\\/g, "/"), FolderSuggest = null, addNoteFolderPicker = () => {
+  }, qiaomuReaderAutoFocus = (el) => queueMicrotask(() => el.isConnected && el.focus()), bookNoteLinkFor = () => book.basename;
+  const noteFolderPath = (value) => {
+    const path = String(value || "notes").trim().replace(/\\/g, "/");
+    if (!path.startsWith("notes") || path.split("/").some((x2) => !x2 || x2 === ".." || x2 === ".") || path !== "notes" && !path.startsWith("notes/")) throw Error("Invalid notes folder");
+    return path;
+  };
+  function parseNoteTags(raw) {
+    return String(raw || "").replace(/\s+#/g, ",#").split(/[,;\n]+/).map((t3) => t3.trim().replace(/^#+/, "").replace(/\s+/g, "-")).filter(Boolean).filter((t3, i2, a4) => a4.indexOf(t3) === i2);
+  }
+  function allVaultTags(app) {
+    try {
+      const counts = app.metadataCache && app.metadataCache.getTags && app.metadataCache.getTags();
+      if (!counts) return [];
+      return Object.keys(counts).map((t3) => t3.replace(/^#/, "")).sort((a4, b2) => (counts["#" + b2] || 0) - (counts["#" + a4] || 0)).slice(0, 60);
+    } catch {
+      return [];
+    }
+  }
+  const NoteTitleModal = class extends Modal {
+    constructor(app, plugin2, fragment2, bookFile, onDone2, options = {}) {
+      super(app);
+      this.plugin = plugin2;
+      this.fragment = fragment2;
+      this.bookFile = bookFile || null;
+      this.onDone = onDone2;
+      this.kind = options.kind || "selection";
+      this._answered = false;
+    }
+    onOpen() {
+      const { contentEl: root } = this;
+      root.addClass("qiaomu-reader-title-modal");
+      const asAnswer = this.kind === "ai-answer";
+      root.createDiv("qiaomu-reader-info-title").setText(qiaomuReaderTranslate(asAnswer ? "save-ai-answer" : "new-note-from-a-highlight"));
+      const titleInput = this._textField(root, qiaomuReaderTranslate("title"));
+      titleInput.value = asAnswer ? this.fragment : suggestNoteTitle(this.fragment);
+      if (asAnswer) root.createDiv("qiaomu-reader-setup-hint").setText(qiaomuReaderTranslate("title-suggested-locally-from-the-reply-edit-it-freely-no-extra-m"));
+      const error = root.createDiv("qiaomu-reader-title-error");
+      error.setAttribute("role", "alert");
+      error.hidden = true;
+      titleInput.addEventListener("input", () => {
+        titleInput.removeAttribute("aria-invalid");
+        error.hidden = true;
+      });
+      this._offerFullFragment(root, asAnswer, titleInput);
+      const folderInput = this._textField(root, qiaomuReaderTranslate("folder"), notesFolderPath(this.app) || qiaomuReaderTranslate("vault-root"));
+      const savedFolder = this.plugin.settings.lastNoteFolder;
+      folderInput.value = this.plugin.settings.notesNextToBook && this.bookFile ? qiaomuReaderPath(this.bookFile.parent?.path) : savedFolder ?? notesFolderPath(this.app);
+      this._suggestFolders(folderInput);
+      addNoteFolderPicker(this.app, folderInput);
+      const tagField = this._textField(root, qiaomuReaderTranslate("tags"), qiaomuReaderTranslate("for-example-ideas-psychology"));
+      tagField.value = this.plugin.settings.lastNoteTags || "";
+      this._attachTagSuggestions(root, tagField);
+      root.createDiv("qiaomu-reader-setup-hint").setText(qiaomuReaderTranslate(asAnswer ? "the-ai-answer-will-be-the-note-body-with-the-attached-source-kep" : "the-folder-and-tags-are-remembered-for-the-next-note-the-passage"));
+      const foot = root.createDiv("qiaomu-reader-setup-foot");
+      const ok = foot.createEl("button", { text: qiaomuReaderTranslate(asAnswer ? "save-to-note" : "create-note") });
+      ok.addClass("qiaomu-reader-setup-btn", "qiaomu-reader-setup-btn-primary");
+      if (this.kind !== "translation") this._toBookButton(foot, asAnswer, titleInput);
+      const cancelBtn = foot.createEl("button", { text: qiaomuReaderTranslate("cancel") });
+      cancelBtn.addClass("qiaomu-reader-setup-btn", "qiaomu-reader-setup-btn-quiet");
+      const submitForm = () => {
+        if (this._answered) return;
+        const title = titleInput.value.trim();
+        if (!title.replace(/[\\/:*?"<>|#^[\].\s]/g, "")) {
+          titleInput.setAttribute("aria-invalid", "true");
+          error.setText(qiaomuReaderTranslate("enter-a-valid-note-title"));
+          error.hidden = false;
+          titleInput.focus();
+          return;
+        }
+        let folderPath;
+        try {
+          folderPath = noteFolderPath(folderInput.value);
+        } catch {
+          error.setText(qiaomuReaderTranslate("could-not-create-the-folder-check-the-path-and-try-again"));
+          error.hidden = false;
+          return;
+        }
+        this._answered = true;
+        ok.disabled = true;
+        cancelBtn.disabled = true;
+        ok.setText(qiaomuReaderTranslate("saving"));
+        const tagList = parseNoteTags(tagField.value);
+        this.plugin.settings.lastNoteFolder = folderPath;
+        this.plugin.settings.notesFolder = folderPath;
+        this.plugin.settings.lastNoteTags = tagField.value.trim();
+        this.close();
+        this.onDone({ title, folder: folderPath, tags: tagList });
+        void this.plugin._saveLocalData().catch(() => {
+        });
+      };
+      ok.addEventListener("click", submitForm);
+      cancelBtn.addEventListener("click", () => this.close());
+      for (const field of [titleInput, folderInput, tagField]) {
+        field.addEventListener("keydown", (e2) => {
+          if (e2.key === "Enter" && !e2.isComposing && e2.keyCode !== 229) {
+            e2.preventDefault();
+            submitForm();
+          }
+        });
+      }
+      qiaomuReaderAutoFocus(titleInput, 30);
+    }
+    _textField(root, label, hint) {
+      const wrap = root.createDiv("qiaomu-reader-setup-field");
+      const caption = wrap.createEl("label", { cls: "qiaomu-reader-setup-label", text: label });
+      const input = wrap.createEl("input", { type: "text" });
+      input.id = `reader-note-${Math.random().toString(36).slice(2)}`;
+      caption.htmlFor = input.id;
+      input.addClass("qiaomu-reader-setup-input");
+      if (hint) input.placeholder = hint;
+      return input;
+    }
+    _offerFullFragment(root, asAnswer, titleInput) {
+      const full = asAnswer ? "" : sanitizeNoteTitle(this.fragment);
+      if (!full || full === titleInput.value) return;
+      const alt = root.createDiv("qiaomu-reader-title-alt");
+      alt.setText(qiaomuReaderTranslate("use-the-whole-passage-as-the-title"));
+      alt.addEventListener("click", () => {
+        titleInput.value = full;
+        titleInput.focus();
+      });
+    }
+    _suggestFolders(input) {
+      if (!FolderSuggest) return;
+      try {
+        new FolderSuggest(this.app, input);
+      } catch {
+      }
+    }
+    _attachTagSuggestions(root, tagField) {
+      const vaultTags = allVaultTags(this.app);
+      if (!vaultTags.length) return;
+      const datalist = root.createEl("datalist");
+      datalist.id = "qiaomu-reader-note-tags-" + Math.random().toString(36).slice(2, 8);
+      vaultTags.forEach((t3) => datalist.createEl("option", { value: t3 }));
+      tagField.setAttr("list", datalist.id);
+    }
+    _toBookButton(foot, asAnswer, titleInput) {
+      const bookNoteName = this.bookFile ? bookNoteLinkFor(this.plugin, this.bookFile) : "";
+      if (!(asAnswer && this.bookFile || bookNoteName)) return null;
+      const toBook = foot.createEl("button", { text: qiaomuReaderTranslate(asAnswer ? "append-to-book-note" : "into-the-book-s-note") });
+      toBook.addClass("qiaomu-reader-setup-btn", "qiaomu-reader-setup-btn-quiet");
+      toBook.setAttribute("aria-label", asAnswer ? qiaomuReaderTranslate("append-to-book-note") : qiaomuReaderTranslate("append-the-quote-to-0-instead-of-making-a-separate-note", bookNoteName));
+      const pickToBook = () => {
+        if (this._answered) return;
+        this._answered = true;
+        this.close();
+        this.onDone({ toBookNote: true, title: titleInput.value });
+      };
+      toBook.addEventListener("click", pickToBook);
+      return toBook;
+    }
+    onClose() {
+      this.contentEl.empty();
+      if (!this._answered) this.onDone(null);
+    }
+  };
+  const modal = new NoteTitleModal(plugin.app, plugin, fragment, book, onDone, { kind });
+  modal.setTitle(t2(kind === "ai-answer" ? "save-ai-answer" : "new-note-from-a-highlight"));
+  modal.open();
+  return modal;
+}
+
+// src/client/notes.js
+function createReaderNotes(features, chatApi) {
+  const primitives = originalNotePrimitives(features.t, () => (/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
+  let disposed = false;
+  const dialogs = /* @__PURE__ */ new Set();
+  return {
+    async copyQuote(ui, selection) {
+      const bookId = ui.store.get().bookId, book = ui.bookOf(bookId), settings = (await features.reload()).settings.notes || {};
+      return ui.copy(primitives.formatQuote(settings, book, { ...selection, comment: selection.note }, positionLink(bookId, selection.chapterHref, selection.text, selection.textOffset)));
+    },
+    async create(ui, { text: text4, source = "", kind = "selection", title, chapterHref, offset = 0, highlightId, comment = "", bookId = ui.store.get().bookId } = {}) {
+      if (disposed || !text4?.trim()) return;
+      if (kind === "ai-answer" && !title) title = suggestAiNoteTitle(text4, { fallback: features.t("save-ai-answer") });
+      const config2 = (await features.reload()).settings.notes || {}, book = ui.bookOf(bookId);
+      if (!book) throw Error("Book is not in the library");
+      const settings = { ...config2 };
+      const plugin = { settings, app: { metadataCache: { getTags: () => ({}) } }, async _saveLocalData() {
+        await features.saveNotes({ lastNoteFolder: settings.lastNoteFolder, lastNoteTags: settings.lastNoteTags });
+      } };
+      let choice = { title: title || primitives.suggestNoteTitle(text4), folder: settings.notesFolder || "notes", tags: [] };
+      if (config2.askNoteTitle !== false) {
+        choice = await new Promise((resolve) => {
+          const modal = openOriginalNoteTitle({ plugin, fragment: kind === "ai-answer" ? title || primitives.suggestNoteTitle(text4) : text4, book: { basename: book.title, path: book.id, parent: { path: "notes" } }, onDone: resolve, t: features.t, kind });
+          dialogs.add(modal);
+        });
+      }
+      if (!choice || disposed) return;
+      const result = await features.call("notes", { action: "create", ...choice, bookId, text: text4, source, kind, chapterHref: chapterHref || ui.stateOr(bookId).locator?.chapterHref || "", offset, highlightId, comment });
+      if (!disposed) {
+        ui.toast(`${features.t("note-created")}\uFF1A${result.title}`, "ok");
+        if (settings.noteOpenMode !== "none") {
+          try {
+            chatApi.previewFile(result.path, settings.noteOpenMode || "split");
+          } catch {
+            ui.toast(`${features.t("note-created")}\uFF1A${result.path}`, "ok");
+          }
+        }
+      }
+      return result;
+    },
+    async exportHighlights(ui, bookId) {
+      const state = ui.stateOr(bookId), items = (state.highlights || []).map((item) => ({ ...item, comment: item.note }));
+      if (!items.length) {
+        ui.toast(features.t("no-highlights-to-export"));
+        return;
+      }
+      const info3 = await features.call("bookNotes", { action: "info", bookId });
+      const modal = openHighlightExport({ t: features.t, highlights: items, noteText: info3.markdown, noteName: info3.exists ? info3.relative : ui.bookOf(bookId)?.title || bookId, toBook: async (selected) => {
+        const result = await features.call("bookNotes", { action: "export", bookId, ids: selected.map((item) => item.id) });
+        ui.toast(features.t("quotes-added"), "ok");
+        if (!disposed) try {
+          chatApi.previewFile(result.path, "split");
+        } catch {
+          ui.toast(result.path, "ok");
+        }
+      }, toSeparate: async (selected) => {
+        let count = 0;
+        for (const item of selected) {
+          if (disposed) break;
+          await features.call("notes", { action: "create", bookId, text: item.text, comment: item.note || item.comment, title: primitives.suggestNoteTitle(item.text), chapterHref: item.chapterHref, highlightId: item.id });
+          count++;
+        }
+        ui.toast(features.t("notes-created-0", count), "ok");
+      }, onError: (error) => ui.toast(error.message, "warn") });
+      dialogs.add(modal);
+    },
+    async chooseBookNote(ui, bookId, onChoose) {
+      const { files } = await features.call("notes", { action: "list" });
+      const modal = openBookNotePicker(features.t, files.map((path) => ({ path, basename: path.replace(/\.md$/, "") })), async (file) => {
+        try {
+          await features.call("bookNotes", { action: "link", bookId, path: file.path });
+          onChoose?.(file.path);
+          ui.toast(features.t("book-note-0", file.basename), "ok");
+        } catch (error) {
+          ui.toast(error.message, "warn");
+        }
+      });
+      dialogs.add(modal);
+    },
+    async previewBook(ui, bookId) {
+      const result = await features.call("bookNotes", { action: "ensure", bookId });
+      chatApi.previewFile(result.path, "split");
+      return result;
+    },
+    dispose() {
+      disposed = true;
+      for (const modal of dialogs) modal.close();
+      dialogs.clear();
+    }
+  };
+}
 
 // src/original/reading-stats.js
 function shiftDayKey(dayKey, dayDelta) {
@@ -156782,6 +157332,7 @@ function createReaderFeaturesClient({ data, store, language = () => "zh" }) {
     save,
     call,
     t: tx2,
+    saveNotes: (patch) => call("notes.settings", patch),
     async findBooks() {
       await reload();
       const modal = new BookDiscoveryModal(plugin.app, plugin, library);
@@ -161126,33 +161677,6 @@ function starterCatalog() {
   return STARTER_BOOKS.map(({ data, ...meta }) => meta);
 }
 
-// src/core/backlink.js
-function highlightLink(bookId, highlightId) {
-  if (!bookId || !highlightId) return "";
-  return `#qmr-book=${encodeURIComponent(String(bookId))}&qmr-highlight=${encodeURIComponent(String(highlightId))}`;
-}
-function parseHighlightLink(href) {
-  if (typeof href !== "string" || !href.startsWith("#qmr-book=")) return null;
-  try {
-    const params = new URLSearchParams(href.slice(1));
-    const bookId = params.get("qmr-book");
-    const highlightId = params.get("qmr-highlight");
-    if (bookId && bookId.length <= 160 && params.has("qmr-chapter")) {
-      const chapterHref = params.get("qmr-chapter"), text4 = params.get("qmr-text"), offset = Number(params.get("qmr-offset"));
-      if (!chapterHref || chapterHref.length > 2048 || !text4 || text4.length > 200 || !Number.isSafeInteger(offset) || offset < 0) return null;
-      return { bookId, chapterHref, text: text4, offset };
-    }
-    if (!bookId || !highlightId || bookId.length > 160 || highlightId.length > 160) return null;
-    return { bookId, highlightId };
-  } catch {
-    return null;
-  }
-}
-function positionLink(bookId, chapterHref, text4, offset = 0) {
-  const params = new URLSearchParams({ "qmr-book": String(bookId), "qmr-chapter": String(chapterHref || ""), "qmr-text": String(text4 || "").slice(0, 200), "qmr-offset": String(Math.max(0, Math.floor(Number(offset) || 0))) });
-  return "#" + params.toString();
-}
-
 // src/core/vocabulary.js
 function vocabularyEntry(bookId, input) {
   const term = String(input.term || "").trim().slice(0, 6e3);
@@ -162986,8 +163510,8 @@ function StyleSheet() {
 }
 
 // src/client/device-appearance.js
-var DEVICE_APPEARANCE_KEYS = ["theme", "fontSize", "fontFamily", "customFontFamily", "customFontId", "pageButtonsVisibility", "lineHeight", "spread", "textAlign", "justify", "margin", "einkMode"];
-var defaults = { theme: "paper", fontSize: 18, fontFamily: "serif", customFontFamily: "", customFontId: "", pageButtonsVisibility: "hover", lineHeight: 1.75, spread: false, textAlign: "justify", justify: true, margin: 64, einkMode: false };
+var DEVICE_APPEARANCE_KEYS = ["theme", "fontSize", "fontFamily", "customFontFamily", "customFontId", "pageButtonsVisibility", "lineHeight", "spread", "textAlign", "justify", "margin", "einkMode", "mobileTopInset"];
+var defaults = { theme: "paper", fontSize: 18, fontFamily: "serif", customFontFamily: "", customFontId: "", pageButtonsVisibility: "hover", lineHeight: 1.75, spread: false, textAlign: "justify", justify: true, margin: 64, einkMode: false, mobileTopInset: 0 };
 function readerDeviceKey(view = globalThis) {
   const coarse = view.matchMedia?.("(pointer: coarse)")?.matches;
   if (coarse && view.innerWidth <= 760) return "phone";
@@ -163698,6 +164222,8 @@ function createController(getProps, store) {
         lastError: null
       });
       startImagePrefetch(id, engine);
+      if (state?.recovery) toast(state.recovery.message, "warn");
+      if (props().features) void props().features.reload().then((config2) => config2.settings.notes?.autoBookNote ? props().features.call("bookNotes", { action: "ensure", bookId: id }) : null).catch((error) => toast(error.message, "warn"));
       return true;
     } catch (error) {
       const text4 = reportError(error, true);
@@ -164670,6 +165196,76 @@ function LibraryView({ ui }) {
   );
 }
 
+// src/client/swipe.js
+function attachReaderSwipe(area, { turn, isPdfZoomed = () => false, isEnabled = () => true }) {
+  const view = area.ownerDocument.defaultView;
+  let originX = 0, originY = 0, axis = null, holdTimer = null, longPress = false, hadSelection = false, disposed = false;
+  const selection = () => {
+    const selected = view.getSelection();
+    return !!(selected && !selected.isCollapsed);
+  };
+  const cancel = () => {
+    view.clearTimeout(holdTimer);
+    axis = "v";
+  };
+  const start = (event) => {
+    view.clearTimeout(holdTimer);
+    if (disposed || !isEnabled() || event.touches.length !== 1 || isPdfZoomed() || event.target.closest?.("input,textarea,button,select,[contenteditable=true]")) {
+      axis = "v";
+      return;
+    }
+    originX = event.touches[0].clientX;
+    originY = event.touches[0].clientY;
+    axis = null;
+    longPress = false;
+    hadSelection = selection();
+    holdTimer = view.setTimeout(() => {
+      longPress = true;
+    }, 350);
+  };
+  const move = (event) => {
+    if (event.touches.length !== 1) {
+      cancel();
+      return;
+    }
+    if (axis !== null) {
+      if (axis === "h") event.preventDefault();
+      return;
+    }
+    const dx = Math.abs(event.touches[0].clientX - originX), dy = Math.abs(event.touches[0].clientY - originY);
+    if (Math.max(dx, dy) < 8) return;
+    view.clearTimeout(holdTimer);
+    if (longPress || hadSelection || selection()) {
+      axis = "v";
+      return;
+    }
+    axis = dx > dy ? "h" : "v";
+    if (axis === "h") event.preventDefault();
+  };
+  const end = (event) => {
+    view.clearTimeout(holdTimer);
+    if (axis !== "h" || !event.changedTouches.length || !isEnabled() || selection() || isPdfZoomed()) {
+      axis = null;
+      return;
+    }
+    const travel = event.changedTouches[0].clientX - originX;
+    axis = null;
+    if (Math.abs(travel) > 44) turn(travel < 0 ? 1 : -1);
+  };
+  area.addEventListener("touchstart", start, { passive: true });
+  area.addEventListener("touchmove", move, { passive: false });
+  area.addEventListener("touchend", end, { passive: true });
+  area.addEventListener("touchcancel", cancel, { passive: true });
+  return () => {
+    disposed = true;
+    cancel();
+    area.removeEventListener("touchstart", start);
+    area.removeEventListener("touchmove", move);
+    area.removeEventListener("touchend", end);
+    area.removeEventListener("touchcancel", cancel);
+  };
+}
+
 // src/original/image-lightbox.js
 function createOriginalLightbox(t2) {
   const qiaomuReaderTranslate = t2, docOf = (el) => el.ownerDocument, active = /* @__PURE__ */ new Set();
@@ -165114,6 +165710,49 @@ function printedPageAt(engine, chapterIndex, root, anchor) {
 // src/ui/reader.js
 var React14 = __toESM(require("react"), 1);
 
+// src/original/answer-actions.js
+function mountOriginalAnswerActions(group, { t: t2, copy, save, preview, onError }) {
+  let savedNote, busy = false, closed = false;
+  const row = enhance(group).createDiv("qiaomu-reader-ai-acts");
+  const act = (icon, label, fn) => {
+    const button3 = row.createEl("button", { cls: "qiaomu-reader-ai-act", attr: { type: "button", "aria-label": label } });
+    setIcon(button3, icon);
+    button3.createSpan({ text: label });
+    button3.addEventListener("click", fn);
+    return button3;
+  };
+  act("copy", t2("copy"), () => void copy().catch(onError));
+  const button2 = act("notebook-pen", t2("save-ai-response"), async () => {
+    if (busy) return;
+    if (savedNote) {
+      try {
+        preview(savedNote.path);
+      } catch (error) {
+        onError(error);
+      }
+      return;
+    }
+    busy = true;
+    button2.disabled = true;
+    try {
+      const result = await save();
+      if (result && !closed) {
+        savedNote = result;
+        button2.querySelector("span").setText(t2("saved-open-note"));
+      }
+    } catch (error) {
+      if (!closed) onError(error);
+    } finally {
+      busy = false;
+      if (!closed) button2.disabled = false;
+    }
+  });
+  return () => {
+    closed = true;
+    row.remove();
+  };
+}
+
 // src/ui/companion.js
 var React6 = __toESM(require("react"), 1);
 var import_react_dom = require("react-dom");
@@ -165140,6 +165779,18 @@ function saveQuickPrompts(items) {
 
 // src/ui/companion.js
 var h5 = React6.createElement;
+function AnswerActions({ ui, chat, bookId }) {
+  const [answer, setAnswer] = React6.useState(""), ref = React6.useRef(null);
+  React6.useEffect(() => {
+    setAnswer("");
+    return chat?.watchAnswer(setAnswer);
+  }, [chat]);
+  React6.useEffect(() => {
+    if (!answer || !ref.current) return;
+    return mountOriginalAnswerActions(ref.current, { t: ui.props().features.t, copy: () => ui.copy(answer), save: () => ui.props().notes.create(ui, { bookId, text: answer, kind: "ai-answer" }), preview: (path) => ui.props().chatApi.previewFile(path, "split"), onError: (error) => ui.toast(error.message, "warn") });
+  }, [ui, bookId, answer]);
+  return h5("div", { ref });
+}
 function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) {
   const book = ui.bookOf(bookId);
   const selection = ui.useSel((state) => state.companionSelection);
@@ -165338,6 +165989,7 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
     ) : null,
     !chatVisible && !error ? h5("div", { className: "qmr-busy" }, !workspaceId ? "\u6B63\u5728\u8FDE\u63A5\u9ED8\u8BA4\u5DE5\u4F5C\u533A\u2026" : !chat || chatBookId !== bookId ? "\u6B63\u5728\u6253\u5F00\u5BF9\u8BDD\u2026" : "\u6B63\u5728\u5173\u8054\u9605\u8BFB\u4E0A\u4E0B\u6587\u2026") : null,
     chatVisible && SessionProvider && renderSlot ? h5("div", { className: "qmr-native-chat", ref: chatRoot }, h5(SessionProvider, { session: chat.reference }, renderSlot("qiaomu-reader.chat", {}))) : null,
+    chatVisible ? h5(AnswerActions, { ui, chat, bookId }) : null,
     promptMount ? (0, import_react_dom.createPortal)(h5(
       "div",
       { className: "qmr-companion-prompts", role: "group", "aria-label": "\u5FEB\u6377\u63D0\u793A\u8BCD" },
@@ -165522,7 +166174,7 @@ function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk, onLookup, on
     if (!el) return;
     const t2 = (key) => key === "speech.selected" ? ui.t("speech.selected", "\u6717\u8BFB\u9009\u4E2D\u5185\u5BB9") : ui.props().features.t(key);
     const link = () => positionLink(bookId, selection.chapterHref, selection.text, selection.textOffset);
-    const dispose = mountOriginalSelection(enhance(el), { t: t2, settings: { ...settings, translateEnabled: lookupEnabled }, selection, colors: HIGHLIGHT_COLORS2.map((id) => ({ id, label: () => HIGHLIGHT_COLOR_LABELS2[id], css: highlightPaint(settings.theme, id) })), close: () => ui.clearSelection(), actions: { highlight: onHighlight, comment: onNote, ai: onAsk, translate: onLookup, copy: () => ui.copy(selection.text), read: onRead, quote: () => ui.copy("> " + selection.text.replace(/\n/g, "\n> ") + "\n\n[" + ui.bookOf(bookId)?.title + "](" + link() + ")"), link: () => ui.copy(link()), note: () => void ui.props().features.call("translation.note", { bookId, target: "new", source: "", text: "> " + selection.text.replace(/\n/g, "\n> ") + "\n\n[\u21A9](" + link() + ")" }).then(() => ui.toast(t2("saved"))).catch((error) => ui.toast(error.message, "warn")) } });
+    const dispose = mountOriginalSelection(enhance(el), { t: t2, settings: { ...settings, translateEnabled: lookupEnabled }, selection, colors: HIGHLIGHT_COLORS2.map((id) => ({ id, label: () => HIGHLIGHT_COLOR_LABELS2[id], css: highlightPaint(settings.theme, id) })), close: () => ui.clearSelection(), actions: { highlight: onHighlight, comment: onNote, ai: onAsk, translate: onLookup, copy: () => ui.copy(selection.text), read: onRead, quote: () => void ui.props().notes.copyQuote(ui, selection).catch((error) => ui.toast(error.message, "warn")), link: () => ui.copy(link()), note: () => void ui.props().notes.create(ui, { bookId, text: selection.text, chapterHref: selection.chapterHref, offset: selection.textOffset }).catch((error) => ui.toast(error.message, "warn")) } });
     setPosition(computeMenuPosition(selection.anchor, { width: el.offsetWidth, height: el.offsetHeight }));
     return dispose;
   }, [ui, selection, config2, onHighlight, onNote, onAsk, onLookup, onRead]);
@@ -166580,8 +167232,8 @@ function HighlightsPanel({ ui }) {
       h9("button", {
         type: "button",
         className: "qmr-icon-btn",
-        "aria-label": "\u5BFC\u51FA Markdown",
-        onClick: exportMarkdown
+        "aria-label": ui.props().features.t("export-highlights-to-notes"),
+        onClick: () => void ui.props().notes.exportHighlights(ui, bookId).catch((error) => ui.toast(error.message, "warn"))
       }, h9(IconExport, { width: 16, height: 16 })),
       h9("button", {
         type: "button",
@@ -166599,6 +167251,7 @@ function HighlightsPanel({ ui }) {
         h9(
           "div",
           { className: "qmr-hl-tools", style: { marginBottom: 8 } },
+          h9("button", { type: "button", className: "qmr-btn qmr-btn-sm", onClick: () => void ui.props().notes.previewBook(ui, bookId).catch((error) => ui.toast(error.message, "warn")) }, ui.props().features.t("the-book-note")),
           h9(
             "button",
             { type: "button", className: "qmr-btn qmr-btn-sm", onClick: copyMarkdown },
@@ -166817,6 +167470,114 @@ function SearchPanel({ ui }) {
   );
 }
 
+// src/client/recovery.js
+async function openReadingHistory(ui) {
+  const bookId = ui.store.get().bookId, features = ui.props().features, t2 = features.t;
+  const result = await features.call("recovery", { action: "list", bookId });
+  class History extends Modal {
+    onOpen() {
+      this.setTitle(t2("jump-back"));
+      const body = this.contentEl;
+      if (result.recovery) {
+        const card = body.createDiv("qiaomu-reader-store-recovery"), title = card.createDiv("qiaomu-reader-store-recovery-title");
+        setIcon(title.createSpan("qiaomu-reader-store-recovery-icon"), "triangle-alert");
+        title.createSpan({ text: t2("the-0-file-cannot-be-read", t2("progress")) });
+        card.createDiv({ cls: "qiaomu-reader-store-recovery-copy", text: t2("to-avoid-overwriting-recoverable-data-the-plugin-has-paused-writ") });
+        for (const file of [result.recovery.path, result.recovery.snapshot]) card.createDiv("qiaomu-reader-store-recovery-path").createEl("code", { text: file });
+        const button2 = card.createDiv("qiaomu-reader-store-recovery-actions").createEl("button", { text: "\u4ECE\u72EC\u7ACB\u5907\u4EFD\u6062\u590D", cls: "mod-cta" });
+        button2.addEventListener("click", async () => {
+          button2.disabled = true;
+          try {
+            const recovered = await features.call("recovery", { action: "restore", bookId });
+            const states = ui.store.get().states || {};
+            ui.store.set({ states: { ...states, [bookId]: recovered.state } });
+            ui.goLocation(recovered.state.locator || { chapterIndex: 0, scroll: 0 });
+            ui.toast(t2("the-data-file-is-readable-again-automatic-saving-has-resumed"), "ok");
+            this.close();
+          } catch (error) {
+            button2.disabled = false;
+            ui.toast(error.message, "warn");
+          }
+        });
+      }
+      const row = body.createDiv("qiaomu-reader-hist-row");
+      if (!result.history.length) row.createDiv("qiaomu-reader-hist-empty").setText(t2("no-points-yet"));
+      for (const snap of [...result.history].reverse().slice(0, 14)) {
+        const chip = row.createDiv("qiaomu-reader-hist-chip");
+        chip.setText(`${snap.percent}% \xB7 ${new Date(snap.ts).toLocaleString(void 0, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`);
+        chip.setAttribute("role", "button");
+        chip.tabIndex = 0;
+        const restore = () => {
+          ui.goLocation(snap.locator);
+          ui.toast(t2("jumped-back-to-0", snap.percent));
+          this.close();
+        };
+        chip.addEventListener("click", restore);
+        chip.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            restore();
+          }
+        });
+      }
+    }
+  }
+  const modal = new History({});
+  modal.open();
+  return modal;
+}
+
+// src/original/note-settings.js
+async function openNoteSettings(features, ui) {
+  let current = (await features.reload()).settings.notes || {};
+  const t2 = features.t;
+  class Preferences extends Modal {
+    onOpen() {
+      this.setTitle(t2("notes"));
+      this.render();
+    }
+    render() {
+      const c3 = this.contentEl;
+      c3.empty();
+      const persist2 = async (key, value) => {
+        current = await features.saveNotes({ [key]: value });
+      };
+      const toggle = (name, desc, key, defaultOn = true) => new Setting(c3).setName(t2(name)).setDesc(t2(desc)).addToggle((control) => control.setValue(defaultOn ? current[key] !== false : current[key] === true).onChange((value) => persist2(key, value)));
+      c3.createEl("h3", { text: t2("where-notes-go") });
+      new Setting(c3).setName(t2("folder-for-new-notes")).setDesc(t2("where-separate-notes-go-the-ones-you-make-from-a-passage-with-cr")).addText((control) => control.setPlaceholder("notes").setValue(current.notesFolder || "notes").onChange((value) => persist2("notesFolder", value.trim())));
+      new Setting(c3).setName(t2("where-a-new-note-opens")).setDesc(t2("beside-the-book-splits-the-pane-so-the-book-stays-in-view-in-a-n")).addDropdown((control) => {
+        for (const [value, label] of [["split", "beside-the-book"], ["tab", "in-a-new-tab"], ["none", "don-t-open-it"]]) control.addOption(value, t2(label));
+        control.setValue(current.noteOpenMode || "split").onChange((value) => persist2("noteOpenMode", value));
+      });
+      toggle("ask-for-the-note-title", "before-a-note-is-created-from-a-highlight-a-dialog-offers-a-shor", "askNoteTitle");
+      c3.createEl("h3", { text: t2("the-book-note") });
+      toggle("a-separate-note-per-book", "the-first-time-a-book-is-opened-a-reading-note-named-after-it-is", "autoBookNote", false);
+      toggle("quotes-straight-into-the-book-note", "every-new-highlight-and-comment-change-is-synchronised-to-this-b", "quotesToBookNote");
+      for (const [key, name, desc] of [["bookNotesFolder", "book-notes-folder-for-links", "where-book-notes-live-one-per-book-collecting-every-quote-from-i"], ["bookNoteTemplate", "reading-note-template", "used-only-for-the-single-reading-note-created-for-a-book-where-h"]]) new Setting(c3).setName(t2(name)).setDesc(t2(desc)).addText((control) => control.setPlaceholder(key === "bookNoteTemplate" ? "notes/Templates/Book.md" : "notes").setValue(current[key] || "").onChange((value) => persist2(key, value.trim())));
+      toggle("progress-in-the-book-note-s-properties", "adds-reading-progress-a-percentage-and-reading-updated-a-date-to", "progressToFrontmatter", false);
+      if (ui) {
+        const bookId = ui.store.get().bookId;
+        new Setting(c3).setName(t2("book-note-for-links")).setDesc(current.bookNoteLinks?.[bookId] || ui.bookOf(bookId)?.title || "").addButton((button2) => button2.setButtonText(t2("pick-an-existing-note")).onClick(() => ui.props().notes.chooseBookNote(ui, bookId, async () => {
+          current = (await features.reload()).settings.notes || {};
+          this.render();
+        }))).addButton((button2) => button2.setButtonText(t2("the-book-note")).onClick(() => void ui.props().notes.previewBook(ui, bookId).catch((error) => ui.toast(error.message, "warn"))));
+      }
+      c3.createEl("h3", { text: t2("quotes-and-highlights") });
+      new Setting(c3).setName(t2("shape-of-a-copied-quote")).setDesc(t2("what-the-copy-as-a-quote-button-puts-on-the-clipboard-available")).addTextArea((control) => {
+        control.setPlaceholder("> {text}\n\n\u2014 [[{book}]]{page}{link}").setValue(current.quoteTemplate || "").onChange((value) => persist2("quoteTemplate", value));
+        control.inputEl.rows = 4;
+        control.inputEl.classList.add("qiaomu-reader-tpl-input");
+      });
+      toggle("link-back-to-the-book-under-each-quote", "every-exported-quote-gets-a-link-that-opens-the-book-at-the-exac", "quoteBacklinks");
+      toggle("keep-highlight-color-on-export", "each-quote-is-wrapped-in-a-colored-mark-the-highlight-color-show", "exportColors");
+      new Setting(c3).setName(t2("note-template")).setDesc(t2("path-to-your-templater-template-applied-to-each-new-highlight-no")).addText((control) => control.setPlaceholder("notes/Templates/Note.md").setValue(current.noteTemplate || "").onChange((value) => persist2("noteTemplate", value.trim())));
+    }
+  }
+  const modal = new Preferences({});
+  modal.open();
+  return modal;
+}
+
 // src/client/appearance.js
 function openAppearanceSettings(ui) {
   const id = ui.store.get().bookId, settings = ui.settingsOf(id), t2 = ui.props().features.t;
@@ -166833,6 +167594,7 @@ function openAppearanceSettings(ui) {
       new Setting(body).setName(t2("immersive")).setDesc(t2("the-top-and-bottom-controls-fully-retract-after-a-couple-of-seco")).addToggle((toggle) => toggle.setValue(settings.immersive !== false).onChange((immersive) => save({ immersive })));
       new Setting(body).setName(t2("page-turn-buttons")).addDropdown((dropdown) => dropdown.addOption("hover", t2("show-when-pointer-approaches")).addOption("always", t2("always-show")).setValue(settings.pageButtonsVisibility || "hover").onChange((pageButtonsVisibility) => save({ pageButtonsVisibility })));
       new Setting(body).setName(t2("page-turning-2")).addDropdown((dropdown) => dropdown.addOption("buttons", t2("buttons")).addOption("click", t2("by-mouse-click")).setValue(settings.navMode || "buttons").onChange((navMode) => save({ navMode })));
+      if (readerDeviceKey() !== "desktop") new Setting(body).setName(t2("top-inset-on-mobile")).setDesc(t2("normally-the-system-reports-the-height-of-the-status-bar-and-the")).addText((field) => field.setPlaceholder("0").setValue(String(settings.mobileTopInset || 0)).onChange((raw) => save({ mobileTopInset: Math.max(0, Math.min(120, Number(String(raw).replace(/[^\d]/g, "")) || 0)) })));
       new Setting(body).setName(t2("e-ink-reader-mode")).setDesc(t2("for-obsidian-on-an-android-e-ink-reader-removes-animations-fades")).addToggle((toggle) => toggle.setValue(settings.einkMode === true).onChange((enabled) => save({ einkMode: enabled })));
       new Setting(body).setName(t2("text-alignment")).setDesc(t2("how-text-is-aligned-in-the-reading-column-you-can-also-change-it")).addDropdown((dropdown) => {
         for (const value of ["left", "justify", "center", "right"]) dropdown.addOption(value, t2(value));
@@ -167171,7 +167933,7 @@ function SettingsPanel({ ui }) {
     h11(
       "div",
       { className: "qmr-panel-body" },
-      h11("div", { className: "qiaomu-reader-find-controls" }, h11("button", { onClick: () => void openLookupSettings({ features: ui.props().features, ui, chatApi: ui.props().chatApi }).catch((error) => ui.toast(error.message)) }, ui.props().features.t("translation")), h11("button", { onClick: () => void ui.props().readingTime.settingsModal().catch((error) => ui.toast(error.message)) }, ui.props().features.t("reading-goal")), h11("button", { onClick: () => openSelectionSettings(ui) }, ui.props().features.t("selection-toolbar")), h11("button", { onClick: () => openAppearanceSettings(ui) }, ui.props().features.t("more-appearance-options")), h11("button", { onClick: () => ui.props().features.calibreSettings() }, ui.props().features.t("add-from-calibre"))),
+      h11("div", { className: "qiaomu-reader-find-controls" }, h11("button", { onClick: () => void openLookupSettings({ features: ui.props().features, ui, chatApi: ui.props().chatApi }).catch((error) => ui.toast(error.message)) }, ui.props().features.t("translation")), h11("button", { onClick: () => void ui.props().readingTime.settingsModal().catch((error) => ui.toast(error.message)) }, ui.props().features.t("reading-goal")), h11("button", { onClick: () => openSelectionSettings(ui) }, ui.props().features.t("selection-toolbar")), h11("button", { onClick: () => openAppearanceSettings(ui) }, ui.props().features.t("more-appearance-options")), h11("button", { onClick: () => void openNoteSettings(ui.props().features, ui).catch((error) => ui.toast(error.message, "warn")) }, ui.props().features.t("notes")), h11("button", { onClick: () => void openReadingHistory(ui).catch((error) => ui.toast(error.message, "warn")) }, ui.props().features.t("jump-back")), h11("button", { onClick: () => ui.props().features.calibreSettings() }, ui.props().features.t("add-from-calibre"))),
       !isLoaded ? h11("div", { className: "qmr-muted qmr-small", style: { marginBottom: 8 } }, "\u6B63\u5728\u8BFB\u53D6\u5DF2\u4FDD\u5B58\u7684\u8BBE\u7F6E\u2026") : null,
       h11("div", { className: "qmr-group-title" }, "\u4E3B\u9898"),
       themeCardGrid(settings.theme, (id) => update({ theme: id })),
@@ -168058,6 +168820,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const anchor = captureContentAnchor(flowRef.current, viewportRef.current);
     ui.reportPosition(live.bookId, {
       anchor,
+      progress: readerPosition(live.engine, live.chapterIndex, scroll).fraction,
       pageHref: printedPageAt(live.engine, live.chapterIndex, flowRef.current, anchor),
       chapterIndex: live.chapterIndex,
       chapterHref: chapterHrefOf(live.engine, live.chapterIndex),
@@ -168131,9 +168894,16 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     };
   }, [ui, setPage]);
   React14.useEffect(() => {
+    const area = viewportRef.current;
+    if (!area) return;
+    return attachReaderSwipe(area, { turn: (direction) => ui.turnPage(direction), isEnabled: () => liveRef.current.settings.flow !== "scroll" || liveRef.current.book?.format === "pdf", isPdfZoomed: () => liveRef.current.book?.format === "pdf" && (Number(ui.settingsOf(bookId).pdfZoom) || 1) > 1.001 });
+  }, [ui, bookId]);
+  React14.useEffect(() => {
     const onKeyDown = (event) => {
       const state = ui.store.get();
       if (!state.visible || state.view !== "reader") return;
+      const origin = event.composedPath?.()[0] || event.target;
+      if (origin?.closest?.(".qmr-native-overlay,.qmr-native-menu") || origin !== document.body && !speechRoot.current?.contains(origin)) return;
       if (event.key === "Home" || event.key === "End") {
         const target = event.composedPath?.()[0] || event.target;
         if (event.metaKey || event.ctrlKey || event.altKey || target?.isContentEditable || target?.closest?.("input,textarea,select,[contenteditable=true],[role=slider],[role=menu],[role=tablist]")) return;
@@ -168197,9 +168967,17 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       } catch (_error) {
       }
     };
+    let selectionTimer;
+    const onSelectionChange = () => {
+      clearTimeout(selectionTimer);
+      selectionTimer = setTimeout(onMouseUp, 120);
+    };
+    document.addEventListener("selectionchange", onSelectionChange);
     window.addEventListener("mouseup", onMouseUp);
     window.addEventListener("mousedown", onMouseDown);
     return () => {
+      clearTimeout(selectionTimer);
+      document.removeEventListener("selectionchange", onSelectionChange);
       window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("mousedown", onMouseDown);
     };
@@ -168242,7 +169020,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           } catch (_error) {
             index = null;
           }
-          if (typeof index === "number" && index >= 0) ui.goHref(href);
+          if (typeof index === "number" && index >= 0 || index && Number.isInteger(index.chapterIndex)) ui.goHref(href);
           else ui.toast("\u65E0\u6CD5\u5B9A\u4F4D\u8FD9\u4E2A\u94FE\u63A5", "warn");
           return;
         }
@@ -168470,7 +169248,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   );
   return h13(
     "div",
-    { className: `qmr-reader qmr-native-tokens${settings.einkMode ? " qiaomu-reader-eink" : ""}`, ref: speechRoot, "data-qmr-theme": settings.theme, style: themeVars },
+    { className: `qmr-reader qmr-native-tokens${settings.einkMode ? " qiaomu-reader-eink" : ""}`, ref: speechRoot, "data-qmr-theme": settings.theme, style: { ...themeVars, paddingTop: `${Math.max(0, Math.min(120, Number(settings.mobileTopInset) || 0))}px` } },
     h13(
       "div",
       { className: `qmr-reader-main${panel === "companion" ? " qmr-has-companion" : ""}`, ref: workareaRef, style: { "--qmr-companion-width": `${companionWidth}%` } },
@@ -168807,7 +169585,13 @@ var shell_default = ReaderOverlay;
 
 // src/client/native-chat.js
 function nativeChatBridge(ctx) {
-  let scope;
+  let scope, sidebar;
+  ctx.inject(["sidebarRight"], (ready) => {
+    sidebar = ready.sidebarRight;
+    return () => {
+      sidebar = void 0;
+    };
+  });
   let readingContextMethod;
   const watchers = /* @__PURE__ */ new Set();
   ctx.inject(["sessions", "uiSession", "uiWorkspace"], (child) => {
@@ -168819,6 +169603,13 @@ function nativeChatBridge(ctx) {
     };
   });
   return {
+    previewFile(path, mode = "split") {
+      const sessionId = sidebar?.mounted?.getSnapshot();
+      if (!sessionId) throw Error("Open a Harness session to preview the saved note");
+      const normalized = String(path).replace(/\\/g, "/");
+      const address = "dsh-resource://file/session/" + encodeURIComponent(sessionId) + "/" + normalized.split("/").map(encodeURIComponent).join("/");
+      sidebar.openResource(address, { preferNewPane: mode === "split" });
+    },
     bindReadingContext(method) {
       readingContextMethod = method;
     },
@@ -168981,6 +169772,8 @@ function apply(ctx) {
   });
   const features = createReaderFeaturesClient({ data, store, language: () => hostLanguage() });
   ctx.effect(() => () => features.dispose());
+  const notes = createReaderNotes(features, chatApi);
+  ctx.effect(() => () => notes.dispose());
   const readingTime = createReadingTime(features);
   ctx.effect(() => () => readingTime.dispose());
   const fonts = createReaderFonts(features);
@@ -169165,7 +169958,8 @@ function apply(ctx) {
             features,
             speech,
             fonts,
-            readingTime
+            readingTime,
+            notes
           })
         },
         ReaderPanel

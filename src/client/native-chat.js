@@ -1,7 +1,8 @@
 import { latestLookupAnswer } from '../core/vocabulary.js';
 /** Reuse Harness's session, composer, model picker, tool and approval UI. */
 export function nativeChatBridge(ctx) {
-  let scope;
+  let scope, sidebar;
+  ctx.inject(['sidebarRight'],ready=>{sidebar=ready.sidebarRight;return()=>{sidebar=undefined;};});
   let readingContextMethod;
   const watchers = new Set();
   ctx.inject(['sessions', 'uiSession', 'uiWorkspace'], (child) => {
@@ -10,6 +11,7 @@ export function nativeChatBridge(ctx) {
     return () => { scope = undefined; for (const notify of watchers) notify(); };
   });
   return {
+    previewFile(path,mode='split'){const sessionId=sidebar?.mounted?.getSnapshot();if(!sessionId)throw Error('Open a Harness session to preview the saved note');const normalized=String(path).replace(/\\/g,'/');const address='dsh-resource://file/session/'+encodeURIComponent(sessionId)+'/'+normalized.split('/').map(encodeURIComponent).join('/');sidebar.openResource(address,{preferNewPane:mode==='split'});},
     bindReadingContext(method) { readingContextMethod = method; },
     async setReadingContext(request) {
       if (typeof readingContextMethod !== 'function') throw new Error('乔木阅读上下文服务尚未就绪');

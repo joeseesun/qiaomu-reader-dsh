@@ -24,12 +24,14 @@ class Control{
  constructor(el){this.el=this.inputEl=this.buttonEl=this.selectEl=this.toggleEl=el;}
  setIcon(name){setIcon(this.el,name);return this;}
  addOption(value,label){const option=this.el.ownerDocument.createElement('option');option.value=value;option.textContent=label;this.el.append(option);return this;}getValue(){return this.el.type==='checkbox'?this.el.checked:this.el.value;}setCta(){this.el.classList.add('mod-cta');return this;}setValue(value){if(this.el.type==='checkbox')this.el.checked=!!value;else this.el.value=value;return this;}setPlaceholder(value){this.el.placeholder=value;return this;}setButtonText(value){this.el.textContent=value;return this;}setDisabled(value){this.el.disabled=value;return this;}
- onChange(fn){this.el.addEventListener('change',()=>void fn(this.getValue()));return this;}onClick(fn){this.el.addEventListener('click',fn);return this;}
+ invoke(fn,value){try{Promise.resolve(fn(value)).catch(error=>new Notice(error?.message||String(error)));}catch(error){new Notice(error?.message||String(error));}}
+ onChange(fn){this.el.addEventListener('change',()=>this.invoke(fn,this.getValue()));return this;}onClick(fn){this.el.addEventListener('click',event=>this.invoke(fn,event));return this;}
 }
 export class Setting{
  constructor(parent){this.settingEl=enhance(parent).createDiv({cls:'setting-item'});this.infoEl=this.settingEl.createDiv({cls:'setting-item-info'});this.nameEl=this.infoEl.createDiv({cls:'setting-item-name',attr:{id:'qmr-setting-'+crypto.randomUUID()}});this.descEl=this.infoEl.createDiv({cls:'setting-item-description'});this.controlEl=this.settingEl.createDiv({cls:'setting-item-control'});}
  setName(text){this.nameEl.textContent=text;return this;}setDesc(text){this.descEl.textContent=text;return this;}
  addSlider(fn){const el=this.controlEl.createEl('input',{attr:{type:'range','aria-labelledby':this.nameEl.id}}),control=new Control(el);control.setLimits=(min,max,step)=>{el.min=min;el.max=max;el.step=step;return control;};fn(control);return this;}
+ addTextArea(fn){const el=this.controlEl.createEl('textarea',{attr:{'aria-labelledby':this.nameEl.id}});fn(new Control(el));return this;}
  addText(fn){const el=this.controlEl.createEl('input',{attr:{type:'text','aria-labelledby':this.nameEl.id}});fn(new Control(el));return this;}
  addToggle(fn){fn(new Control(this.controlEl.createEl('input',{attr:{type:'checkbox','aria-labelledby':this.nameEl.id}})));return this;}
  addDropdown(fn){fn(new Control(this.controlEl.createEl('select',{attr:{'aria-labelledby':this.nameEl.id}})));return this;}
@@ -54,6 +56,7 @@ export class Menu{
 
 // Obsidian's standard searchable chooser boundary; item preview is original product code.
 export class FuzzySuggestModal extends Modal{
+ renderSuggestion({item},element){element.setText(this.getItemText(item));}
  setPlaceholder(text){this.placeholder=text;}
  onOpen(){this.setTitle(this.placeholder||'');this.input=this.contentEl.createEl('input',{attr:{type:'search','aria-label':this.placeholder||''},placeholder:this.placeholder});this.results=this.contentEl.createDiv('suggestion-container');const render=()=>{this.results.empty();const query=this.input.value.trim().toLocaleLowerCase();for(const item of this.getItems().filter(item=>this.getItemText(item).toLocaleLowerCase().includes(query)).slice(0,200)){const row=this.results.createEl('button',{cls:'suggestion-item',attr:{type:'button'}});this.renderSuggestion({item},row);row.addEventListener('click',()=>{this.close();this.onChooseItem(item);});}};this.input.addEventListener('input',render);render();queueMicrotask(()=>this.input.isConnected&&this.input.focus());}
 }

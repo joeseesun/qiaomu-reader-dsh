@@ -597,6 +597,8 @@ export function createController(getProps, store) {
         lastError: null,
       });
       startImagePrefetch(id, engine);
+      if(state?.recovery)toast(state.recovery.message,'warn');
+      if(props().features)void props().features.reload().then(config=>config.settings.notes?.autoBookNote?props().features.call('bookNotes',{action:'ensure',bookId:id}):null).catch(error=>toast(error.message,'warn'));
       return true;
     } catch (error) {
       const text = reportError(error, true);

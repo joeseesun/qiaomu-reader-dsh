@@ -1,3 +1,4 @@
+import {attachReaderSwipe} from '../client/swipe.js';
 import {createOriginalLightbox} from '../original/image-lightbox.js';
 import {mountReaderPdfZoom} from '../client/pdf-zoom.js';
 import {captureContentAnchor,resolveContentAnchor,printedPageAt} from '../client/content-position.js';
@@ -690,6 +691,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const anchor=captureContentAnchor(flowRef.current,viewportRef.current);
     ui.reportPosition(live.bookId, {
       anchor,
+      progress:readerPosition(live.engine,live.chapterIndex,scroll).fraction,
       pageHref:printedPageAt(live.engine,live.chapterIndex,flowRef.current,anchor),
       chapterIndex: live.chapterIndex,
       chapterHref: chapterHrefOf(live.engine, live.chapterIndex),
@@ -767,12 +769,15 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     };
   }, [ui, setPage]);
 
+  React.useEffect(()=>{const area=viewportRef.current;if(!area)return;return attachReaderSwipe(area,{turn:direction=>ui.turnPage(direction),isEnabled:()=>liveRef.current.settings.flow!=='scroll'||liveRef.current.book?.format==='pdf',isPdfZoomed:()=>liveRef.current.book?.format==='pdf'&&(Number(ui.settingsOf(bookId).pdfZoom)||1)>1.001});},[ui,bookId]);
+
   // ------------------------------------------------------------- 键盘
 
   React.useEffect(() => {
     const onKeyDown = (event) => {
       const state = ui.store.get();
       if (!state.visible || state.view !== 'reader') return;
+      const origin=event.composedPath?.()[0]||event.target;if(origin?.closest?.('.qmr-native-overlay,.qmr-native-menu')||origin!==document.body&&!speechRoot.current?.contains(origin))return;
       if (event.key === 'Home' || event.key === 'End') {
         const target = event.composedPath?.()[0] || event.target;
         if (event.metaKey || event.ctrlKey || event.altKey || target?.isContentEditable
@@ -841,9 +846,12 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         /* 忽略 */
       }
     };
+    let selectionTimer;const onSelectionChange=()=>{clearTimeout(selectionTimer);selectionTimer=setTimeout(onMouseUp,120);};
+    document.addEventListener('selectionchange',onSelectionChange);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousedown', onMouseDown);
     return () => {
+      clearTimeout(selectionTimer);document.removeEventListener('selectionchange',onSelectionChange);
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('mousedown', onMouseDown);
     };
@@ -883,7 +891,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           } catch (_error) {
             index = null;
           }
-          if (typeof index === 'number' && index >= 0) ui.goHref(href);
+          if (typeof index === 'number' && index >= 0 || index && Number.isInteger(index.chapterIndex)) ui.goHref(href);
           else ui.toast('无法定位这个链接', 'warn');
           return;
         }
@@ -1127,7 +1135,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   return h(
     'div',
-    { className: `qmr-reader qmr-native-tokens${settings.einkMode?' qiaomu-reader-eink':''}`, ref:speechRoot, 'data-qmr-theme': settings.theme, style: themeVars },
+    { className: `qmr-reader qmr-native-tokens${settings.einkMode?' qiaomu-reader-eink':''}`, ref:speechRoot, 'data-qmr-theme': settings.theme, style: {...themeVars,paddingTop:`${Math.max(0,Math.min(120,Number(settings.mobileTopInset)||0))}px`} },
     h(
       'div',
       { className: `qmr-reader-main${panel === 'companion' ? ' qmr-has-companion' : ''}`, ref: workareaRef, style: { '--qmr-companion-width': `${companionWidth}%` } },

@@ -141,3 +141,9 @@ Markdown 保存可读摘录与回跳链接；精确定位仍依赖结构化划�
 - 一次真实 Google Host 查词 `reader → zh-CN` 返回上游限流（原版错误分类 limit），没有翻译成功证据，也没有自动改用或调用付费 AI。无需继续重复请求限流接口。
 - 用户浏览器仍处于暂停控制，未接管、未操作任何测试页，未重启 ports-qa/public-qa/daily Harness。
 - 下一步继续原版笔记创建/命名/文件夹/标签/模板/书籍关联/导出与备份恢复对照，以及移动触控和语言覆盖；其后仍有 RSS/Radio/Home 全量审计和 Agent 迁移。
+
+## 2026-10-28 notes, navigation and recovery continuation
+
+Original NoteTitleModal, HighlightExportModal, BookNotePicker, AI note-title algorithm, quote formatting, answer actions, note preferences and highlight colors are now used. Host adapters provide notes-only paths, unique filenames, original title/date template fallback, existing-note linking, book templates/properties, progress properties, selective exports, duplicate suppression and managed-section preservation. Native preview uses public `sidebarRight.mounted` and `openResource`; no session/model is created to preview a saved file. External Templater JavaScript is not executed. New book notes use book titles; existing 1.1.0 ID-based note files remain linked in place.
+
+Original swipe thresholds/guards now work through owned listeners. Mobile top inset is stored per device. Reading state writes verify an independent snapshot before replacing the main file. Damaged main files remain untouched and write-blocked while the snapshot supports reading; explicit restoration retains the original damaged bytes. Position history keeps 30 snapshots and displays the original history chips. Native sidebars, physical touch and the new dialogs are not runtime-accepted while browser control remains with the user.

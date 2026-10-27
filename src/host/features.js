@@ -8,7 +8,7 @@ import path from 'node:path';
 import {readFile,writeFile,mkdir,rename,stat,realpath} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 import * as calibre from '../original/calibre-library.js';
-export function createReaderFeatures({root,importBook,appendTranslation,vocabularyOperation}){
+export function createReaderFeatures({root,importBook,appendTranslation,vocabularyOperation,notesOperation,bookNotesOperation,recoveryOperation}){
  const fonts=createFontHost({root});
  let data=null,loading,lane=Promise.resolve();const handles=new Map(),credentials=new CredentialStore(),lookup=createLookupHost();
  const load=()=>loading ||= (async()=>{try{data=JSON.parse(await readFile(path.join(root(),'features.json'),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;data={revision:0,settings:{}};}if(!data||typeof data!=='object'||!data.settings||typeof data.settings!=='object')throw Error('Invalid Reader feature settings');return data;})();
@@ -16,9 +16,14 @@ export function createReaderFeatures({root,importBook,appendTranslation,vocabula
  const serial=fn=>{const next=lane.then(fn);lane=next.catch(()=>{});return next;};
  const settings=()=>({...data.settings,calibreLibraryPath:calibre.detectCalibreLibraryPath(data.settings.calibreLibraryPath),calibreCalibredbPath:calibre.detectCalibredbPath(data.settings.calibreCalibredbPath)});
  const ebook=createEbookHost({loadState:async()=>{await load();return data.ebook||{};},saveState:next=>serial(async()=>{const previous=data;data={...data,ebook:next};try{await save();}catch(error){data=previous;throw error;}}),importBook});
+ const updateNotes=async updater=>{await load();return serial(async()=>{const previous=data;data={...data,revision:data.revision+1,settings:{...data.settings,notes:updater(data.settings.notes||{})}};try{await save();}catch(error){data=previous;throw error;}return data.settings.notes;});};
  async function call(method,input={}){
   await load();
   if(method==='reading')return serial(async()=>{if(input.action==='load')return applyReadingTime(data.reading,input);const previous=data;data={...data,reading:applyReadingTime(data.reading,input)};try{await save();}catch(error){data=previous;throw error;}return data.reading;});
+  if(method==='notes.settings'){if(!input||typeof input!=='object'||Array.isArray(input)||JSON.stringify(input).length>128000)throw Error('Invalid note settings');return updateNotes(previous=>({...previous,...input}));}
+  if(method==='notes')return notesOperation(input);
+  if(method==='recovery')return recoveryOperation(input);
+  if(method==='bookNotes')return bookNotesOperation(input);
   if(method==='font')return fonts(input);
   if(method==='vocabulary')return vocabularyOperation(input);
   if(method==='lookup')return lookup.run(input);
@@ -27,7 +32,7 @@ export function createReaderFeatures({root,importBook,appendTranslation,vocabula
   if(method==='ebook')return ebook.operation(input);
   if(method==='public.request'){const url=new URL(input.url);if(url.origin!=='https://www.gutenberg.org')throw Error('Unsupported public catalogue');return boundedHttpRequest({url:url.href,method:'GET'});}
   if(method==='load')return {revision:data.revision,settings:settings()};
-  if(method==='save')return serial(async()=>{if(input.revision!==data.revision)throw Error('Reader settings changed; reload before saving');const patch=input.settings;if(!patch||typeof patch!=='object'||Array.isArray(patch))throw Error('Invalid Reader settings');const allowed=['calibreLibraryPath','calibreCalibredbPath','tts','lookup','reading'];for(const key of Object.keys(patch))if(!allowed.includes(key))throw Error('Unknown Reader setting');if(JSON.stringify(patch).length>512000)throw Error('Reader settings exceed limit');const previous=data;data={...data,revision:data.revision+1,settings:{...data.settings,...patch}};try{await save();}catch(error){data=previous;throw error;}return {revision:data.revision,settings:settings()};});
+  if(method==='save')return serial(async()=>{if(input.revision!==data.revision)throw Error('Reader settings changed; reload before saving');const patch=input.settings;if(!patch||typeof patch!=='object'||Array.isArray(patch))throw Error('Invalid Reader settings');const allowed=['calibreLibraryPath','calibreCalibredbPath','tts','lookup','reading','notes'];for(const key of Object.keys(patch))if(!allowed.includes(key))throw Error('Unknown Reader setting');if(JSON.stringify(patch).length>512000)throw Error('Reader settings exceed limit');const previous=data;data={...data,revision:data.revision+1,settings:{...data.settings,...patch}};try{await save();}catch(error){data=previous;throw error;}return {revision:data.revision,settings:settings()};});
   if(method==='calibre.search'){
    const config=settings();if(!config.calibreLibraryPath)throw Error('missing-library');const query=String(input.query||'').slice(0,1000),limit=Math.max(1,Math.min(80,Number(input.limit)||40));
    const result=await calibre.searchCalibreLibrary({libraryPath:config.calibreLibraryPath,calibredbPath:config.calibreCalibredbPath,query,limit,syntax:!!input.syntax});
@@ -44,5 +49,5 @@ export function createReaderFeatures({root,importBook,appendTranslation,vocabula
   }
   throw Error('Unknown Reader feature operation');
  }
- return {async operation(request){try{return {value:await call(request?.method,request?.input)}}catch(error){return {failure:{message:error.message,code:error.code||'operation',qiaomuReaderReason:error.qiaomuReaderReason,qiaomuReaderStatus:error.qiaomuReaderStatus}};}},dispose(){handles.clear();ebook.dispose();lookup.dispose();}};
+ return {updateNotes,async operation(request){try{return {value:await call(request?.method,request?.input)}}catch(error){return {failure:{message:error.message,code:error.code||'operation',qiaomuReaderReason:error.qiaomuReaderReason,qiaomuReaderStatus:error.qiaomuReaderStatus}};}},dispose(){handles.clear();ebook.dispose();lookup.dispose();}};
 }

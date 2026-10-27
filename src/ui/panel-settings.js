@@ -1,3 +1,5 @@
+import {openReadingHistory} from '../client/recovery.js';
+import {openNoteSettings} from '../original/note-settings.js';
 import {openAppearanceSettings} from '../client/appearance.js';
 import {openSelectionSettings} from '../original/selection-settings.js';
 import {openLookupSettings} from '../original/lookup-settings.js';
@@ -79,7 +81,7 @@ export function SettingsPanel({ ui }) {
     h(
       'div',
       { className: 'qmr-panel-body' },
-      h('div',{className:'qiaomu-reader-find-controls'},h('button',{onClick:()=>void openLookupSettings({features:ui.props().features,ui,chatApi:ui.props().chatApi}).catch(error=>ui.toast(error.message))},ui.props().features.t('translation')),h('button',{onClick:()=>void ui.props().readingTime.settingsModal().catch(error=>ui.toast(error.message))},ui.props().features.t('reading-goal')),h('button',{onClick:()=>openSelectionSettings(ui)},ui.props().features.t('selection-toolbar')),h('button',{onClick:()=>openAppearanceSettings(ui)},ui.props().features.t('more-appearance-options')),h('button',{onClick:()=>ui.props().features.calibreSettings()},ui.props().features.t('add-from-calibre'))),
+      h('div',{className:'qiaomu-reader-find-controls'},h('button',{onClick:()=>void openLookupSettings({features:ui.props().features,ui,chatApi:ui.props().chatApi}).catch(error=>ui.toast(error.message))},ui.props().features.t('translation')),h('button',{onClick:()=>void ui.props().readingTime.settingsModal().catch(error=>ui.toast(error.message))},ui.props().features.t('reading-goal')),h('button',{onClick:()=>openSelectionSettings(ui)},ui.props().features.t('selection-toolbar')),h('button',{onClick:()=>openAppearanceSettings(ui)},ui.props().features.t('more-appearance-options')),h('button',{onClick:()=>void openNoteSettings(ui.props().features,ui).catch(error=>ui.toast(error.message,'warn'))},ui.props().features.t('notes')),h('button',{onClick:()=>void openReadingHistory(ui).catch(error=>ui.toast(error.message,'warn'))},ui.props().features.t('jump-back')),h('button',{onClick:()=>ui.props().features.calibreSettings()},ui.props().features.t('add-from-calibre'))),
       !isLoaded ? h('div', { className: 'qmr-muted qmr-small', style: { marginBottom: 8 } }, '正在读取已保存的设置…') : null,
 
       h('div', { className: 'qmr-group-title' }, '主题'),
