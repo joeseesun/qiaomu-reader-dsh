@@ -162985,6 +162985,29 @@ function StyleSheet() {
   return h2("style", { "data-qmr-style": "1" }, UI_CSS);
 }
 
+// src/client/device-appearance.js
+var DEVICE_APPEARANCE_KEYS = ["theme", "fontSize", "fontFamily", "customFontFamily", "customFontId", "pageButtonsVisibility", "lineHeight", "spread", "textAlign", "justify", "margin", "einkMode"];
+var defaults = { theme: "paper", fontSize: 18, fontFamily: "serif", customFontFamily: "", customFontId: "", pageButtonsVisibility: "hover", lineHeight: 1.75, spread: false, textAlign: "justify", justify: true, margin: 64, einkMode: false };
+function readerDeviceKey(view = globalThis) {
+  const coarse = view.matchMedia?.("(pointer: coarse)")?.matches;
+  if (coarse && view.innerWidth <= 760) return "phone";
+  if (coarse && view.innerWidth <= 1366) return "tablet";
+  return "desktop";
+}
+function applyDeviceAppearance(target, key = readerDeviceKey()) {
+  if (!target?.perDevice) return target;
+  const profile = target.deviceProfiles?.[key];
+  if (profile) for (const field of DEVICE_APPEARANCE_KEYS) target[field] = profile[field] ?? defaults[field];
+  return target;
+}
+function captureDeviceAppearance(target, key = readerDeviceKey()) {
+  if (!target?.perDevice) return target;
+  const profile = {};
+  for (const field of DEVICE_APPEARANCE_KEYS) profile[field] = structuredClone(target[field] ?? defaults[field]);
+  target.deviceProfiles = { ...target.deviceProfiles, [key]: profile };
+  return target;
+}
+
 // src/original/reader-position.js
 var ENGINE_LOCATION_SIZE = 1500;
 function flattenPageList(items = []) {
@@ -163456,8 +163479,9 @@ function createController(getProps, store) {
     const base = { ...UI_SETTING_DEFAULTS, ...DEFAULT_READER_SETTINGS || {} };
     const own = state && state.settings || {};
     const merged = { ...base, ...own };
-    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 14, 28);
-    merged.lineHeight = Math.min(2.2, Math.max(1.4, Number(merged.lineHeight) || base.lineHeight));
+    applyDeviceAppearance(merged);
+    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 12, 48);
+    merged.lineHeight = Math.min(2.5, Math.max(1.2, Number(merged.lineHeight) || base.lineHeight));
     merged.margin = clampInt(merged.margin || base.margin, 32, 120);
     if (!READER_THEMES2[merged.theme]) merged.theme = base.theme;
     if (!["serif", "sans-serif", "mono", ...Object.keys(READER_FONTS)].includes(merged.fontFamily)) merged.fontFamily = "serif";
@@ -163469,7 +163493,8 @@ function createController(getProps, store) {
   function updateSettings(id, patch) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
-      const merged = { ...state.settings || {}, ...patch || {} };
+      const merged = { ...state.settings || {}, ...settingsOf(id), ...patch || {} };
+      captureDeviceAppearance(merged);
       patchState(id, { settings: merged });
     });
   }
@@ -166804,6 +166829,10 @@ function openAppearanceSettings(ui) {
     onOpen() {
       this.setTitle(t2("more-appearance-options"));
       const body = this.contentEl;
+      new Setting(body).setName(t2("a-separate-look-on-each-device")).setDesc(t2("font-size-theme-typeface-line-spacing-column-count-and-alignment", t2({ desktop: "computer", tablet: "tablet", phone: "phone" }[readerDeviceKey()]))).addToggle((toggle) => toggle.setValue(settings.perDevice === true).onChange((perDevice) => save({ perDevice })));
+      new Setting(body).setName(t2("immersive")).setDesc(t2("the-top-and-bottom-controls-fully-retract-after-a-couple-of-seco")).addToggle((toggle) => toggle.setValue(settings.immersive !== false).onChange((immersive) => save({ immersive })));
+      new Setting(body).setName(t2("page-turn-buttons")).addDropdown((dropdown) => dropdown.addOption("hover", t2("show-when-pointer-approaches")).addOption("always", t2("always-show")).setValue(settings.pageButtonsVisibility || "hover").onChange((pageButtonsVisibility) => save({ pageButtonsVisibility })));
+      new Setting(body).setName(t2("page-turning-2")).addDropdown((dropdown) => dropdown.addOption("buttons", t2("buttons")).addOption("click", t2("by-mouse-click")).setValue(settings.navMode || "buttons").onChange((navMode) => save({ navMode })));
       new Setting(body).setName(t2("e-ink-reader-mode")).setDesc(t2("for-obsidian-on-an-android-e-ink-reader-removes-animations-fades")).addToggle((toggle) => toggle.setValue(settings.einkMode === true).onChange((enabled) => save({ einkMode: enabled })));
       new Setting(body).setName(t2("text-alignment")).setDesc(t2("how-text-is-aligned-in-the-reading-column-you-can-also-change-it")).addDropdown((dropdown) => {
         for (const value of ["left", "justify", "center", "right"]) dropdown.addOption(value, t2(value));
@@ -167157,8 +167186,8 @@ function SettingsPanel({ ui }) {
           h11("input", {
             className: "qmr-range",
             type: "range",
-            min: 14,
-            max: 28,
+            min: 12,
+            max: 48,
             step: 1,
             value: settings.fontSize,
             "aria-label": "\u5B57\u53F7",
@@ -167177,8 +167206,8 @@ function SettingsPanel({ ui }) {
           h11("input", {
             className: "qmr-range",
             type: "range",
-            min: 1.4,
-            max: 2.2,
+            min: 1.2,
+            max: 2.5,
             step: 0.05,
             value: settings.lineHeight,
             "aria-label": "\u884C\u9AD8",
@@ -167625,8 +167654,8 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const showChrome = React14.useCallback(() => {
     setChromeVisible(true);
     clearTimeout(chromeTimerRef.current);
-    chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
-  }, []);
+    if (ui.settingsOf(bookId).immersive !== false) chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
+  }, [ui, bookId, bookState?.settings?.immersive]);
   React14.useEffect(() => {
     showChrome();
     return () => clearTimeout(chromeTimerRef.current);
@@ -168206,15 +168235,25 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
             return;
           }
           event.preventDefault();
-          const live = liveRef.current;
+          const live2 = liveRef.current;
           let index = null;
           try {
-            index = live.engine && live.engine.resolveLink ? live.engine.resolveLink(live.chapterIndex, href) : null;
+            index = live2.engine && live2.engine.resolveLink ? live2.engine.resolveLink(live2.chapterIndex, href) : null;
           } catch (_error) {
             index = null;
           }
           if (typeof index === "number" && index >= 0) ui.goHref(href);
           else ui.toast("\u65E0\u6CD5\u5B9A\u4F4D\u8FD9\u4E2A\u94FE\u63A5", "warn");
+          return;
+        }
+        const live = liveRef.current;
+        if (live.settings.navMode === "click" && live.settings.flow !== "scroll" && !window.getSelection()?.toString()) {
+          const rect = viewportRef.current?.getBoundingClientRect();
+          if (rect && rect.width) {
+            const ratio = (event.clientX - rect.left) / rect.width;
+            if (ratio < 0.3) ui.turnPage(-1);
+            else if (ratio > 0.7) ui.turnPage(1);
+          }
         }
       }
     } catch (_error) {
@@ -168448,10 +168487,10 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         topBar,
         settings.flow !== "scroll" ? h13("button", {
           type: "button",
-          className: "qmr-page-zone qmr-page-zone-prev",
+          className: settings.pageButtonsVisibility === "always" ? "qiaomu-reader-page-edge qiaomu-reader-page-edge-prev" : "qmr-page-zone qmr-page-zone-prev",
           "aria-label": "\u4E0A\u4E00\u9875",
           onClick: () => ui.turnPage(-1)
-        }) : null,
+        }, settings.pageButtonsVisibility === "always" ? h13(IconPrev, { width: 18, height: 18 }) : null) : null,
         h13(
           "div",
           { className: "qmr-page-frame", style: contentStyle },
@@ -168465,10 +168504,10 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         ),
         settings.flow !== "scroll" ? h13("button", {
           type: "button",
-          className: "qmr-page-zone qmr-page-zone-next",
+          className: settings.pageButtonsVisibility === "always" ? "qiaomu-reader-page-edge qiaomu-reader-page-edge-next" : "qmr-page-zone qmr-page-zone-next",
           "aria-label": "\u4E0B\u4E00\u9875",
           onClick: () => ui.turnPage(1)
-        }) : null,
+        }, settings.pageButtonsVisibility === "always" ? h13(IconNext, { width: 18, height: 18 }) : null) : null,
         settings.flow !== "scroll" ? h13("div", { className: "qmr-page-count" }, `\u7B2C ${page + 1} / ${pageCount} \u9875`) : null,
         chapterBusy ? h13("div", { className: "qmr-chapter-loading" }, "\u6B63\u5728\u6392\u7248\u2026") : null,
         renderError ? h13(

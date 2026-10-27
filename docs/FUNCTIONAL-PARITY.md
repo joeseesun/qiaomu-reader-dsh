@@ -22,7 +22,7 @@ Original UI/CSS is retained under `src/original`; adapters replace Obsidian stor
 | Selection actions | Original toolbar/color dropdown/order/hide/labels; original preferences UI | DOM ordering/hidden More/color/keyboard/reset, source-link round trip tests |
 | Theme/e-ink/image lightbox | Original full theme catalogue, e-ink colours/CSS, image viewer | Build passes; dedicated runtime acceptance pending |
 | AI accounts and agent permissions | Native Harness conversations; original account secrets not duplicated | Host-managed models/tools/permission surfaces; actual response not tested in this branch |
-| Per-device appearance, immersive/nav details | In audit | Must finish comparison before claiming full parity |
+| Per-device appearance, immersive/nav details | Original device-profile model; immersive toggle, always-visible original edge arrows and click navigation | Device isolation tests pass; real mobile swipe and full runtime acceptance pending |
 | Notes templates/folders/metadata/export variants and data recovery | Existing managed Markdown notes and new translation/selection saves | Must finish original workflow comparison; do not claim all original variants yet |
 | Original language coverage | Original locale sources retained; current Harness integration zh/en | Remaining locale/UI coverage audit |
 

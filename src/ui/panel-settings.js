@@ -94,8 +94,8 @@ export function SettingsPanel({ ui }) {
           h('input', {
             className: 'qmr-range',
             type: 'range',
-            min: 14,
-            max: 28,
+            min: 12,
+            max: 48,
             step: 1,
             value: settings.fontSize,
             'aria-label': '字号',
@@ -111,8 +111,8 @@ export function SettingsPanel({ ui }) {
           h('input', {
             className: 'qmr-range',
             type: 'range',
-            min: 1.4,
-            max: 2.2,
+            min: 1.2,
+            max: 2.5,
             step: 0.05,
             value: settings.lineHeight,
             'aria-label': '行高',

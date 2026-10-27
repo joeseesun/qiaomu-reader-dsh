@@ -128,3 +128,16 @@ Markdown 保存可读摘录与回跳链接；精确定位仍依赖结构化划�
 - 许可证随包补全：Elton Reader、Lyceum、fflate、saxes、朱雀仿宋；新增 scripts/licenses.mjs 生成生产依赖与 Lucide 完整声明，build 自动生成，verify-package 检查必需许可。原版 CSS 未改。
 - 最新整套验收 /tmp/qmr-full-check20.log：228/228，22 个发布文件；随后 PDF 与字体定向测试 /tmp/qmr-pdf-font-check.log 2/2。Reader 尚未提交/发布/安装新候选，版本仍 1.1.0。此前已公开并落盘安装的 Audio 0.1.1 等状态不变。
 - 仍需：计时/阅读统计、选文操作自定义、外观/eink/插图等逐项对照；字体与 PDF 真界面验收、Reader 公共包/CI/发布安装；RSS/Radio/Home 全量对照及 Agent 迁移。不得将当前测试通过等同于全部迁移完成。
+
+
+### 2026-10-28 00:24 — Reader 草稿已上 GitHub，继续原版细节迁移
+
+- 已提交并推送 `6765f97` 到 `feat/full-obsidian-adaptation`；草稿 PR https://github.com/joeseesun/qiaomu-reader-dsh/pull/3 。Linux CI run `40540032062` 通过，包含 npm ci/check 和 client.js/index.js 重建一致性。尚未合并、打 tag、发新 Release 或替换日用 Reader。
+- Reader 源码候选版本改为 2.0.0；公开稳定版仍 1.1.0。README 中已明确新分支与稳定包的区别，新增 docs/FUNCTIONAL-PARITY.md 逐项记录缺口。
+- 原版 CSS SHA256 双份实测相同：`0a2d4f2d8ab6c5effacbabb1ca1ee327d50aba601c83780ed706bfbd13c30e5e`。新增源码凭证形状扫描未发现实际凭证字面量；SSH 解析器标头及翻译键造成的初筛误报已区分。
+- 新增原版计时/阅读目标/连续天数/14 日统计，Host 按 idempotent receipt 累加，暂停与隐藏页面落盘；新增原版选文工具条、颜色下拉、显隐排序/文字标签设置、更多动作、无需创建划线的正文位置链接。
+- 新增原版完整主题目录、墨水屏颜色/CSS、插图 lightbox；继续接入分设备外观、沉浸模式、常显原版边缘翻页按钮、点击翻页；修复设备外观中未设置字段串用其他设备墨水屏状态的问题，字号/行距恢复原版 12–48 / 1.2–2.5 范围。
+- 整套测试 /tmp/qmr-full-check27.log 为 237/237，23 个发布文件通过，包含设备默认值修复。全部新界面仍未做真实浏览器验收。
+- 一次真实 Google Host 查词 `reader → zh-CN` 返回上游限流（原版错误分类 limit），没有翻译成功证据，也没有自动改用或调用付费 AI。无需继续重复请求限流接口。
+- 用户浏览器仍处于暂停控制，未接管、未操作任何测试页，未重启 ports-qa/public-qa/daily Harness。
+- 下一步继续原版笔记创建/命名/文件夹/标签/模板/书籍关联/导出与备份恢复对照，以及移动触控和语言覆盖；其后仍有 RSS/Radio/Home 全量审计和 Agent 迁移。

@@ -255,8 +255,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const showChrome = React.useCallback(() => {
     setChromeVisible(true);
     clearTimeout(chromeTimerRef.current);
-    chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
-  }, []);
+    if(ui.settingsOf(bookId).immersive!==false)chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
+  }, [ui,bookId,bookState?.settings?.immersive]);
   React.useEffect(() => {
     showChrome();
     return () => clearTimeout(chromeTimerRef.current);
@@ -885,7 +885,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           }
           if (typeof index === 'number' && index >= 0) ui.goHref(href);
           else ui.toast('无法定位这个链接', 'warn');
+          return;
         }
+        const live=liveRef.current;if(live.settings.navMode==='click'&&live.settings.flow!=='scroll'&&!window.getSelection()?.toString()){const rect=viewportRef.current?.getBoundingClientRect();if(rect&&rect.width){const ratio=(event.clientX-rect.left)/rect.width;if(ratio<.3)ui.turnPage(-1);else if(ratio>.7)ui.turnPage(1);}}
       }
     } catch (_error) {
       /* 忽略 */
@@ -1143,10 +1145,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         settings.flow !== 'scroll'
           ? h('button', {
             type: 'button',
-            className: 'qmr-page-zone qmr-page-zone-prev',
+            className: settings.pageButtonsVisibility==='always'?'qiaomu-reader-page-edge qiaomu-reader-page-edge-prev':'qmr-page-zone qmr-page-zone-prev',
             'aria-label': '上一页',
             onClick: () => ui.turnPage(-1),
-          })
+          },settings.pageButtonsVisibility==='always'?h(IconPrev,{width:18,height:18}):null)
           : null,
         h(
           'div',
@@ -1162,10 +1164,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         settings.flow !== 'scroll'
           ? h('button', {
             type: 'button',
-            className: 'qmr-page-zone qmr-page-zone-next',
+            className: settings.pageButtonsVisibility==='always'?'qiaomu-reader-page-edge qiaomu-reader-page-edge-next':'qmr-page-zone qmr-page-zone-next',
             'aria-label': '下一页',
             onClick: () => ui.turnPage(1),
-          })
+          },settings.pageButtonsVisibility==='always'?h(IconNext,{width:18,height:18}):null)
           : null,
         settings.flow !== 'scroll'
           ? h('div', { className: 'qmr-page-count' }, `第 ${page + 1} / ${pageCount} 页`)

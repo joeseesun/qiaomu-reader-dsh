@@ -1,3 +1,4 @@
+import {applyDeviceAppearance,captureDeviceAppearance} from '../client/device-appearance.js';
 import {READER_FONTS} from '../original/font-catalog.js';
 import {positionLocation} from '../client/position.js';
 /**
@@ -327,8 +328,9 @@ export function createController(getProps, store) {
     const base = { ...UI_SETTING_DEFAULTS, ...(DEFAULT_READER_SETTINGS || {}) };
     const own = (state && state.settings) || {};
     const merged = { ...base, ...own };
-    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 14, 28);
-    merged.lineHeight = Math.min(2.2, Math.max(1.4, Number(merged.lineHeight) || base.lineHeight));
+    applyDeviceAppearance(merged);
+    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 12, 48);
+    merged.lineHeight = Math.min(2.5, Math.max(1.2, Number(merged.lineHeight) || base.lineHeight));
     merged.margin = clampInt(merged.margin || base.margin, 32, 120);
     if (!READER_THEMES[merged.theme]) merged.theme = base.theme;
     if (!['serif', 'sans-serif', 'mono',...Object.keys(READER_FONTS)].includes(merged.fontFamily)) merged.fontFamily = 'serif';
@@ -342,7 +344,8 @@ export function createController(getProps, store) {
   function updateSettings(id, patch) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
-      const merged = { ...(state.settings || {}), ...(patch || {}) };
+      const merged = { ...(state.settings || {}), ...settingsOf(id), ...(patch || {}) };
+      captureDeviceAppearance(merged);
       patchState(id, { settings: merged });
     });
   }
