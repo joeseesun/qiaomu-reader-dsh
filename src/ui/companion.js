@@ -1,9 +1,11 @@
+import {mountOriginalAnswerActions} from '../original/answer-actions.js';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { IconClose, IconPlus } from './icons.js';
 import { readQuickPrompts } from './quick-prompts.js';
 
 const h = React.createElement;
+function AnswerActions({ui,chat,bookId}){const [answer,setAnswer]=React.useState(''),ref=React.useRef(null);React.useEffect(()=>{setAnswer('');return chat?.watchAnswer(setAnswer);},[chat]);React.useEffect(()=>{if(!answer||!ref.current)return;return mountOriginalAnswerActions(ref.current,{t:ui.props().features.t,copy:()=>ui.copy(answer),save:()=>ui.props().notes.create(ui,{bookId,text:answer,kind:'ai-answer'}),preview:path=>ui.props().chatApi.previewFile(path,'split'),onError:error=>ui.toast(error.message,'warn')});},[ui,bookId,answer]);return h('div',{ref});}
 
 export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) {
   const book = ui.bookOf(bookId);
@@ -156,6 +158,7 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
     chatVisible && SessionProvider && renderSlot
       ? h('div', { className: 'qmr-native-chat', ref: chatRoot }, h(SessionProvider, { session: chat.reference }, renderSlot('qiaomu-reader.chat', {})))
       : null,
+    chatVisible?h(AnswerActions,{ui,chat,bookId}):null,
     promptMount ? createPortal(h('div', { className: 'qmr-companion-prompts', role: 'group', 'aria-label': '快捷提示词' },
       h('div', { className: 'qmr-companion-prompt-scroll' }, prompts.map((item) => h('button', {
         key: item.id, type: 'button', title: item.body, 'aria-label': `直接发送：${item.title}`,

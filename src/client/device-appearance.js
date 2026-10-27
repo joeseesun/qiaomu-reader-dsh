@@ -1,0 +1,6 @@
+// Original per-device appearance model; Harness spread/justify names map original columns/textAlign.
+export const DEVICE_APPEARANCE_KEYS=['theme','fontSize','fontFamily','customFontFamily','customFontId','pageButtonsVisibility','lineHeight','spread','textAlign','justify','margin','einkMode','mobileTopInset'];
+const defaults={theme:'paper',fontSize:18,fontFamily:'serif',customFontFamily:'',customFontId:'',pageButtonsVisibility:'hover',lineHeight:1.75,spread:false,textAlign:'justify',justify:true,margin:64,einkMode:false,mobileTopInset:0};
+export function readerDeviceKey(view=globalThis){const coarse=view.matchMedia?.('(pointer: coarse)')?.matches;if(coarse&&view.innerWidth<=760)return 'phone';if(coarse&&view.innerWidth<=1366)return 'tablet';return 'desktop';}
+export function applyDeviceAppearance(target,key=readerDeviceKey()){if(!target?.perDevice)return target;const profile=target.deviceProfiles?.[key];if(profile)for(const field of DEVICE_APPEARANCE_KEYS)target[field]=profile[field]??defaults[field];return target;}
+export function captureDeviceAppearance(target,key=readerDeviceKey()){if(!target?.perDevice)return target;const profile={};for(const field of DEVICE_APPEARANCE_KEYS)profile[field]=structuredClone(target[field]??defaults[field]);target.deviceProfiles={...target.deviceProfiles,[key]:profile};return target;}

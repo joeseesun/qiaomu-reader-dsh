@@ -8,6 +8,8 @@ export function remoteHostApi(ctx) {
     throw result?.error || new Error(`乔木阅读宿主调用失败：${name}`);
   };
   return {
+    featureOperation:request=>call('featureOperation',request),
+    kindleOperation:request=>call('kindleOperation',request),
     info: () => call('info'),
     library: () => call('library'),
     import: (request) => call('importBook', request),

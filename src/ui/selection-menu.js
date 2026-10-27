@@ -1,10 +1,13 @@
+import {mountOriginalSelection} from '../original/selection-ui.js';
+import {enhance} from '../client/native-ui.js';
+import {positionLink} from '../core/backlink.js';
 /**
  * 选中文字后的小工具条：四色划线 / 复制 / 写批注 / 取消。
  * 用 getBoundingClientRect() 的坐标定位（position: fixed），超出视口自动翻转/收拢。
  */
 import * as React from 'react';
 import { HIGHLIGHT_COLORS, HIGHLIGHT_COLOR_LABELS, highlightPaint } from './theme.js';
-import { IconClose, IconCopy, IconHighlight, IconNote, IconSparkles, IconLanguages } from './icons.js';
+import { IconClose, IconCopy, IconHighlight, IconNote, IconSparkles, IconLanguages, IconAudio } from './icons.js';
 
 const h = React.createElement;
 
@@ -37,65 +40,16 @@ export function computeMenuPosition(anchor, size) {
  * @param {()=>void} props.onNote 写批注
  * @returns {React.ReactElement|null}
  */
-export function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk, onLookup }) {
-  const elementRef = React.useRef(null);
-  const [position, setPosition] = React.useState(() => computeMenuPosition(selection.anchor));
-  const themeId = ui.settingsOf(ui.useSel((state) => state.bookId)).theme;
-
-  React.useLayoutEffect(() => {
-    const element = elementRef.current;
-    const size = element ? { width: element.offsetWidth, height: element.offsetHeight } : undefined;
-    setPosition(computeMenuPosition(selection.anchor, size));
-  }, [selection.anchor, selection.text]);
-
-  if (!selection || !selection.anchor) return null;
-
-  const swatches = HIGHLIGHT_COLORS.map((color) =>
-    h('button', {
-      key: color,
-      type: 'button',
-      className: 'qmr-swatch',
-      style: { background: highlightPaint(themeId, color) },
-      'aria-label': `${HIGHLIGHT_COLOR_LABELS[color]}色划线`,
-      onClick: () => onHighlight(color),
-    }));
-
-  return h(
-    'div',
-    {
-      ref: elementRef,
-      className: 'qmr-selmenu',
-      style: { left: position.left, top: position.top },
-      role: 'toolbar',
-      'aria-label': '选中文字操作',
-      onMouseDown: (event) => event.preventDefault(),
-    },
-    h('span', { className: 'qmr-swatches', 'aria-label': '划线颜色' }, swatches),
-    h('span', { className: 'qmr-selmenu-sep', 'aria-hidden': 'true' }),
-    h('button', { type: 'button', className: 'qmr-selmenu-btn', 'aria-label': ui.t('lookup.title', '查词与翻译'), onClick: onLookup }, h(IconLanguages, { width: 16, height: 16 })),
-    h('button', {
-      type: 'button',
-      className: 'qmr-selmenu-btn',
-      'aria-label': '复制',
-      onClick: () => ui.copy(selection.text),
-    }, h(IconCopy, { width: 16, height: 16 })),
-    h('button', {
-      type: 'button',
-      className: 'qmr-selmenu-btn',
-      'aria-label': '写批注',
-      onClick: () => onNote(),
-    }, h(IconNote, { width: 16, height: 16 })),
-    h('button', {
-      type: 'button', className: 'qmr-selmenu-btn', 'aria-label': '问 AI',
-      onClick: () => onAsk?.(),
-    }, h(IconSparkles, { width: 16, height: 16 })),
-    h('button', {
-      type: 'button',
-      className: 'qmr-selmenu-btn',
-      'aria-label': '取消选中',
-      onClick: () => ui.clearSelection(),
-    }, h(IconClose, { width: 16, height: 16 })),
-  );
+export function SelectionMenu({ui,selection,onHighlight,onNote,onAsk,onLookup,onRead}) {
+ const elementRef=React.useRef(null),[position,setPosition]=React.useState(()=>computeMenuPosition(selection.anchor));
+ const bookId=ui.useSel(state=>state.bookId),lookupEnabled=ui.useSel(state=>state.lookupEnabled)!==false;
+ const settings=ui.settingsOf(bookId);const config=JSON.stringify([settings.selectionActions,settings.selectionShowLabels,lookupEnabled]);
+ React.useLayoutEffect(()=>{const el=elementRef.current;if(!el)return;const t=key=>key==='speech.selected'?ui.t('speech.selected','朗读选中内容'):ui.props().features.t(key);
+  const link=()=>positionLink(bookId,selection.chapterHref,selection.text,selection.textOffset);
+  const dispose=mountOriginalSelection(enhance(el),{t,settings:{...settings,translateEnabled:lookupEnabled},selection,colors:HIGHLIGHT_COLORS.map(id=>({id,label:()=>HIGHLIGHT_COLOR_LABELS[id],css:highlightPaint(settings.theme,id)})),close:()=>ui.clearSelection(),actions:{highlight:onHighlight,comment:onNote,ai:onAsk,translate:onLookup,copy:()=>ui.copy(selection.text),read:onRead,quote:()=>void ui.props().notes.copyQuote(ui,selection).catch(error=>ui.toast(error.message,'warn')),link:()=>ui.copy(link()),note:()=>void ui.props().notes.create(ui,{bookId,text:selection.text,chapterHref:selection.chapterHref,offset:selection.textOffset}).catch(error=>ui.toast(error.message,'warn'))}});
+  setPosition(computeMenuPosition(selection.anchor,{width:el.offsetWidth,height:el.offsetHeight}));return dispose;
+ },[ui,selection,config,onHighlight,onNote,onAsk,onLookup,onRead]);
+ return h('div',{ref:elementRef,className:'qiaomu-reader-hl-popup qiaomu-reader-hl-popup-on',style:{position:'fixed',left:position.left,top:position.top,zIndex:1500},onMouseDown:event=>event.preventDefault()});
 }
 
 /** 供阅读器复用的划线图标按钮（保持图标一致） */

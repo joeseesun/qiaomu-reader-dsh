@@ -1,3 +1,4 @@
+import {EXTENDED_FORMATS,parseExtendedBook} from './extended-book.js';
 /**
  * 客户端数据面：把「宿主半的持久化」与「浏览器本地缓存」合成一个数据源，
  * 并以 UI 能直接消费的形状暴露书库、单本状态与阅读引擎。
@@ -249,7 +250,7 @@ export function createDataLayer(options = {}) {
     const previous = pendingStateWrites.get(bookId) || Promise.resolve();
     const pending = previous.catch(() => {}).then(async () => {
       await saveLocalState(bookId, state);
-      if (host !== null) await host.saveState(bookId, state);
+      if (host !== null) { const result=await host.saveState(bookId, state);if(result?.warning)setStatus('ready',result.warning); }
     });
     pendingStateWrites.set(bookId, pending);
     void pending.catch(error => setStatus('ready', `阅读数据暂未同步到宿主：${error?.message || error}`));
@@ -292,6 +293,8 @@ export function createDataLayer(options = {}) {
       if (entry?.format === 'pdf') {
         const { parsePdfBook } = await import('./pdf-book.js');
         record = await parsePdfBook(bytes, entry.title);
+      } else if (EXTENDED_FORMATS.includes(entry?.format)) {
+        record=await parseExtendedBook(bytes,entry.title+'.'+entry.format,entry.format);
       } else if (TEXT_FORMATS.includes(entry?.format)) {
         const { parseTextBook } = await import('./text-book.js');
         record = parseTextBook(bytes, entry.title, entry.format, { layout: entry.textLayout || 1 });
@@ -356,6 +359,9 @@ export function createDataLayer(options = {}) {
       } catch (error) {
         return { ok: false, error: `解析 EPUB 失败：${error instanceof Error ? error.message : String(error)}` };
       }
+    } else if (EXTENDED_FORMATS.includes(format)) {
+      try {const record=await parseExtendedBook(bytes,filename,format);meta={title:record.book.title,author:record.book.author,language:record.book.language,identifier:record.book.identifier,chapterCount:record.book.chapters.length,cover:record.cover};await record.engine.dispose();}
+      catch(error){return {ok:false,error:error.message};}
     } else if (TEXT_FORMATS.includes(format)) {
       try {
         const { parseTextBook } = await import('./text-book.js');
@@ -376,6 +382,7 @@ export function createDataLayer(options = {}) {
         return { ok: false, error: error instanceof Error ? error.message : String(error) };
       }
     }
+    if(file.bookMetadata)meta={...meta,...file.bookMetadata,sourceId:file.bookMetadata.sourceId||file.bookJobId};
     if (/^gutenberg:\d+$/.test(file.discoveryIdentifier || '')) meta = { ...meta, identifier: file.discoveryIdentifier };
     let book = null;
     let hostError = '';

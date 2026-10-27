@@ -95,3 +95,55 @@ Markdown 保存可读摘录与回跳链接；精确定位仍依赖结构化划�
 另补齐原版 4.2.4 的 pdf.js 句号截断修复：`scripts/patch-pdfjs.mjs` 把 worker 里 `SpecialCharRegExp` 的 `/^(\s)|…/u` 改成 `/^(\s+)$|(\p{Mn})|(\p{Cf})$/u`（否则 " ." 中的句号被吞）。`scripts/build.mjs` 每次构建前自动重打（npm install 会还原补丁），脚本幂等。
 
 新增测试 `test/upgrades.test.mjs`（60 个用例全绿）：伴读外观归一化/持久化/容错、`readerPageDirection` 守卫矩阵（含 shadow DOM composedPath）、PDF 资源工厂（CMap 字节、wasm `\0asm` 魔数、未知资源报错、选项契约）。构建通过，`client.js` 5,782,813 字节。
+
+## 2026-10-27 23:43 第二阶段迁移（开发中，尚未发布）
+
+独立 worktree `qiaomu-reader-dsh-migration`，分支 `feat/full-obsidian-adaptation`，保留原仓库与已接受的 C 书目/阅读界面。原版 4.9.2 的 Kindle 配对/传书窗口、Calibre 搜索/批量导入窗口及完整 CSS 已复用到 `src/original`；只在 Host 边界替换 Obsidian 的文件、系统凭据与 Node 访问。
+
+已构建并通过 133 项测试（`/tmp/qmr-full-check8.log`）：
+
+- Kindle KOReader/原生双模式，USB 公钥配对、固定设备身份、SSH/SFTP 回读校验、独立 worker EPUB→AZW3、超时/取消、原库保留、每模式配置；密钥只在 Host 系统存储，Remote 不返回私钥。
+- 复用与原版相同的 Foliate 解析器增加 MOBI/AZW/AZW3/FB2/FBZ/CBZ，保留中文、图片、目录与脚注链接，并接入现有搜索、划线与状态接口。Host Agent 用隔离 DOM worker 读取同一章节。
+- 实际测试覆盖原生转换器输出经独立 MOBI 解析器读取、FB2/FBZ 中文图片与回链、CBZ 页序/释放、真实 SSH fixture/USB 目录 fixture及取消。没有实物 Kindle 传输/打开验证。
+- Calibre 原版查询与文件边界测试通过；原版搜索窗口与批量导入已接线，新增 Host 设置 CAS、限时搜索句柄、实际导入根目录验证。Host API 全链路和真实窗口尚待验收。
+
+测试浏览器由用户接管，未继续其浏览器验收；这些新增能力未安装到日用，也尚未声称完成 UI、设备或发布验收。完整语音 UI/Audio 联动、可选乔木书库、稳定位置及原版剩余功能矩阵仍继续，不是完整迁移交付。
+
+## 2026-10-27 23:58 第二阶段补充（开发中）
+
+- 乔木书库复用原版统一“找书”窗口和服务代码：激活、搜索、可选封面、额度/到期、下载验证、完成任务恢复、退出、关闭取消。异步系统凭据适配，Host 导入真实 EPUB 与重启恢复/去重通过；没有调用真实激活服务。
+- 原版 `tts-ui`/播放器/音色列表/设置/本地模型面板与原版控制器已接回，使用 Audio 0.1.1 的 `createSpeechBridge` 和 `coordinateSpeech`。密钥放 Reader 系统存储，设置和进度在 Host，真实 Reader 设置来源已注册供 Audio 显式导入。Node/JSDOM 加真实 Mac 清和合成两章 WAV（48 kHz、4.302229s/413058 字节及1.971646s/189322字节），竞争播放暂停、第二章进度保存通过；不是浏览器播放验收。
+- 全套188项（check12/13）通过；另新增原版稳定位置/跳转弹窗与 EPUB3 printed page-list、EPUB2 NCX 页表适配，3项专项测试通过。目录和正文链接开始保留片段锚点，需真实页面复验。
+- 命名书签已接回原版命名/列表/删除确认控件及 Host 书籍状态，正在补测试。查词的免费翻译与原版 UI、阅读记录/设置差异、稳定位置精度及剩余功能矩阵继续处理。
+- Audio 0.1.1 已公开并以匿名下载包更新 public-qa/日用，日用不重启；Reader 仍是开发分支，未覆盖用户当前安装。
+
+
+### 2026-10-28 00:13 — Reader 完整迁移继续，浏览器仍由用户使用
+
+- 遵守用户“我还在使用，先继续代码和发布准备”：未接管 Ego，未操作测试浏览器，未重启 ports-qa 或日常 Harness。
+- 原版查词卡/Google 翻译/原生 AI 会话边界/目标语言菜单/保存译文/生词本及 Spaced Repetition 格式已接入；原版翻译设置含 Anki 同步。手动发送与自动同步现统一走原版 Anki 卡片模型；自动同步失败保留已保存的生词并返回独立提示。
+- 增加正文文字锚点以恢复命名书签与重开位置；印刷页码按当前正文锚点计算，进度条按原版 1500 单位位置模型。Node DOM 测试验证重复文字、包裹划线后的定位、同章多印刷页；真实字体重排/浏览器效果尚未验收。
+- 复用原版字体目录、字体选择区、字体导入存储与校验代码。Host 限定摘要路径、64 MiB、文件签名、读回哈希、拒绝软链接；保留朱雀仿宋 OFL。原版字体测试 8 项和真实内嵌字体 Host 落盘重开测试通过（FontFace 真浏览器解析仍待验收）。
+- 复用原版 PDF 缩放控件、菜单、自定义百分比、手势/拖动处理，适配 Harness 当前页容器；新增 Node DOM 测试验证尺寸/快捷键/鼠标滚轮/卸载回收。
+- 许可证随包补全：Elton Reader、Lyceum、fflate、saxes、朱雀仿宋；新增 scripts/licenses.mjs 生成生产依赖与 Lucide 完整声明，build 自动生成，verify-package 检查必需许可。原版 CSS 未改。
+- 最新整套验收 /tmp/qmr-full-check20.log：228/228，22 个发布文件；随后 PDF 与字体定向测试 /tmp/qmr-pdf-font-check.log 2/2。Reader 尚未提交/发布/安装新候选，版本仍 1.1.0。此前已公开并落盘安装的 Audio 0.1.1 等状态不变。
+- 仍需：计时/阅读统计、选文操作自定义、外观/eink/插图等逐项对照；字体与 PDF 真界面验收、Reader 公共包/CI/发布安装；RSS/Radio/Home 全量对照及 Agent 迁移。不得将当前测试通过等同于全部迁移完成。
+
+
+### 2026-10-28 00:24 — Reader 草稿已上 GitHub，继续原版细节迁移
+
+- 已提交并推送 `6765f97` 到 `feat/full-obsidian-adaptation`；草稿 PR https://github.com/joeseesun/qiaomu-reader-dsh/pull/3 。Linux CI run `40540032062` 通过，包含 npm ci/check 和 client.js/index.js 重建一致性。尚未合并、打 tag、发新 Release 或替换日用 Reader。
+- Reader 源码候选版本改为 2.0.0；公开稳定版仍 1.1.0。README 中已明确新分支与稳定包的区别，新增 docs/FUNCTIONAL-PARITY.md 逐项记录缺口。
+- 原版 CSS SHA256 双份实测相同：`0a2d4f2d8ab6c5effacbabb1ca1ee327d50aba601c83780ed706bfbd13c30e5e`。新增源码凭证形状扫描未发现实际凭证字面量；SSH 解析器标头及翻译键造成的初筛误报已区分。
+- 新增原版计时/阅读目标/连续天数/14 日统计，Host 按 idempotent receipt 累加，暂停与隐藏页面落盘；新增原版选文工具条、颜色下拉、显隐排序/文字标签设置、更多动作、无需创建划线的正文位置链接。
+- 新增原版完整主题目录、墨水屏颜色/CSS、插图 lightbox；继续接入分设备外观、沉浸模式、常显原版边缘翻页按钮、点击翻页；修复设备外观中未设置字段串用其他设备墨水屏状态的问题，字号/行距恢复原版 12–48 / 1.2–2.5 范围。
+- 整套测试 /tmp/qmr-full-check27.log 为 237/237，23 个发布文件通过，包含设备默认值修复。全部新界面仍未做真实浏览器验收。
+- 一次真实 Google Host 查词 `reader → zh-CN` 返回上游限流（原版错误分类 limit），没有翻译成功证据，也没有自动改用或调用付费 AI。无需继续重复请求限流接口。
+- 用户浏览器仍处于暂停控制，未接管、未操作任何测试页，未重启 ports-qa/public-qa/daily Harness。
+- 下一步继续原版笔记创建/命名/文件夹/标签/模板/书籍关联/导出与备份恢复对照，以及移动触控和语言覆盖；其后仍有 RSS/Radio/Home 全量审计和 Agent 迁移。
+
+## 2026-10-28 notes, navigation and recovery continuation
+
+Original NoteTitleModal, HighlightExportModal, BookNotePicker, AI note-title algorithm, quote formatting, answer actions, note preferences and highlight colors are now used. Host adapters provide notes-only paths, unique filenames, original title/date template fallback, existing-note linking, book templates/properties, progress properties, selective exports, duplicate suppression and managed-section preservation. Native preview uses public `sidebarRight.mounted` and `openResource`; no session/model is created to preview a saved file. External Templater JavaScript is not executed. New book notes use book titles; existing 1.1.0 ID-based note files remain linked in place.
+
+Original swipe thresholds/guards now work through owned listeners. Mobile top inset is stored per device. Reading state writes verify an independent snapshot before replacing the main file. Damaged main files remain untouched and write-blocked while the snapshot supports reading; explicit restoration retains the original damaged bytes. Position history keeps 30 snapshots and displays the original history chips. Native sidebars, physical touch and the new dialogs are not runtime-accepted while browser control remains with the user.

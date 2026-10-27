@@ -179,7 +179,7 @@ export function ReaderOverlay(props) {
     let cancelled = false;
     (async () => {
       const ok = await ui.openBook(jumpTarget.bookId);
-      if (!cancelled && ok) ui.focusHighlight(store.get().bookId, jumpTarget.highlightId);
+      if (!cancelled && ok){if(jumpTarget.highlightId)ui.focusHighlight(store.get().bookId,jumpTarget.highlightId);else{ui.goHref(jumpTarget.chapterHref);store.set({speechFocus:{text:jumpTarget.text,offset:jumpTarget.offset,chapterIndex:store.get().chapterIndex,token:Date.now()}});}}
       if (!cancelled) store.set({ jumpTarget: null });
     })();
     return () => { cancelled = true; };

@@ -1,0 +1,132 @@
+export const READER_THEMES = {
+  auto: {
+    label: "match-obsidian-2",
+    bg: "var(--background-primary)",
+    text: "var(--text-normal)",
+    ui: "var(--background-secondary)",
+    border: "var(--background-modifier-border)",
+    accent: "var(--interactive-accent)",
+    muted: "var(--text-muted)",
+  },
+  paper: {
+    label: "paper-white",
+    bg: "#f8f6f0",
+    text: "#24231f",
+    ui: "#efebe2",
+    border: "#dcd5c8",
+    accent: "#4f6758",
+    muted: "#746f66",
+  },
+  warm: {
+    label: "warm-paper",
+    bg: "#f3ebdd",
+    text: "#30291f",
+    ui: "#e9decb",
+    border: "#d5c5ab",
+    accent: "#755d3c",
+    muted: "#776b59",
+  },
+  celadon: {
+    label: "celadon",
+    bg: "#eaf0e8",
+    text: "#243029",
+    ui: "#dfe8dd",
+    border: "#c6d3c4",
+    accent: "#4f6d5a",
+    muted: "#667269",
+  },
+  moon: {
+    label: "moon-white",
+    bg: "#eef2f3",
+    text: "#263238",
+    ui: "#e2e8ea",
+    border: "#c9d2d5",
+    accent: "#516c78",
+    muted: "#5f6d74",
+  },
+  night: {
+    dark: true,
+    label: "night",
+    bg: "#181a1b",
+    text: "#d9d7d1",
+    ui: "#222526",
+    border: "#383c3d",
+    accent: "#91ab9a",
+    muted: "#9a9a94",
+  },
+  bright: {
+    label: "bright",
+    bg: "#ffffff",
+    text: "#292929",
+    ui: "#f7f7f7",
+    border: "#dedede",
+    accent: "#292929",
+    muted: "#626262",
+  },
+  rice: {
+    label: "rice-paper",
+    bg: "#f8f5ee",
+    text: "#2e2a24",
+    ui: "#f1ece2",
+    border: "#e2dace",
+    accent: "#2e2a24",
+    muted: "#6b6358",
+  },
+  bamboo: {
+    label: "bamboo",
+    bg: "#edf2ec",
+    text: "#27322c",
+    ui: "#e4ebe3",
+    border: "#d3ddd2",
+    accent: "#27322c",
+    muted: "#56645b",
+  },
+  mist: {
+    label: "mist-blue",
+    bg: "#f3f5f8",
+    text: "#1f2933",
+    ui: "#eaeef3",
+    border: "#d9dfe7",
+    accent: "#1f2933",
+    muted: "#52606d",
+  },
+  deepsea: {
+    dark: true,
+    label: "deep-sea",
+    bg: "#171c24",
+    text: "#d5dce6",
+    ui: "#1d232d",
+    border: "#2a313c",
+    accent: "#d5dce6",
+    muted: "#98a3b3",
+  },
+  black: {
+    dark: true,
+    label: "ink-black",
+    bg: "#000000",
+    text: "#c8c8c8",
+    ui: "#0d0d0d",
+    border: "#222222",
+    accent: "#c8c8c8",
+    muted: "#8e8e8e",
+  },
+  eink: {
+    label: "e-ink-2",
+    bg: "#ffffff",
+    text: "#000000",
+    ui: "#ffffff",
+    border: "#000000",
+    accent: "#000000",
+    muted: "#444444",
+  },
+};
+
+export const READER_THEME_CHOICES = ["auto", "bright", "paper", "rice", "warm", "celadon", "bamboo", "moon", "mist", "night", "deepsea", "black"];
+
+export function migrateReaderTheme(value) {
+  if (value === "light") return "paper";
+  if (value === "sepia") return "warm";
+  if (value === "dark") return "night";
+  if (value === "eink") return "moon";
+  return READER_THEMES[value] ? value : "auto";
+}

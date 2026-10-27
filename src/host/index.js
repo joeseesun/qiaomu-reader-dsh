@@ -1,3 +1,11 @@
+import {readStoredState,writeStoredState,stateRecoveryOperation} from './state-recovery.js';
+import {createBookNotes} from './book-notes.js';
+import {createNotesHost} from './note-service.js';
+import {randomUUID} from 'node:crypto';
+import {createVocabularyHost} from './vocabulary-service.js';
+import {createReaderFeatures} from './features.js';
+import {readExtendedChapter} from './extended-formats.js';
+import {createKindleService} from './kindle-service.js';
 /**
  * 乔木阅读 · 宿主半
  *
@@ -13,12 +21,9 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import { highlightLink } from '../core/backlink.js';
-import { mergeManagedNotes } from '../core/markdown-notes.js';
 import { formatOf, TEXT_FORMATS } from '../client/text-formats.js';
 import { parseTextBook } from '../client/text-book.js';
 import { speechAudio, speechVoices } from './speech.js';
-import { sendAnkiEntry } from './anki.js';
-import { vocabularyMarkdown } from '../core/vocabulary.js';
 import { searchBooks, downloadBook } from './discovery.js';
 import { TypertRemoteService, Remote } from '@deepseek-ai/dsh-typert-protocol';
 
@@ -217,6 +222,8 @@ function normalizeBook(raw) {
     cover: typeof raw.cover === 'string' ? raw.cover : null,
     addedAt: typeof raw.addedAt === 'number' ? raw.addedAt : Date.now(),
     openedAt: typeof raw.openedAt === 'number' ? raw.openedAt : null,
+    sourceId: typeof raw.sourceId==='string'?raw.sourceId:'',
+    isbn: typeof raw.isbn==='string'?raw.isbn:'',
     source: typeof raw.source === 'string' ? raw.source : 'upload',
     language: typeof raw.language === 'string' ? raw.language : '',
     chapterCount: typeof raw.chapterCount === 'number' ? raw.chapterCount : 0,
@@ -264,6 +271,7 @@ async function importBook(paths, input) {
     bytes: bytes.byteLength,
     addedAt: typeof previous.addedAt === 'number' ? previous.addedAt : Date.now(),
     source: input.source ?? previous.source ?? 'upload',
+    sourceId: previous.sourceId||input.sourceId||'',isbn:previous.isbn||input.isbn||'',
     language: previous.language || input.language || parsed?.language || '',
     chapterCount: parsed?.chapters.length ?? input.chapterCount ?? previous.chapterCount ?? 0,
     textLayout,
@@ -291,17 +299,18 @@ function emptyState(bookId) {
 }
 
 function stateSummary(state, chapterCount) {
-  const progress = ((Number(state.locator?.chapterIndex) || 0) + (Number(state.locator?.scroll) || 0)) / Math.max(1, Number(chapterCount) || 1);
+  const progress = Number.isFinite(state.locator?.progress)?state.locator.progress:((Number(state.locator?.chapterIndex) || 0) + (Number(state.locator?.scroll) || 0)) / Math.max(1, Number(chapterCount) || 1);
   return { readProgress: Math.min(1, Math.max(0, progress)), highlightCount: state.highlights?.length || 0 };
 }
 
 /** 读取某本书的阅读状态。 */
 async function readState(paths, bookId) {
-  const raw = await readJson(safeJoin(paths.state, `${bookId}.json`), null);
+  const {raw,recovery}=await readStoredState(paths.state,bookId);
   if (raw === null || typeof raw !== 'object') return emptyState(bookId);
   return {
     ...emptyState(bookId),
     ...raw,
+    ...(recovery?{recovery}:{}),
     version: STATE_VERSION,
     bookId,
     highlights: Array.isArray(raw.highlights) ? raw.highlights : [],
@@ -313,8 +322,8 @@ async function readState(paths, bookId) {
 /** 写入阅读状态，并把 openedAt 回填到索引。 */
 async function writeState(paths, bookId, state) {
   const next = { ...state, version: STATE_VERSION, bookId, updatedAt: Date.now() };
-  await writeTextAtomic(safeJoin(paths.state, `${bookId}.json`), `${JSON.stringify(next, null, 2)}\n`);
-  return next;
+  const book=(await readLibrary(paths)).books.find(book=>book.id===bookId);
+  return writeStoredState(paths.state,bookId,next,{chapterCount:book?.chapterCount||1});
 }
 
 /* ------------------------------------------------------------------ *
@@ -396,6 +405,14 @@ export function apply(ctx, config = {}) {
     return paths;
   };
 
+  const features=createReaderFeatures({root:()=>pathsOf().base,importBook:request=>api.import(request),appendTranslation:request=>api.appendTranslation(request),vocabularyOperation:request=>vocabulary.operation(request),notesOperation:request=>notes.operation(request),bookNotesOperation:request=>bookNotes.operation(request),recoveryOperation:request=>serializeLibrary(pathsOf().index,()=>stateRecoveryOperation(pathsOf().state,request))});
+  const vocabulary=createVocabularyHost({root:()=>pathsOf().base,settings:async()=>{const result=await features.operation({method:"load"});if(result.failure)throw Error(result.failure.message);return result.value.settings.lookup||{};}});
+  ctx.effect(()=>()=>features.dispose());
+  const bookNotes=createBookNotes({root:()=>pathsOf().base,bookById:async id=>(await readLibrary(pathsOf())).books.find(book=>book.id===id&&!book.removedAt),stateOf:id=>readState(pathsOf(),id),settings:async()=>((await features.operation({method:'load'})).value.settings.notes||{}),updateSettings:updater=>features.updateNotes(updater),serializeFile:serializeLibrary});
+  const notes=createNotesHost({root:()=>pathsOf().base,bookById:async id=>(await readLibrary(pathsOf())).books.find(book=>book.id===id&&!book.removedAt),exportBook:id=>bookNotes.ensure(id),settings:async()=>((await features.operation({method:'load'})).value.settings.notes||{}),serializeFile:serializeLibrary});
+  const kindle=createKindleService({root:()=>pathsOf().base,bookById:async id=>(await readLibrary(pathsOf())).books.find(b=>b.id===id&&!b.removedAt)});
+  ctx.effect(()=>()=>kindle.dispose());
+
   /* ---- 供客户端半调用的持久化操作 ---- */
 
   /**
@@ -403,6 +420,8 @@ export function apply(ctx, config = {}) {
    * 每个方法都返回可 JSON 序列化的结果，失败时抛带原因的 Error。
    */
   const api = {
+    featureOperation:request=>features.operation(request),
+    kindleOperation:request=>kindle.operation(request),
     speechAudio,
     speechVoices,
     searchBooks: request => searchBooks(request.query),
@@ -413,7 +432,7 @@ export function apply(ctx, config = {}) {
       const state = await readState(pathsOf(), bookId);
       const entry = state.vocabulary?.find(e => e.id === entryId);
       if (!book || !entry) throw new Error('找不到这条生词记录');
-      return sendAnkiEntry(book, entry);
+      return vocabulary.send(book, entry);
     },
     /** 环境信息，客户端用来显示存储位置。 */
     info() {
@@ -459,7 +478,7 @@ export function apply(ctx, config = {}) {
         localId: input.localId,
         cover: typeof input.cover === 'string' && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(input.cover)
           && input.cover.length <= 1400000 ? input.cover : null,
-        source: input.source ?? 'upload',
+        source: input.source ?? 'upload',sourceId:input.sourceId,isbn:input.isbn,
       });
       return { book };
     },
@@ -518,10 +537,14 @@ export function apply(ctx, config = {}) {
         library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now(), ...stateSummary(saved, library.books[index].chapterCount) });
         await writeLibrary(paths, library);
       }
+      let warning;
       if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights) || JSON.stringify(previous.vocabulary) !== JSON.stringify(saved.vocabulary)) {
-        await api.exportNotes(bookId);
+        try{const config=(await features.operation({method:'load'})).value.settings.notes||{};
+        if(config.quotesToBookNote!==false)await api.exportNotes(bookId);}catch(error){warning=error.message;}
+        if(JSON.stringify(previous.vocabulary)!==JSON.stringify(saved.vocabulary)){try{const result=await vocabulary.add(library.books[index]||{id:bookId},saved.vocabulary||[]);warning=warning||result.warning;}catch(error){warning=warning||error.message;}}
       }
-      return { state: saved };
+      try{await bookNotes.syncProgress(bookId);}catch(error){warning=warning||error.message;}
+      return { state: saved, ...(warning?{warning}:{}) };
     },
 
     /** 读取书籍字节（base64）：客户端在浏览器内存里解析。 */
@@ -541,38 +564,19 @@ export function apply(ctx, config = {}) {
       return { highlights: state.highlights, bookmarks: state.bookmarks };
     },
 
+    async appendTranslation({bookId,target,text,source=''}){
+      if(!['book','current','new','daily'].includes(target)||typeof text!=='string'||!text.trim()||text.length>64000)throw Error('Invalid translation note');
+      const paths=await ensureFolders(),library=await readLibrary(paths);const book=library.books.find(b=>b.id===bookId);if(!book)throw Error('Book is not in the library');
+      const date=new Date(),day=[date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+      const filename=target==='book'||target==='current'?`${bookId}.md`:target==='daily'?`${day}.md`:`translation-${randomUUID()}.md`;
+      const destination=target==='book'||target==='current'?await api.exportNotes(bookId):null;
+      const file=destination?.path||safeJoin(paths.notes,filename);await serializeLibrary(file,async()=>{let previous='';try{previous=await readFile(file,'utf8');}catch(e){if(e.code!=='ENOENT')throw e;}await writeTextAtomic(file,previous+'\n\n## '+String(book.title).replace(/[\r\n]/g,' ')+' · '+day+'\n\n> '+String(source).slice(0,16000).replace(/\n/g,'\n> ')+'\n\n'+text+'\n');});
+      return {basename:filename.slice(0,-3),path:file};
+    },
     /** 导出某本书的 Markdown 阅读笔记。 */
     async exportNotes(bookId) {
-      const paths = await ensureFolders();
-      const library = await readLibrary(paths);
-      const book = library.books.find((entry) => entry.id === bookId);
-      const state = await readState(paths, bookId);
-      const title = book?.title ?? bookId;
-      const lines = [`# ${title} · 阅读笔记`, ''];
-      const byChapter = new Map();
-      for (const highlight of state.highlights) {
-        const key = highlight.chapterHref || '未定位';
-        if (!byChapter.has(key)) byChapter.set(key, []);
-        byChapter.get(key).push(highlight);
-      }
-      if (state.highlights.length === 0) lines.push('_还没有划线。_');
-      for (const [chapter, items] of byChapter) {
-        lines.push(`## ${chapter}`, '');
-        for (const item of items) {
-          const quote = String(item.text ?? '').replace(/\n+/g, ' ').trim();
-          const link = highlightLink(bookId, item.id);
-          lines.push(`> ${quote}${link ? ` [↩ 回到原文](${link})` : ''}`, '');
-          if (item.note) lines.push(`${item.note}`, '');
-          lines.push(`- 颜色：${item.color ?? 'yellow'}　位置：${Math.round((item.percent ?? 0) * 100)}%`, '');
-        }
-      }
-      const notePath = safeJoin(paths.notes, `${bookId}.md`);
-      lines.push(vocabularyMarkdown(bookId, state.vocabulary));
-      let existing = '';
-      try { existing = await readFile(notePath, 'utf8'); } catch (error) { if (error?.code !== 'ENOENT') throw error; }
-      const markdown = mergeManagedNotes(existing, lines.join('\n'));
-      await writeTextAtomic(notePath, markdown);
-      return { markdown, path: notePath };
+      await ensureFolders();
+      return bookNotes.exportBook(bookId);
     },
   };
 
@@ -674,6 +678,10 @@ export function apply(ctx, config = {}) {
               const content = await page.getTextContent();
               return { book: { id: book.id, title: book.title, chapters: pdf.numPages }, chapter: { index: wanted, href: `pdf/page-${wanted}` }, text: clip(content.items.map((item) => item.str || '').join(' '), 8000) };
             } finally { await task.destroy(); }
+          }
+          if (['mobi','azw','azw3','fb2','fbz','cbz'].includes(book.format)) {
+            const result=await readExtendedChapter({bytes,filename:book.title+'.'+book.format,format:book.format,chapter:wanted});
+            return {book:{id:book.id,title:result.title,author:result.author,chapters:result.chapters},chapter:result.chapter,text:result.text};
           }
           if (book.format !== 'epub') throw new Error(`不支持读取 ${book.format} 的正文`);
           const { parseEpub } = await loadEpubTools();
@@ -788,6 +796,8 @@ export default class ReaderService extends TypertRemoteService {
     });
   }
 
+  featureOperation(request) { return this.api.featureOperation(request); }
+  kindleOperation(request) { return this.api.kindleOperation(request); }
   info() { return this.api.info(); }
   library() { return this.api.library(); }
   importBook(request) { return this.api.import(request); }
@@ -825,7 +835,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['featureOperation', 'kindleOperation', 'info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

@@ -1,3 +1,12 @@
+import {createReaderNotes} from './notes.js';
+import {createReadingTime} from './reading-time.js';
+import {createReaderFonts} from './fonts.js';
+import {disposeNativeSurfaces} from './native-ui.js';
+import {createReaderSpeech} from './speech.js';
+import {createReaderFeaturesClient} from './features.js';
+import {createKindleClient} from './kindle.js';
+import nativeCss from './native-ui.css';
+import originalCss from '../original/styles.css';
 import { LIBRARY_MESSAGES, flatMessages } from '../ui/library-locale.js';
 /**
  * 乔木阅读 · 客户端半入口（bootstrap）
@@ -28,7 +37,7 @@ const remoteCodec = () => ({
 });
 const REMOTE = {
   package: 'qiaomu-reader-dsh',
-  descriptors: ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
+  descriptors: ['featureOperation', 'kindleOperation', 'info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
     id: `qiaomu-reader-dsh#qiaomuReader/${method}`,
     service: 'qiaomuReader', namespace: 'qiaomuReader', method,
     invocation: { kind: 'direct' },
@@ -67,8 +76,13 @@ function pickComponent(module, names, label) {
  * @param {object} ctx - 客户端根上下文，至少含 slots / locale / effect。
  */
 export function apply(ctx) {
+  let hostLanguage=()=>'zh';
   // 数据面：宿主半能连上就连，连不上退化为「内置书 + 浏览器缓存」。
   const data = createDataLayer();
+  ctx.effect(()=>()=>disposeNativeSurfaces());
+  const kindle=createKindleClient({host:()=>data.getHost(),language:()=>hostLanguage(),pickDirectory:globalThis.__DSH_DIRECTORY_PICKER__?()=>globalThis.__DSH_DIRECTORY_PICKER__.pick():undefined});
+  ctx.effect(()=>()=>kindle.dispose());
+  ctx.effect(()=>{if(typeof document==='undefined')return()=>{};const style=document.createElement('style');style.textContent=nativeCss+'\n'+originalCss;document.head.append(style);return()=>style.remove();});
   const chatApi = nativeChatBridge(ctx);
 
   // UI 状态容器：全屏浮层的可见性、当前书、当前面板都住在这里。
@@ -83,6 +97,18 @@ export function apply(ctx) {
     lastError: '',
     openSignal: 0,
   });
+
+  const features=createReaderFeaturesClient({data,store,language:()=>hostLanguage()});
+  ctx.effect(()=>()=>features.dispose());
+  const notes=createReaderNotes(features,chatApi);
+  ctx.effect(()=>()=>notes.dispose());
+  const readingTime=createReadingTime(features);
+  ctx.effect(()=>()=>readingTime.dispose());
+  const fonts=createReaderFonts(features);
+  ctx.effect(()=>()=>fonts.dispose());
+  const speech=createReaderSpeech({features,data,store,language:()=>hostLanguage()});
+  ctx.inject(['qiaomuAudio'],ready=>speech.connect(ready.qiaomuAudio));
+  ctx.effect(()=>()=>speech.dispose());
 
   /** 打开浮层的唯一入口：把可见性与打开信号一起推给 UI。 */
   function openReader(bookId = null) {
@@ -285,6 +311,7 @@ export function apply(ctx) {
               actions,
               data,
               chatApi,
+              kindle,features,speech,fonts,readingTime,notes,
             }),
           },
           ReaderPanel,
@@ -348,9 +375,10 @@ export function apply(ctx) {
   // Cordis 的服务代理在属性读取时检查 inject，`ctx.locale?.` 也会抛错。
   // 子上下文等待语言服务就绪，并在服务或本插件卸载时回收字典。
   ctx.inject(['locale'], (child) => {
+    if(typeof child.locale.bind==='function')hostLanguage=()=>child.locale.bind(NS)('language');
     return child.locale.register(NS, {
-      zh: { open: '乔木阅读', library: '书库', reader: '阅读', themeWhite: '纯白', ...flatMessages(LIBRARY_MESSAGES.zh) },
-      en: { open: 'Qiaomu Reader', library: 'Library', reader: 'Reader', themeWhite: 'Pure white', ...flatMessages(LIBRARY_MESSAGES.en) },
+      zh: { language:'zh', open: '乔木阅读', library: '书库', reader: '阅读', themeWhite: '纯白', ...flatMessages(LIBRARY_MESSAGES.zh) },
+      en: { language:'en', open: 'Qiaomu Reader', library: 'Library', reader: 'Reader', themeWhite: 'Pure white', ...flatMessages(LIBRARY_MESSAGES.en) },
     });
   });
 
@@ -367,7 +395,8 @@ export function apply(ctx) {
         connected = true;
         clearTimeout(pending);
         chatApi.bindReadingContext((request) => ready.remote.qiaomuReader.setReadingContext(request));
-        void data.setHost(remoteHostApi(ready)).then(() => {
+        void data.setHost(remoteHostApi(ready)).then(async () => {
+          await features.reload();
           store.set({ lastError: '' });
         }).catch((error) => {
           store.set({ lastError: `宿主书库连接失败：${error?.message || error}` });

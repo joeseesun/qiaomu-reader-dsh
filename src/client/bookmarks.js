@@ -1,0 +1,14 @@
+import {Modal,Notice,setIcon} from './native-ui.js';
+import {ReaderNameModal,ConfirmModal} from '../original/bookmark-dialogs.js';
+// Original showLocationMarks/addLocationMark controls; storage/navigation use Harness book state.
+export function createBookmarks(ui){
+ const t=ui.props().features.t,bookId=ui.store.get().bookId;
+ const current=()=>ui.store.get().bookId===bookId;
+ const items=()=>ui.stateOr(bookId).bookmarks||[];
+ const save=async bookmarks=>{const previous=items();ui.patchState(bookId,{bookmarks});const result=await ui.flushState(bookId);if(result?.ok===false){ui.patchState(bookId,{bookmarks:previous});throw Error(result.error);}};
+ const rename=mark=>new ReaderNameModal({},t('rename-bookmark'),mark.label,async label=>{await save(items().map(item=>item.id===mark.id?{...item,label}:item));},t);
+ return {
+  add(){const engine=ui.engineOf(bookId),state=ui.store.get(),locator=structuredClone(ui.stateOr(bookId).locator||{chapterIndex:state.chapterIndex,scroll:0}),chapter=engine.book.chapters[state.chapterIndex];const name=chapter?.label||t('reading-position');const modal=new ReaderNameModal({},t('bookmark-this-location'),name,async label=>{if(!current())throw Error('Reader changed');await save([...items(),{id:crypto.randomUUID(),label,chapterHref:chapter?.href||'',percent:locator.scroll||0,locator,createdAt:Date.now()}]);},t);modal.open();return modal;},
+  list(){const modal=new Modal({});modal.onOpen=()=>{modal.setTitle(t('location-bookmarks'));modal.titleEl.hidden=true;const c=modal.contentEl;c.empty();c.createEl('h3',{text:t('location-bookmarks')});const marks=items();if(!marks.length)c.createDiv({text:t('no-location-bookmarks-yet')});for(const mark of marks){const row=c.createDiv('qiaomu-reader-location-mark');row.createEl('button',{cls:'qiaomu-reader-location-mark-open',text:mark.label}).addEventListener('click',()=>{if(!current())return;ui.goLocation(mark.locator||{chapterIndex:Math.max(0,ui.engineOf(bookId).book.chapters.findIndex(c=>c.href===mark.chapterHref)),scroll:mark.percent||0});modal.close();});const edit=row.createEl('button',{cls:'qiaomu-reader-ibtn',attr:{'aria-label':t('rename-bookmark')}});setIcon(edit,'pencil');edit.addEventListener('click',()=>{const dialog=rename(mark),close=dialog.onClose.bind(dialog);dialog.onClose=()=>{close();if(modal.opened)modal.onOpen();};dialog.open();});const del=row.createEl('button',{cls:'qiaomu-reader-ibtn',attr:{'aria-label':t('delete-bookmark')}});setIcon(del,'trash');del.addEventListener('click',()=>new ConfirmModal({},{t,title:t('delete-bookmark'),body:mark.label,okText:t('delete'),cancelText:t('cancel'),async onYes(){try{await save(items().filter(item=>item.id!==mark.id));if(modal.opened)modal.onOpen();}catch{new Notice(t('saving-failed-check-vault-permissions-and-retry'));}}}).open());}};modal.open();return modal;},
+ };
+}

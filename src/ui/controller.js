@@ -1,3 +1,6 @@
+import {applyDeviceAppearance,captureDeviceAppearance} from '../client/device-appearance.js';
+import {READER_FONTS} from '../original/font-catalog.js';
+import {positionLocation} from '../client/position.js';
 /**
  * UI 控制器：把 lead 注入的 props 包装成界面可直接调用的动作集合。
  *
@@ -325,11 +328,12 @@ export function createController(getProps, store) {
     const base = { ...UI_SETTING_DEFAULTS, ...(DEFAULT_READER_SETTINGS || {}) };
     const own = (state && state.settings) || {};
     const merged = { ...base, ...own };
-    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 14, 28);
-    merged.lineHeight = Math.min(2.2, Math.max(1.4, Number(merged.lineHeight) || base.lineHeight));
+    applyDeviceAppearance(merged);
+    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 12, 48);
+    merged.lineHeight = Math.min(2.5, Math.max(1.2, Number(merged.lineHeight) || base.lineHeight));
     merged.margin = clampInt(merged.margin || base.margin, 32, 120);
     if (!READER_THEMES[merged.theme]) merged.theme = base.theme;
-    if (!['serif', 'sans-serif', 'mono'].includes(merged.fontFamily)) merged.fontFamily = 'serif';
+    if (!['serif', 'sans-serif', 'mono',...Object.keys(READER_FONTS)].includes(merged.fontFamily)) merged.fontFamily = 'serif';
     if (merged.flow !== 'scroll') merged.flow = 'paginated';
     merged.justify = merged.justify !== false;
     merged.spread = merged.spread === true;
@@ -340,7 +344,8 @@ export function createController(getProps, store) {
   function updateSettings(id, patch) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
-      const merged = { ...(state.settings || {}), ...(patch || {}) };
+      const merged = { ...(state.settings || {}), ...settingsOf(id), ...(patch || {}) };
+      captureDeviceAppearance(merged);
       patchState(id, { settings: merged });
     });
   }
@@ -585,12 +590,15 @@ export function createController(getProps, store) {
         focusHighlightId: null,
         editingHighlightId: null,
         restoreScroll: Math.min(1, Math.max(0, Number(locator.scroll) || 0)),
+        restoreAnchor: locator.anchor || null,
         engineVersion: (uiStore.get().engineVersion || 0) + 1,
         imagesVersion: 0,
         busyBookId: null,
         lastError: null,
       });
       startImagePrefetch(id, engine);
+      if(state?.recovery)toast(state.recovery.message,'warn');
+      if(props().features)void props().features.reload().then(config=>config.settings.notes?.autoBookNote?props().features.call('bookNotes',{action:'ensure',bookId:id}):null).catch(error=>toast(error.message,'warn'));
       return true;
     } catch (error) {
       const text = reportError(error, true);
@@ -649,7 +657,7 @@ export function createController(getProps, store) {
     } catch (_error) {
       /* 忽略 */
     }
-    uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null });
+    uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null, restoreAnchor: null, anchorFocus:null });
     updateLocator(state.bookId, { chapterIndex: target, scroll: 0 });
   }
 
@@ -658,8 +666,9 @@ export function createController(getProps, store) {
     const state = uiStore.get();
     const count = Number(state.chapterCount) || chapterCountOf(state.bookId) || 1;
     if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
-    const location = percentLocation(fraction, count);
-    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, jumpToken: (state.jumpToken || 0) + 1 });
+    const engine=engineOf(state.bookId);
+    const location = engine?.book?.chapters ? positionLocation(engine, fraction) : percentLocation(fraction, count);
+    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, restoreAnchor:null, anchorFocus:null, jumpToken: (state.jumpToken || 0) + 1 });
     updateLocator(state.bookId, location);
   }
 
@@ -668,7 +677,7 @@ export function createController(getProps, store) {
     if (id == null) return;
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
-      patchState(id, { locator: { ...(state.locator || {}), ...(patch || {}) } });
+      patchState(id, { locator: { ...(state.locator || {}), anchor:null, pageHref:'', ...(patch || {}) } });
     });
   }
 
@@ -682,6 +691,8 @@ export function createController(getProps, store) {
         chapterIndex: clampInt(position.chapterIndex, 0, 100000),
         scroll: Math.min(1, Math.max(0, Number(position.scroll) || 0)),
       };
+      locator.anchor = position.anchor || null;
+      locator.pageHref = position.pageHref || '';
       if (position.chapterHref) locator.chapterHref = String(position.chapterHref);
       if (position.textQuote) locator.textQuote = String(position.textQuote).slice(0, 200);
       patchState(id, { locator });
@@ -1070,10 +1081,12 @@ export function createController(getProps, store) {
     turnPage,
     goChapter,
     goPercent,
+    goLocation(location){const state=uiStore.get();if(!state.jumpReturn)uiStore.set({jumpReturn:{...stateOr(state.bookId).locator}});uiStore.set({chapterIndex:location.chapterIndex,restoreScroll:location.scroll,restoreAnchor:location.anchor||null,anchorFocus:null,jumpToken:(state.jumpToken||0)+1});updateLocator(state.bookId,location);},
+    goHref(href){const state=uiStore.get(),engine=engineOf(state.bookId);const resolved=engine?.resolveLink?.(state.chapterIndex,href);const index=typeof resolved==='object'?resolved?.chapterIndex:resolved;if(!Number.isInteger(index)||index<0){toast('无法定位这个链接','warn');return;}if(!state.jumpReturn)uiStore.set({jumpReturn:{...stateOr(state.bookId).locator}});goChapter(index);const hash=String(href).split('#').slice(1).join('#');let anchor=hash;try{anchor=decodeURIComponent(hash);}catch{}uiStore.set({anchorFocus:anchor?{chapterIndex:index,id:anchor,token:Date.now()}:null});},
     returnFromJump() {
       const state = uiStore.get();
       if (!state.jumpReturn) return;
-      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
+      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, restoreAnchor:state.jumpReturn.anchor||null, anchorFocus:null, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
       updateLocator(state.bookId, state.jumpReturn);
     },
     updateLocator,

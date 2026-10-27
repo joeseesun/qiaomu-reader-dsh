@@ -211,8 +211,8 @@ export function HighlightsPanel({ ui }) {
       h('button', {
         type: 'button',
         className: 'qmr-icon-btn',
-        'aria-label': '导出 Markdown',
-        onClick: exportMarkdown,
+        'aria-label': ui.props().features.t('export-highlights-to-notes'),
+        onClick:()=>void ui.props().notes.exportHighlights(ui,bookId).catch(error=>ui.toast(error.message,'warn')),
       }, h(IconExport, { width: 16, height: 16 })),
       h('button', {
         type: 'button',
@@ -231,6 +231,7 @@ export function HighlightsPanel({ ui }) {
           h(
             'div',
             { className: 'qmr-hl-tools', style: { marginBottom: 8 } },
+            h('button', { type: 'button', className: 'qmr-btn qmr-btn-sm', onClick:()=>void ui.props().notes.previewBook(ui,bookId).catch(error=>ui.toast(error.message,'warn')) },ui.props().features.t('the-book-note')),
             h('button', { type: 'button', className: 'qmr-btn qmr-btn-sm', onClick: copyMarkdown },
               h(IconCopy, { width: 14, height: 14 }), '复制 Markdown'),
             h('button', { type: 'button', className: 'qmr-btn qmr-btn-sm', onClick: exportMarkdown },
