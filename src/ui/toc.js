@@ -1,3 +1,4 @@
+import {createBookmarks} from '../client/bookmarks.js';
 /**
  * 目录侧滑：递归渲染 TOC 树，可折叠，当前章高亮，点击跳转。
  */
@@ -41,7 +42,7 @@ export function TocPanel({ ui }) {
   const jump = (href) => {
     const index = indexOfHref(href);
     if (index >= 0) {
-      ui.goChapter(index);
+      ui.goHref(href);
     } else {
       ui.toast('无法定位该目录项', 'warn');
     }
@@ -106,6 +107,7 @@ export function TocPanel({ ui }) {
     h(
       'div',
       { className: 'qmr-panel-body' },
+      h('div',{className:'qiaomu-reader-find-controls'},h('button',{type:'button',onClick:()=>createBookmarks(ui).add()},ui.props().features.t('bookmark-this-location')),h('button',{type:'button',onClick:()=>createBookmarks(ui).list()},ui.props().features.t('location-bookmarks'))),
       h('div', { className: 'qmr-group-title' },
         `第 ${chapterIndex + 1} / ${chapterCount || '?'} 章`,
         h('span', { className: 'qmr-muted' }, chapterLabel)),

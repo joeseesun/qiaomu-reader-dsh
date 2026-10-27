@@ -1,10 +1,11 @@
+import {kindleSsh} from '../scripts/kindle-build.mjs';
 import { build } from 'esbuild';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const result = await build({ entryPoints: ['src/host/index.js'], bundle: true, write: false, format: 'esm', platform: 'node',
-  external: ['pdfjs-dist/*'], plugins: [{ name: 'remote-contract', setup(b) {
+  external: ['pdfjs-dist/*'], plugins: [kindleSsh, { name: 'remote-contract', setup(b) {
     b.onResolve({ filter: /^@deepseek-ai\/dsh-typert-protocol$/ }, () => ({ path: 'remote', namespace: 'stub' }));
     b.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({ contents: 'export class TypertRemoteService {} export const Remote = () => () => {};' }));
   } }] });

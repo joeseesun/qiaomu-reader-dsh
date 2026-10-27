@@ -1,3 +1,7 @@
+import {createOriginalLightbox} from '../original/image-lightbox.js';
+import {mountReaderPdfZoom} from '../client/pdf-zoom.js';
+import {captureContentAnchor,resolveContentAnchor,printedPageAt} from '../client/content-position.js';
+import {openReaderPosition,readerPosition} from '../client/position.js';
 /**
  * 阅读器正文区：章节渲染、翻页（分页 / 连续滚动）、进度、键盘、选中菜单、搜索命中高亮。
  *
@@ -25,7 +29,6 @@ import {
 } from './icons.js';
 import { CompanionPanel } from './companion.js';
 import { SelectionMenu } from './selection-menu.js';
-import { useSpeech, SpeechPanel } from './panel-speech.js';
 import { IconAudio, IconLanguages } from './icons.js';
 import { LookupCard, VocabularyPanel } from './panel-vocabulary.js';
 import { TocPanel } from './toc.js';
@@ -229,6 +232,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const restoreScroll = ui.useSel((state) => state.restoreScroll);
   const jumpToken = ui.useSel(state => state.jumpToken);
   const jumpReturn = ui.useSel(state => state.jumpReturn);
+  const anchorFocus=ui.useSel(state=>state.anchorFocus);
+  const restoreAnchor=ui.useSel(state=>state.restoreAnchor);
   const lastRestoreRef = React.useRef('');
   const focusHighlightId = ui.useSel((state) => state.focusHighlightId);
   const focusToken = ui.useSel((state) => state.focusToken);
@@ -261,11 +266,14 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const book = ui.bookOf(bookId);
   const sectionUnit = book?.format === 'pdf' ? '页' : book?.format === 'txt' ? '部分' : '章';
   const engine = ui.engineOf(bookId);
-  const speech = useSpeech(ui, bookId, engine);
+  const speech=ui.props().speech;
+  const speechRoot=React.useRef(null);
+  React.useEffect(()=>()=>speech.close(),[speech,bookId]);
+  React.useEffect(()=>speech.relocated(),[speech,chapterIndex]);
   const speechFocus = ui.useSel(state => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
   const settings = book?.format === 'pdf' ? { ...storedSettings, flow: 'scroll' } : storedSettings;
-  const themeVars = readerThemeVars(settings.theme);
+  const themeVars = readerThemeVars(settings.theme,settings.einkMode);
   /** 伴读独立外观（null = 跟随正文书籍设置，对照原版 4.5.10） */
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
   const companionLook = companionAppearance
@@ -285,6 +293,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const lastFocusRef = React.useRef('');
   const lastSearchFocusRef = React.useRef(null);
   const scrollTimerRef = React.useRef(null);
+  const lightbox=React.useMemo(()=>createOriginalLightbox(ui.props().features.t),[ui]);
+  React.useEffect(()=>()=>lightbox.dispose(),[lightbox,bookId]);
+  const pdfControlsRef=React.useRef(null);
+  const readingTimerRef=React.useRef(null);
 
   const highlights = React.useMemo(
     () => ((bookState && bookState.highlights) || []).filter(Boolean),
@@ -595,6 +607,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     else revealNode(range);
   }, [speechFocus, chapterIndex, chapterBusy, html, revealNode, settings.flow]);
 
+  // Prefer the saved text anchor when reopening a book or returning to a bookmark.
+  React.useEffect(()=>{if(!restoreAnchor||chapterBusy||!html)return;const range=resolveContentAnchor(flowRef.current,restoreAnchor);if(range){if(settings.flow==='scroll')revealNode(range.startContainer.parentElement);else revealNode(range);}},[restoreAnchor,jumpToken,html,chapterBusy,revealNode,settings.flow]);
+
   // 平移当前页
   React.useEffect(() => {
     const flow = flowRef.current;
@@ -606,8 +621,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const meta = measureRef.current;
     const offset = page * (meta.perPage || 1) * ((meta.columnWidth || 320) + (meta.gap || COLUMN_GAP));
     flow.style.transform = `translateX(${-offset}px)`;
-    flow.style.transition = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'none' : 'transform .18s ease';
-  }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin]);
+    flow.style.transition = settings.einkMode || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'none' : 'transform .18s ease';
+  }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin,settings.einkMode]);
 
   // 尺寸变化重新测量
   React.useEffect(() => {
@@ -644,6 +659,12 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     };
   }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify]);
 
+  React.useEffect(()=>{let live=true;void ui.props().fonts?.load(document,settings).then(()=>{if(live)measure();}).catch(error=>{if(live)ui.toast(error.message,'warn');});return()=>{live=false;};},[ui,settings.fontFamily,settings.customFontId,measure]);
+
+  React.useEffect(()=>{if(book?.format!=='pdf'||!html||chapterBusy||!pdfControlsRef.current)return;return mountReaderPdfZoom({parent:pdfControlsRef.current,viewport:viewportRef.current,flow:flowRef.current,ui,bookId});},[ui,bookId,book?.format,html,chapterBusy]);
+
+  React.useEffect(()=>{let gone=false,dispose;void ui.props().readingTime?.mount(readingTimerRef.current,ui).then(cleanup=>{if(gone)cleanup?.();else dispose=cleanup;}).catch(error=>ui.toast(error.message,'warn'));return()=>{gone=true;dispose?.();};},[ui,bookId]);
+
   // ------------------------------------------------------------- 位置上报
 
   const reportPosition = React.useCallback(() => {
@@ -666,7 +687,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     } catch (_error) {
       quote = '';
     }
+    const anchor=captureContentAnchor(flowRef.current,viewportRef.current);
     ui.reportPosition(live.bookId, {
+      anchor,
+      pageHref:printedPageAt(live.engine,live.chapterIndex,flowRef.current,anchor),
       chapterIndex: live.chapterIndex,
       chapterHref: chapterHrefOf(live.engine, live.chapterIndex),
       scroll: Math.min(1, Math.max(0, scroll)),
@@ -829,6 +853,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     try {
       const target = event.target;
       if (target && target.closest) {
+        const image=target.closest('img');if(image&&!image.closest('.qmr-pdf-sheet')){event.preventDefault();lightbox.open(image.currentSrc||image.src,{},flowRef.current);return;}
         const mark = target.closest('[data-qmr-hl]');
         if (mark) {
           const id = mark.getAttribute('data-qmr-hl');
@@ -858,7 +883,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           } catch (_error) {
             index = null;
           }
-          if (typeof index === 'number' && index >= 0) ui.goChapter(index);
+          if (typeof index === 'number' && index >= 0) ui.goHref(href);
           else ui.toast('无法定位这个链接', 'warn');
         }
       }
@@ -869,9 +894,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   // ------------------------------------------------------------- 进度条
 
-  const progress = chapterCount
-    ? Math.min(1, Math.max(0, (chapterIndex + (pageCount > 1 ? page / (pageCount - 1) : 0)) / chapterCount))
-    : 0;
+  React.useEffect(()=>{if(!anchorFocus||anchorFocus.chapterIndex!==chapterIndex||chapterBusy||!html)return;const target=[...(flowRef.current?.querySelectorAll('[id]')||[])].find(el=>el.id===anchorFocus.id);if(target)revealNode(target);},[anchorFocus,chapterIndex,chapterBusy,html,revealNode]);
+  const stablePosition=engine?readerPosition(engine,chapterIndex,settings.flow==='scroll'?bookState?.locator?.scroll||0:pageCount>1?page/(pageCount-1):0,bookState?.locator?.pageHref):null;
+  const progress = Math.min(1,Math.max(0,stablePosition?.fraction||0));
 
   const jumpFromPointer = (clientX, element) => {
     try {
@@ -965,10 +990,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   contentStyle.maxWidth = settings.spread ? '1280px' : '860px';
   contentStyle.marginInline = 'auto';
   const flowStyle = {
-    fontFamily: fontStackOf(settings.fontFamily),
+    fontFamily: fontStackOf(settings.fontFamily,settings),
     fontSize: `${settings.fontSize}px`,
     lineHeight: settings.lineHeight,
-    textAlign: settings.justify ? 'justify' : 'left',
+    textAlign: settings.textAlign || (settings.justify ? 'justify' : 'left'),
     color: 'var(--qmr-ink)',
   };
 
@@ -976,8 +1001,6 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     ? h(TocPanel, { ui })
     : panel === 'vocabulary'
       ? h(VocabularyPanel, { ui, bookId })
-    : panel === 'speech'
-      ? h(SpeechPanel, { ui, speech })
     : panel === 'search'
       ? h(SearchPanel, { ui })
       : panel === 'highlights' || panel === 'notes'
@@ -1025,7 +1048,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       h(
         'div',
         { className: 'qmr-actions' },
-        toolbarButton('speech', h(IconAudio, { width: 16, height: 16 }), ui.t('speech.title', '连续朗读'), () => ui.setPanel('speech'), panel === 'speech'),
+        book?.format==='pdf'?h('div',{ref:pdfControlsRef}):null,
+        h('div',{ref:readingTimerRef}),
+        toolbarButton('speech', h(IconAudio, { width: 16, height: 16 }), ui.t('speech.title', '连续朗读'), () => void speech.open(speechRoot.current,ui,bookId,engine), false),
         toolbarButton('vocabulary', h(IconLanguages, { width: 16, height: 16 }), ui.t('lookup.vocabulary', '生词本'), () => ui.setPanel('vocabulary'), panel === 'vocabulary'),
         toolbarButton('search', h(IconSearch, { width: 16, height: 16 }), '搜索', () => ui.setPanel('search'), panel === 'search'),
         toolbarButton('hl', h(IconHighlight, { width: 16, height: 16 }), '划线', () => ui.setPanel('highlights'), panel === 'highlights' || panel === 'notes'),
@@ -1087,7 +1112,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         h('div', { className: 'qmr-track-fill', style: { width: `${Math.round(progress * 100)}%` } }),
         h('div', { className: 'qmr-track-knob', style: { left: `${Math.round(progress * 100)}%` } }),
       ),
-      h('span', { className: 'qmr-bottom-text' }, `第 ${chapterIndex + 1} / ${chapterCount || '?'} ${sectionUnit}`),
+      h('button', { className:'qmr-bottom-text qmr-btn',onClick:()=>openReaderPosition(ui,engine,ui.props().features.t),'aria-label':ui.props().features.t('position-jump-title') }, stablePosition&&stablePosition.kind!=='percent'?`${ui.props().features.t(stablePosition.kind==='location'?'reading-position':stablePosition.kind==='original'?'position-original':'position-page')} ${stablePosition.current} / ${stablePosition.total}`:`第 ${chapterIndex+1} / ${chapterCount||'?'} ${sectionUnit}`),
       h('span', { className: 'qmr-bottom-text' }, formatPercent(progress)),
       jumpReturn ? h('button', { className: 'qmr-icon-btn', 'aria-label': ui.t('navigation.return', '回到跳转前'), title: ui.t('navigation.return', '回到跳转前'), onClick: () => ui.returnFromJump() }, h(IconBack, { width: 16, height: 16 })) : null,
       h('button', {
@@ -1100,7 +1125,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   return h(
     'div',
-    { className: 'qmr-reader', 'data-qmr-theme': settings.theme, style: themeVars },
+    { className: `qmr-reader qmr-native-tokens${settings.einkMode?' qiaomu-reader-eink':''}`, ref:speechRoot, 'data-qmr-theme': settings.theme, style: themeVars },
     h(
       'div',
       { className: `qmr-reader-main${panel === 'companion' ? ' qmr-has-companion' : ''}`, ref: workareaRef, style: { '--qmr-companion-width': `${companionWidth}%` } },
@@ -1156,7 +1181,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
               onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 }),
             }, '重试'))
           : null,
-        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onLookup: () => { ui.store.set({ lookupSelection: { ...selection } }); ui.clearSelection(); } }) : null,
+        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk,onRead:()=>{const text=selection.text;ui.clearSelection();void speech.open(speechRoot.current,ui,bookId,engine,text);}, onLookup: () => { ui.store.set({ lookupSelection: { ...selection } }); ui.clearSelection(); } }) : null,
         lookupSelection ? h(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
         bottomBar,
       ),
@@ -1193,7 +1218,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           className: `qmr-panel${panel === 'companion' ? ' qmr-panel-companion' : ''}${narrow && panel !== 'companion' ? ' qmr-panel-overlay' : ''}`,
           style: panel === 'companion' ? {
             ...readerThemeVars(companionLook.theme),
-            '--qmr-ai-font': fontStackOf(companionLook.fontFamily),
+            '--qmr-ai-font': fontStackOf(companionLook.fontFamily,companionLook),
             '--qmr-ai-size': `${companionLook.fontSize}px`,
             '--qmr-ai-line-height': String(companionLook.lineHeight),
           } : undefined,

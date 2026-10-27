@@ -5,7 +5,7 @@ export function vocabularyEntry(bookId, input) {
   const term = String(input.term || '').trim().slice(0, 6000);
   if (!term) throw new Error('没有选中文字');
   const context = String(input.context || term).trim().slice(0, 12000);
-  return { id: stableId('vocab', bookId, term.toLocaleLowerCase(), context), term, context,
+  return { lemma:String(input.lemma||'').slice(0,80),phonetic:String(input.phonetic||'').slice(0,160),senses:(Array.isArray(input.senses)?input.senses:[]).slice(0,8).map(s=>({pos:String(s.pos||'').slice(0,80),def:String(s.def||'').slice(0,1000)})),id: stableId('vocab', bookId, term.toLocaleLowerCase(), context), term, context,
     meaning: String(input.meaning || '').trim().slice(0, 16000), chapterHref: String(input.chapterHref || ''),
     highlightId: String(input.highlightId || ''), createdAt: input.createdAt || Date.now() };
 }

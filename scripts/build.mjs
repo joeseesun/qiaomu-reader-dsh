@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {kindleDefines,kindleSsh,formatDefines} from './kindle-build.mjs';
 /**
  * 构建乔木阅读 DSH 插件的两半产物：
  *
@@ -27,6 +28,7 @@ const BOOTSTRAP_DIR = '/tmp/qmr-bootstrap';
 // pdf.js 句号截断修复（对照原版 4.2.4）：client 从 node_modules 打包，
 // npm install 会还原补丁，所以每次构建前重打（幂等）。
 await import('./patch-pdfjs.mjs');
+await import('./licenses.mjs');
 
 /** 宿主半的 external：由 dsh 安装目录解析，不打进产物。 */
 const HOST_EXTERNAL = [
@@ -81,6 +83,7 @@ ${body}
 }
 
 async function buildHost() {
+  const kindle = {...await kindleDefines(),...await formatDefines()};
   await build({
     entryPoints: [path.join(ROOT, 'src/host/index.js')],
     outfile: path.join(ROOT, 'index.js'),
@@ -89,9 +92,10 @@ async function buildHost() {
     platform: 'node',
     target: 'node20',
     external: HOST_EXTERNAL,
+    define:kindle,plugins:[kindleSsh],
     legalComments: 'none',
     logLevel: 'info',
-    banner: { js: '/* 乔木阅读 · 宿主半 — 由 scripts/build.mjs 生成，请勿手改。 */' },
+    banner: { js: 'import {createRequire as __createRequire} from "node:module";const require=__createRequire(import.meta.url);' },
     sourcemap: dev,
   });
   // 去掉产物里的 JSDoc 块注释：产物是可执行文件，不需要文档注释，
@@ -99,7 +103,7 @@ async function buildHost() {
   if (!dev) {
     const file = path.join(ROOT, 'index.js');
     const withComments = await readFile(file, 'utf8');
-    const stripped = withComments.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?\*\//g, '');
+    const stripped = withComments.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?\*\//g, '').replace(/^[ \t]+$/gm, '');
     if (stripped.length !== withComments.length) await writeFile(file, stripped, 'utf8');
   }
 }

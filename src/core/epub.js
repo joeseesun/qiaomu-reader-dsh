@@ -415,10 +415,11 @@ function chapterLabel(xhtml) {
  * @param {string} navPath nav 文档的 zip 路径
  * @returns {object[]} 目录项
  */
-function parseNavDoc(text, navPath) {
+function parseNavDoc(text, navPath, kind = "toc") {
   const doc = parseMarkup(text);
   const navs = descendantsNamed(doc, "nav");
-  let target = navs.find((node) => String(attr(node, "type") || "").toLowerCase() === "toc") || null;
+  let target = navs.find((node) => String(attr(node, "type") || "").toLowerCase() === kind) || null;
+  if (!target && kind !== "toc") return [];
   if (!target) target = navs[0] || null;
   if (!target) {
     // 有些 nav 文档干脆没有 <nav>，退而求其次找 ol。
@@ -576,6 +577,7 @@ export async function parseEpub(bytes) {
       id: item.id,
       mediaType: item.mediaType || "application/xhtml+xml",
       xhtml,
+      size: new TextEncoder().encode(xhtml).length,
       linear: String(attr(ref, "linear") || "").toLowerCase() !== "no",
       label: chapterLabel(xhtml),
     });
@@ -583,11 +585,11 @@ export async function parseEpub(bytes) {
   if (!chapters.length) throw new Error("EPUB 解析失败：spine 里没有可读取的章节文件");
 
   // ── toc ────────────────────────────────────────────────────────────────
-  let toc = [];
+  let toc = [], pageList = [];
   const navItem = items.find((item) => /\bnav\b/.test(item.properties));
   if (navItem) {
     const navText = await zip.readText(navItem.href);
-    if (navText) toc = parseNavDoc(navText, navItem.href);
+    if (navText) {toc = parseNavDoc(navText, navItem.href);pageList=parseNavDoc(navText,navItem.href,"page-list");}
   }
   if (!toc.length) {
     const ncxItem =
@@ -598,6 +600,10 @@ export async function parseEpub(bytes) {
       const ncxText = await zip.readText(ncxItem.href);
       if (ncxText) toc = parseNcxDoc(ncxText, ncxItem.href);
     }
+  }
+  if (!pageList.length) {
+    const ncx=items.find(item=>item.mediaType==='application/x-dtbncx+xml');
+    if(ncx){const text=await zip.readText(ncx.href);if(text){const list=firstDescendant(parseMarkup(text),'pageList');pageList=descendantsNamed(list||{children:[]},'pageTarget').map(node=>({label:cleanTextOf(firstDescendant(node,'navLabel')),href:resolveFrom(dirOf(ncx.href),attr(firstDescendant(node,'content'),'src')),children:[]})).filter(p=>p.label&&p.href);}}
   }
   if (!toc.length) {
     // 容错：没有任何目录文档时，用章节自身猜的名字兜底。
@@ -619,6 +625,7 @@ export async function parseEpub(bytes) {
     identifier,
     chapters,
     toc,
+    pageList,
     resources,
     coverHref,
     rootDir,

@@ -41,6 +41,7 @@ export const LIBRARY_MESSAGES = {
       "noResults": "没有符合条件的书",
       "empty": "从第一本书开始",
       "noResultsHelp": "换个关键词，或清空筛选。",
+      "connectKindle":"连接 Kindle","sendKindle":"发送到 Kindle","addCalibre":"从 Calibre 添加",
       "emptyHelp": "导入 EPUB、PDF、TXT、Markdown 或 HTML，开始阅读。",
       "clear": "清空筛选",
       "titleAuthor": "书名 / 作者",
@@ -57,6 +58,7 @@ export const LIBRARY_MESSAGES = {
     },
     "speech": {
       "title": "连续朗读",
+      "selected": "朗读选中内容",
       "close": "关闭面板",
       "provider": "语音来源",
       "browser": "浏览器系统语音",
@@ -93,7 +95,7 @@ export const LIBRARY_MESSAGES = {
       "saveFailed": "无法保存原文位置"
     },
     "discover": {
-      "title": "找书 · Project Gutenberg",
+      "title": "找书",
       "query": "书名或作者",
       "search": "搜索",
       "offline": "请连接宿主后再搜索书源",
@@ -153,6 +155,7 @@ export const LIBRARY_MESSAGES = {
       "noResults": "No matching books",
       "empty": "Start with your first book",
       "noResultsHelp": "Try another keyword or clear the filters.",
+      "connectKindle":"Connect Kindle","sendKindle":"Send to Kindle","addCalibre":"Add from Calibre",
       "emptyHelp": "Import EPUB, PDF, TXT, Markdown or HTML to start reading.",
       "clear": "Clear filters",
       "titleAuthor": "Title / Author",
@@ -166,6 +169,7 @@ export const LIBRARY_MESSAGES = {
     },
     "speech": {
       "title": "Read aloud",
+      "selected": "Read selection",
       "close": "Close panel",
       "provider": "Speech source",
       "browser": "Browser system voices",
@@ -202,7 +206,7 @@ export const LIBRARY_MESSAGES = {
       "saveFailed": "Unable to save source position"
     },
     "discover": {
-      "title": "Find books · Project Gutenberg",
+      "title": "Find books",
       "query": "Title or author",
       "search": "Search",
       "offline": "Connect the host to search for books",

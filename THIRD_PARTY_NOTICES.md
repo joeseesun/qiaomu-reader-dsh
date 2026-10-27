@@ -281,3 +281,13 @@ Redistributions in binary form must reproduce the above copyright notice, this l
 THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+## Original Reader and adaptation dependencies
+
+Original Qiaomu Reader 4.9.2 source: commit `4a6e6ee1e39966f2af5d831df8b3f4c4fd387ca3`, GPL-3.0-only. Its adapted Elton Reader portions (upstream `46c2eb7f63e183ab09e9a741fcda3347e6aa1fba`, copyright 2026 Elton Labs) retain the terms in `licenses/elton-reader-MIT.txt`.
+
+The embedded AZW3 writer derives from Higino-Neto/Lyceum `806be2fd3677c77cd2bff5f61793ef4564ad2cca`; see `licenses/lyceum-MIT.txt`. Harness boundaries, credential storage, workers, navigation and lifecycle were adapted in this repository; original product CSS is retained.
+
+Foliate's bundled fflate implementation retains `licenses/fflate-MIT.txt`. Production dependencies and bundled Lucide icons, including Feather-derived icons, retain their complete license texts in `licenses/DEPENDENCIES.md`. Saxes 6.0.0 omits the license file from its npm tarball; `licenses/saxes-ISC.txt` preserves the upstream v6.0.0 license. This inventory is regenerated from the lockfile and installed package notices by `scripts/licenses.mjs`.
+
+The original embedded Zhuque Fangsong font retains its SIL Open Font License in `licenses/Zhuque-OFL.txt`.

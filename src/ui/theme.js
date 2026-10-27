@@ -1,3 +1,7 @@
+import {READER_THEMES as ORIGINAL_THEMES,READER_THEME_CHOICES} from '../original/reader-themes.js';
+import {QIAOMU_READER_ZH_CN} from '../original/i18n-zh.js';
+import {READER_FONTS,FONTS} from '../original/font-catalog.js';
+import {resolveReaderFont} from '../original/reader-appearance.js';
 /**
  * 设计令牌、阅读主题与组件级样式。
  *
@@ -25,7 +29,7 @@ export const HIGHLIGHT_COLOR_LABELS = Object.freeze({
  * 6 套阅读主题（含纯白）。每个主题定义页底色、正文色、次要色、选中高亮色、边线、强调色，
  * 以及 4 种划线的纸面覆盖色（paints）。
  */
-export const READER_THEMES = Object.freeze({
+const PREVIOUS_THEMES = Object.freeze({
   white: {
     id: 'white',
     label: '纯白',
@@ -137,7 +141,8 @@ export const READER_THEMES = Object.freeze({
 });
 
 /** 主题 id 列表（设置面板展示顺序） */
-export const READER_THEME_IDS = Object.freeze(['white', 'paper', 'warm', 'celadon', 'moon', 'night']);
+export const READER_THEMES=Object.freeze({...PREVIOUS_THEMES,...Object.fromEntries(Object.entries(ORIGINAL_THEMES).map(([id,theme])=>[id,{...(PREVIOUS_THEMES[id]||PREVIOUS_THEMES[theme.dark?'night':'paper']),...theme,id,label:id==='auto'?'跟随 Harness':QIAOMU_READER_ZH_CN[theme.label]||theme.label}]))});
+export const READER_THEME_IDS=Object.freeze(['white',...READER_THEME_CHOICES]);
 
 /** 字体族候选 */
 export const READER_FONT_STACKS = Object.freeze({
@@ -152,6 +157,7 @@ export const READER_FONT_LABELS = Object.freeze({
   serif: '衬线',
   'sans-serif': '无衬线',
   mono: '等宽',
+  ...Object.fromEntries(Object.values(READER_FONTS).map(font=>[font.id,font.labels.zh])),
 });
 
 /** 排版默认值（core DEFAULT_READER_SETTINGS 缺失时的兜底，也补齐 UI 专有字段 spread） */
@@ -183,7 +189,8 @@ export function highlightPaint(themeId, color) {
  * @param {string} fontFamily serif|sans-serif|mono
  * @returns {string}
  */
-export function fontStackOf(fontFamily) {
+export function fontStackOf(fontFamily,settings={}) {
+  if(READER_FONTS[fontFamily])return resolveReaderFont({...settings,fontFamily},FONTS);
   return READER_FONT_STACKS[fontFamily] || READER_FONT_STACKS.serif;
 }
 
@@ -192,8 +199,8 @@ export function fontStackOf(fontFamily) {
  * @param {string} themeId 阅读主题 id
  * @returns {object} React inline style
  */
-export function readerThemeVars(themeId) {
-  const theme = READER_THEMES[themeId] || READER_THEMES.paper;
+export function readerThemeVars(themeId,einkMode=false) {
+  const theme = READER_THEMES[einkMode?'eink':themeId] || READER_THEMES.paper;
   return {
     '--qmr-paper': theme.bg,
     '--qmr-ink': theme.text,

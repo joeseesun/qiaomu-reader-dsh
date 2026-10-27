@@ -1,3 +1,6 @@
+import {openAppearanceSettings} from '../client/appearance.js';
+import {openSelectionSettings} from '../original/selection-settings.js';
+import {openLookupSettings} from '../original/lookup-settings.js';
 /**
  * 阅读设置面板：主题 / 字号 / 行高 / 字体 / 页边距 / 翻页方式 / 单双页 / 两端对齐。
  * 改动立即生效（写进 BookState.settings 并防抖持久化）。
@@ -12,6 +15,7 @@ import {
 import { IconClose, IconSettings } from './icons.js';
 
 const h = React.createElement;
+function CustomFontInput({ui,fontFamily}){const ref=React.useRef(null);React.useEffect(()=>{if(fontFamily==='custom')return ui.props().fonts?.mount(ref.current,ui);},[ui,fontFamily]);return h('div',{ref});}
 
 /**
  * 阅读设置面板。
@@ -75,6 +79,7 @@ export function SettingsPanel({ ui }) {
     h(
       'div',
       { className: 'qmr-panel-body' },
+      h('div',{className:'qiaomu-reader-find-controls'},h('button',{onClick:()=>void openLookupSettings({features:ui.props().features,ui,chatApi:ui.props().chatApi}).catch(error=>ui.toast(error.message))},ui.props().features.t('translation')),h('button',{onClick:()=>void ui.props().readingTime.settingsModal().catch(error=>ui.toast(error.message))},ui.props().features.t('reading-goal')),h('button',{onClick:()=>openSelectionSettings(ui)},ui.props().features.t('selection-toolbar')),h('button',{onClick:()=>openAppearanceSettings(ui)},ui.props().features.t('more-appearance-options')),h('button',{onClick:()=>ui.props().features.calibreSettings()},ui.props().features.t('add-from-calibre'))),
       !isLoaded ? h('div', { className: 'qmr-muted qmr-small', style: { marginBottom: 8 } }, '正在读取已保存的设置…') : null,
 
       h('div', { className: 'qmr-group-title' }, '主题'),
@@ -128,6 +133,7 @@ export function SettingsPanel({ ui }) {
             onChange: (event) => update({ fontFamily: event.target.value }),
           }, Object.keys(READER_FONT_LABELS).map((key) =>
             h('option', { key, value: key }, READER_FONT_LABELS[key])))),
+        h(CustomFontInput,{ui,fontFamily:settings.fontFamily}),
       ),
       h(
         'div',
@@ -278,6 +284,7 @@ export function SettingsPanel({ ui }) {
               onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontFamily: event.target.value }),
             }, Object.keys(READER_FONT_LABELS).map((key) =>
               h('option', { key, value: key }, READER_FONT_LABELS[key])))),
+        h(CustomFontInput,{ui,fontFamily:settings.fontFamily}),
         ),
         h('p', { className: 'qmr-muted qmr-small', style: { marginTop: 8 } },
           '独立外观只影响 AI 伴读面板，全局生效；重新打开「跟随正文」恢复与书籍设置一致。'),
