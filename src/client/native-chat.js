@@ -1,3 +1,4 @@
+import { latestLookupAnswer } from '../core/vocabulary.js';
 /** Reuse Harness's session, composer, model picker, tool and approval UI. */
 export function nativeChatBridge(ctx) {
   let scope;
@@ -53,6 +54,12 @@ export function nativeChatBridge(ctx) {
           });
         };
         return { sessionId: id, reference, release: () => reference.release(),
+          watchAnswer(listener) {
+            const conversation = source.value.hooks?.conversation;
+            if (!conversation?.subscribe) return () => {};
+            const read = () => listener(latestLookupAnswer(conversation.getSnapshot()));
+            read(); return conversation.subscribe(read);
+          },
           setDraft: setPrompt,
           insertContext(prompt) {
             if (typeof actions.captureInsertion !== 'function' || typeof actions.insertText !== 'function') throw new Error('当前 Harness 版本不支持插入引用');

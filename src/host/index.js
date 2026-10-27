@@ -14,6 +14,12 @@ import { mkdir, readFile, readdir, rename, rm, stat, writeFile, copyFile } from 
 import path from 'node:path';
 import { highlightLink } from '../core/backlink.js';
 import { mergeManagedNotes } from '../core/markdown-notes.js';
+import { formatOf, TEXT_FORMATS } from '../client/text-formats.js';
+import { parseTextBook } from '../client/text-book.js';
+import { speechAudio, speechVoices } from './speech.js';
+import { sendAnkiEntry } from './anki.js';
+import { vocabularyMarkdown } from '../core/vocabulary.js';
+import { searchBooks, downloadBook } from './discovery.js';
 import { TypertRemoteService, Remote } from '@deepseek-ai/dsh-typert-protocol';
 
 /** 书库相对工作区根目录的文件夹名。 */
@@ -71,6 +77,15 @@ export const Config = {
 
 /** 每个路径一条写入链，避免并发覆盖。 */
 const writeChains = new Map();
+const operationChains = new Map();
+
+// Serialize the whole read/modify/write, not only the final file write.
+function serializeLibrary(key, run) {
+  const next = (operationChains.get(key) ?? Promise.resolve()).catch(() => {}).then(run);
+  operationChains.set(key, next);
+  void next.finally(() => { if (operationChains.get(key) === next) operationChains.delete(key); }).catch(() => {});
+  return next;
+}
 
 /**
  * 原子写文本：先写临时文件再 rename，保证读者永远看到完整内容。
@@ -95,12 +110,13 @@ function writeTextAtomic(file, content) {
   return next;
 }
 
-/** 读取 JSON；文件不存在或损坏时返回 fallback。 */
+/** 读取 JSON；仅文件不存在时返回 fallback，损坏内容保留并报错。 */
 async function readJson(file, fallback) {
   try {
     return JSON.parse(await readFile(file, 'utf8'));
-  } catch {
-    return fallback;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return fallback;
+    throw new Error(`无法读取书库数据，已保留原文件：${path.basename(file)}`, { cause: error });
   }
 }
 
@@ -168,6 +184,7 @@ function emptyLibrary() {
  */
 async function readLibrary(paths) {
   const raw = await readJson(paths.index, null);
+  if (raw !== null && (!raw || !Array.isArray(raw.books))) throw new Error('书库索引格式异常，已保留原文件');
   const books = Array.isArray(raw?.books) ? raw.books.filter((book) => book && typeof book.id === 'string') : [];
   return {
     version: typeof raw?.version === 'number' ? raw.version : LIBRARY_VERSION,
@@ -188,15 +205,6 @@ function bookIdOf(bytes) {
   return createHash('sha1').update(bytes).digest('hex').slice(0, 16);
 }
 
-/** 由文件名猜格式。 */
-function formatOf(filename) {
-  const ext = path.extname(filename).toLowerCase();
-  if (ext === '.epub') return 'epub';
-  if (ext === '.pdf') return 'pdf';
-  if (ext === '.txt') return 'txt';
-  throw new Error('支持 EPUB、PDF 和 TXT 文件');
-}
-
 /** 归一化单本书的元数据，容忍缺字段的旧数据。 */
 function normalizeBook(raw) {
   return {
@@ -213,6 +221,11 @@ function normalizeBook(raw) {
     language: typeof raw.language === 'string' ? raw.language : '',
     chapterCount: typeof raw.chapterCount === 'number' ? raw.chapterCount : 0,
     identifier: typeof raw.identifier === 'string' ? raw.identifier : '',
+    removedAt: Number(raw.removedAt) || null,
+    textLayout: raw.textLayout === 2 ? 2 : 1,
+    readProgress: Number.isFinite(raw.readProgress) ? raw.readProgress : null,
+    highlightCount: Number.isFinite(raw.highlightCount) ? raw.highlightCount : null,
+    aliases: Array.isArray(raw.aliases) ? raw.aliases.filter(id => typeof id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(id)) : [],
   };
 }
 
@@ -230,26 +243,32 @@ async function importBook(paths, input) {
   const storedName = `${id}.${format}`;
   const absolute = safeJoin(paths.books, storedName);
 
+  const library = await readLibrary(paths);
+  const index = library.books.findIndex((book) => book.id === id);
+  const previous = index >= 0 ? library.books[index] : {};
+  const textLayout = index >= 0 ? previous.textLayout || 1 : input.textLayout || 2;
+  const parsed = TEXT_FORMATS.includes(format)
+    ? parseTextBook(bytes, input.title || previous.title || path.basename(filename, path.extname(filename)), format, { layout: textLayout }).book : null;
   await mkdir(paths.books, { recursive: true });
   const exists = await stat(absolute).then(() => true).catch(() => false);
   if (!exists) await writeFile(absolute, bytes);
 
-  const library = await readLibrary(paths);
-  const index = library.books.findIndex((book) => book.id === id);
-  const previous = index >= 0 ? library.books[index] : {};
   const book = normalizeBook({
     ...previous,
     id,
-    title: input.title ?? previous.title ?? path.basename(filename, path.extname(filename)),
-    author: input.author ?? previous.author ?? '',
+    removedAt: null,
+    title: previous.title || input.title || parsed?.title || path.basename(filename, path.extname(filename)),
+    author: previous.author || input.author || parsed?.author || '',
     format,
     file: path.posix.join('books', storedName),
     bytes: bytes.byteLength,
     addedAt: typeof previous.addedAt === 'number' ? previous.addedAt : Date.now(),
     source: input.source ?? previous.source ?? 'upload',
-    language: input.language ?? previous.language ?? '',
-    chapterCount: input.chapterCount ?? previous.chapterCount ?? 0,
-    identifier: input.identifier ?? previous.identifier ?? '',
+    language: previous.language || input.language || parsed?.language || '',
+    chapterCount: parsed?.chapters.length ?? input.chapterCount ?? previous.chapterCount ?? 0,
+    textLayout,
+    aliases: [...new Set([...(previous.aliases || []), ...(typeof input.localId === 'string' ? [input.localId] : [])])],
+    identifier: previous.identifier || input.identifier || '',
     cover: input.cover ?? previous.cover ?? null,
   });
   if (index >= 0) library.books[index] = book;
@@ -264,11 +283,16 @@ function emptyState(bookId) {
     version: STATE_VERSION,
     bookId,
     locator: { chapterIndex: 0, chapterHref: '', scroll: 0, textQuote: '' },
-    updatedAt: Date.now(),
+    updatedAt: 0,
     highlights: [],
     bookmarks: [],
     settings: {},
   };
+}
+
+function stateSummary(state, chapterCount) {
+  const progress = ((Number(state.locator?.chapterIndex) || 0) + (Number(state.locator?.scroll) || 0)) / Math.max(1, Number(chapterCount) || 1);
+  return { readProgress: Math.min(1, Math.max(0, progress)), highlightCount: state.highlights?.length || 0 };
 }
 
 /** 读取某本书的阅读状态。 */
@@ -379,6 +403,18 @@ export function apply(ctx, config = {}) {
    * 每个方法都返回可 JSON 序列化的结果，失败时抛带原因的 Error。
    */
   const api = {
+    speechAudio,
+    speechVoices,
+    searchBooks: request => searchBooks(request.query),
+    downloadBook: request => downloadBook(request.id),
+    async sendToAnki({ bookId, entryId }) {
+      const library = await readLibrary(pathsOf());
+      const book = library.books.find(b => b.id === bookId);
+      const state = await readState(pathsOf(), bookId);
+      const entry = state.vocabulary?.find(e => e.id === entryId);
+      if (!book || !entry) throw new Error('找不到这条生词记录');
+      return sendAnkiEntry(book, entry);
+    },
     /** 环境信息，客户端用来显示存储位置。 */
     info() {
       const paths = pathsOf();
@@ -389,7 +425,15 @@ export function apply(ctx, config = {}) {
     async library() {
       await ensureFolders();
       const library = await readLibrary(pathsOf());
-      return { ...library, books: library.books.map(normalizeBook) };
+      let migrated = false;
+      for (const book of library.books) {
+        if (Number.isFinite(book.readProgress) && Number.isFinite(book.highlightCount)) continue;
+        const state = await readState(pathsOf(), book.id);
+        Object.assign(book, stateSummary(state, book.chapterCount)); migrated = true;
+      }
+      if (migrated) await writeLibrary(pathsOf(), library);
+      return { ...library, books: library.books.filter(book => !book.removedAt).map(normalizeBook),
+        removedBooks: library.books.filter(book => book.removedAt).map(normalizeBook) };
     },
 
     /**
@@ -408,6 +452,11 @@ export function apply(ctx, config = {}) {
         bytes,
         title: input.title,
         author: input.author,
+        language: input.language,
+        chapterCount: input.chapterCount,
+        identifier: input.identifier,
+        textLayout: input.textLayout,
+        localId: input.localId,
         cover: typeof input.cover === 'string' && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(input.cover)
           && input.cover.length <= 1400000 ? input.cover : null,
         source: input.source ?? 'upload',
@@ -431,19 +480,25 @@ export function apply(ctx, config = {}) {
       return { book, from: absolute };
     },
 
-    /** 删除一本书（同时删掉文件和状态）。 */
+    /** Only remove membership. Bytes, state and handwritten notes remain recoverable. */
     async remove(bookId) {
       const paths = await ensureFolders();
       const library = await readLibrary(paths);
       const book = library.books.find((entry) => entry.id === bookId);
       if (book === undefined) throw new Error(`书库里没有这本书：${bookId}`);
-      if (typeof book.file === 'string') {
-        await rm(safeJoin(paths.base, book.file), { force: true });
-      }
-      await rm(safeJoin(paths.state, `${bookId}.json`), { force: true });
-      library.books = library.books.filter((entry) => entry.id !== bookId);
+      book.removedAt = Date.now();
       await writeLibrary(paths, library);
       return { removed: bookId };
+    },
+
+    async restore(bookId) {
+      const paths = await ensureFolders();
+      const library = await readLibrary(paths);
+      const book = library.books.find(entry => entry.id === bookId);
+      if (!book) throw new Error(`没有可恢复的书籍：${bookId}`);
+      book.removedAt = null;
+      await writeLibrary(paths, library);
+      return { book: normalizeBook(book) };
     },
 
     /** 读取某本书的阅读状态。 */
@@ -460,10 +515,10 @@ export function apply(ctx, config = {}) {
       const library = await readLibrary(paths);
       const index = library.books.findIndex((entry) => entry.id === bookId);
       if (index >= 0) {
-        library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now() });
+        library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now(), ...stateSummary(saved, library.books[index].chapterCount) });
         await writeLibrary(paths, library);
       }
-      if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights)) {
+      if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights) || JSON.stringify(previous.vocabulary) !== JSON.stringify(saved.vocabulary)) {
         await api.exportNotes(bookId);
       }
       return { state: saved };
@@ -512,6 +567,7 @@ export function apply(ctx, config = {}) {
         }
       }
       const notePath = safeJoin(paths.notes, `${bookId}.md`);
+      lines.push(vocabularyMarkdown(bookId, state.vocabulary));
       let existing = '';
       try { existing = await readFile(notePath, 'utf8'); } catch (error) { if (error?.code !== 'ENOENT') throw error; }
       const markdown = mergeManagedNotes(existing, lines.join('\n'));
@@ -519,6 +575,11 @@ export function apply(ctx, config = {}) {
       return { markdown, path: notePath };
     },
   };
+
+  for (const method of ['library', 'import', 'importPath', 'remove', 'restore', 'saveState']) {
+    const run = api[method];
+    api[method] = (...args) => serializeLibrary(pathsOf().index, () => run(...args));
+  }
 
   /* ---- Agent 工具 ---- */
 
@@ -528,7 +589,7 @@ export function apply(ctx, config = {}) {
     return tools.register({
       name: 'reader_library',
       description:
-        '乔木阅读的书库操作：列出书库、读取 EPUB 章节或 PDF 页或 TXT 分段、查看或导出划线，以及把工作区里的 EPUB/PDF/TXT 导入书库。用户提到书架、书库、阅读器、划线或阅读笔记时用它。',
+        '乔木阅读的书库操作：列出书库、读取 EPUB 章节或 PDF 页或 TXT 分段、查看或导出划线，以及把工作区里的 EPUB/PDF/TXT/Markdown/HTML 导入书库。用户提到书架、书库、阅读器、划线或阅读笔记时用它。',
       parameters: {
         type: 'object',
         additionalProperties: false,
@@ -594,9 +655,9 @@ export function apply(ctx, config = {}) {
           const { base64, book } = await api.readBookBytes(args.id);
           const bytes = Uint8Array.from(Buffer.from(base64, 'base64'));
           const wanted = Math.max(1, Number(args?.chapter ?? 1));
-          if (book.format === 'txt') {
+          if (TEXT_FORMATS.includes(book.format)) {
             const { parseTextBook } = await import('../client/text-book.js');
-            const parsed = parseTextBook(bytes, book.title);
+            const parsed = parseTextBook(bytes, book.title, book.format, { layout: book.textLayout || 1 });
             if (wanted > parsed.book.chapters.length) throw new Error(`这本书只有 ${parsed.book.chapters.length} 部分`);
             return { book: { id: book.id, title: book.title, chapters: parsed.book.chapters.length }, chapter: { index: wanted, href: parsed.book.chapters[wanted - 1].href }, text: clip(await parsed.engine.plainTextOf(wanted - 1), 8000) };
           }
@@ -683,7 +744,7 @@ export function apply(ctx, config = {}) {
             return { kind: 'success', text: `书库共 ${library.books.length} 本：\n${lines.join('\n')}\n目录：${api.info().root}` };
           }
           if (sub === 'import') {
-            if (argument === '') return { kind: 'error', text: '用法：/reader import <EPUB/PDF/TXT 路径>' };
+            if (argument === '') return { kind: 'error', text: '用法：/reader import <EPUB/PDF/TXT/Markdown/HTML 路径>' };
             const result = await api.importPath(argument);
             return { kind: 'success', text: `已导入《${result.book.title}》（${result.book.bytes} 字节，id ${result.book.id}）。` };
           }
@@ -705,7 +766,7 @@ export function apply(ctx, config = {}) {
   ctx.effect(() => {
     ctx.logger?.info?.('乔木阅读已就绪：书库目录将在首次使用时解析');
     return () => {
-      writeChains.clear();
+      // In-flight writes retain their ordering until their own finally handlers run.
     };
   }, 'qiaomu-reader: 生命周期');
   return api;
@@ -731,6 +792,12 @@ export default class ReaderService extends TypertRemoteService {
   library() { return this.api.library(); }
   importBook(request) { return this.api.import(request); }
   removeBook(request) { return this.api.remove(request.bookId); }
+  restoreBook(request) { return this.api.restore(request.bookId); }
+  speechVoices() { return this.api.speechVoices(); }
+  speechAudio(request) { return this.api.speechAudio(request); }
+  sendToAnki(request) { return this.api.sendToAnki(request); }
+  searchBooks(request) { return this.api.searchBooks(request); }
+  downloadBook(request) { return this.api.downloadBook(request); }
   loadState(request) { return this.api.loadState(request.bookId); }
   saveState(request) { return this.api.saveState(request.bookId, request.state); }
   readBookBytes(request) { return this.api.readBookBytes(request.bookId); }
@@ -758,7 +825,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

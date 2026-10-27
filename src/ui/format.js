@@ -5,6 +5,7 @@
  */
 
 import { highlightLink } from '../core/backlink.js';
+import { vocabularyMarkdown } from '../core/vocabulary.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -243,6 +244,7 @@ export function toMarkdown(state, book, engine) {
       lines.push(`*（${color}色划线 · ${formatPercent(highlight.percent)}）*`, '');
     }
   }
+  lines.push(vocabularyMarkdown(book?.id, state?.vocabulary));
   return `${lines.join('\n').replace(/\n{4,}/g, '\n\n\n').replace(/\s*$/, '')}\n`;
 }
 

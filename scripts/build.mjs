@@ -24,6 +24,10 @@ const dev = process.argv.includes('--dev');
 const bootstrap = process.argv.includes('--bootstrap');
 const BOOTSTRAP_DIR = '/tmp/qmr-bootstrap';
 
+// pdf.js 句号截断修复（对照原版 4.2.4）：client 从 node_modules 打包，
+// npm install 会还原补丁，所以每次构建前重打（幂等）。
+await import('./patch-pdfjs.mjs');
+
 /** 宿主半的 external：由 dsh 安装目录解析，不打进产物。 */
 const HOST_EXTERNAL = [
   'pdfjs-dist',

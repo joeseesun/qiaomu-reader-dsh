@@ -535,8 +535,7 @@ export function mergeStates(a, b) {
     : { ...left.settings };
 
   return {
-    ...left,
-    ...right,
+    ...(aNewer ? { ...right, ...left } : { ...left, ...right }),
     version: Math.max(left.version, right.version) || 1,
     bookId: left.bookId || right.bookId,
     locator,

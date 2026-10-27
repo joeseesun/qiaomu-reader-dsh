@@ -96,7 +96,7 @@
 - Harness 安装版已加载本轮产物：真实六本书目可见；搜索「老子」得到一本，清除后恢复六本；菜单展示阅读笔记、划线、文件格式 / 大小和删除；Esc 只关闭菜单。
 - 构建成功，47 项现有测试通过。本轮没有执行真实书籍删除，也没有进行导入或 AI 请求；原生 AI 伴读的完整验收仍属阅读器章节所述的待验范围。
 
-截图：`docs/qa/library-desktop.png`、`docs/qa/library-mobile.png`、`docs/qa/library-dark-mobile.png`（实际组件预览）。
+截图：`docs/qa/library-harness.png`（实机）、`docs/qa/library-desktop.png`、`docs/qa/library-mobile.png`、`docs/qa/library-dark-mobile.png`（实际组件预览）。
 
 
 ## 纯白与无边框划线（v1.0.2）

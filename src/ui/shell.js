@@ -179,7 +179,7 @@ export function ReaderOverlay(props) {
     let cancelled = false;
     (async () => {
       const ok = await ui.openBook(jumpTarget.bookId);
-      if (!cancelled && ok) ui.focusHighlight(jumpTarget.bookId, jumpTarget.highlightId);
+      if (!cancelled && ok) ui.focusHighlight(store.get().bookId, jumpTarget.highlightId);
       if (!cancelled) store.set({ jumpTarget: null });
     })();
     return () => { cancelled = true; };
@@ -196,6 +196,7 @@ export function ReaderOverlay(props) {
       if (target?.closest?.('.qmr-book-more')?.querySelector('[aria-expanded="true"]')) return;
       const inField = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT');
       if (inField && state.panel === 'search') return; // 搜索面板自己处理
+      if (state.lookupSelection) { store.set({ lookupSelection: null }); return; }
       if (state.selection) {
         ui.clearSelection();
         return;

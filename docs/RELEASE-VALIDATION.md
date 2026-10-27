@@ -28,3 +28,15 @@ Installed the prebuilt v1.0.2 tarball into an independent Web profile with separ
 In the installed UI: six starter books appeared; Tao Te Ching opened; Pure white was available beside Paper; choosing it made the page and reading header rgb(255,255,255). Selected a three-line passage in chapter three using the mouse, created a pink highlight, clicked it to open the annotation panel, and observed is-focused=true, border=0px, outline=none and box-shadow=none. The host saved theme=white and one highlight in the isolated book state file. See docs/qa/white-borderless-harness.png, which contains only a default test workspace and public-domain book.
 
 Source release preparation covers the prior library and companion UI refinements too. Live AI inference, real user-file imports and other operating systems were not exercised in this release pass. GitHub CI, Release upload and public asset checksum are checked separately at publication time.
+
+## v1.1.0 — 2026-10-27
+
+Reconciled the tested local 1.1.0 implementation with the existing public repository at `1a640ee`. Preserved the repository's CI, prepack/export guard, portable starter-book script, GPL license, third-party notices and older screenshots. Added Marked, parse5 and entities notices. The rebuilt Host and Client bundles match the previously verified local candidate byte-for-byte.
+
+`npm ci` and `npm run check` passed: 84 tests, build, exports, bundle, README/license and screenshot-path verification. CI additionally rebuilds on Node 22 / Linux and compares committed bundles.
+
+Runtime evidence comes from macOS, bundled DSH 0.2.1-rc.3, an isolated Web profile installed from a tarball. Verified: Markdown table/task rendering, remove/reload/restore with saved vocabulary and progress, native lookup-session UI and manual meanings, Markdown export/backlinks, actual macOS audio playback/pause and cross-chapter/resume, Gutenberg search/download/import, 10,008-book metadata search and end-of-list virtualization, and 390px simulated viewport. See READER-ADAPTATION.md and `docs/qa/adaptation-*.png`.
+
+The ordinary desktop process has not been reloaded. Actual model replies and real Anki cards remain unverified. Kindle transport, activated Qiaomu Library, extra speech engines, MOBI/FB2/comics and stable whole-book page numbers remain outside this first-stage release. These are not described as completed.
+
+Public-distribution evidence (merge SHA, tarball SHA256, unauthenticated download and second-profile install) is recorded in the v1.1.0 Release notes after publication. Preparing this source does not itself prove public availability. No new marketplace submission or npm publication is claimed.

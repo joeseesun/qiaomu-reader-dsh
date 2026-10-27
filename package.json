@@ -1,9 +1,12 @@
 {
   "name": "qiaomu-reader-dsh",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
-  "description": "乔木阅读：DeepSeek Harness 的 EPUB、PDF、TXT 阅读器，支持书库、划线、批注、Markdown 阅读笔记和 AI 伴读。",
+  "engines": {
+    "dsh": ">=0.2.0-rc.2 <0.3.0"
+  },
+  "description": "乔木阅读：DSH 的 EPUB、PDF、TXT、Markdown、HTML 阅读器，支持朗读、生词本、阅读笔记与原生 AI 伴读。",
   "exports": {
     ".": "./index.js",
     "./index.js": "./index.js",
@@ -18,18 +21,21 @@
     "icon.svg",
     "index.js",
     "locale/*.json",
+    "docs/qa/adaptation-*.png",
+    "docs/READER-ADAPTATION.md",
     "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test test/*.test.mjs",
     "books": "node scripts/make-starter-books.mjs",
+    "resources": "node scripts/generate-pdf-resources.mjs",
     "prepack": "npm run build && node scripts/verify-package.mjs",
     "check": "npm run build && npm test && node scripts/verify-package.mjs"
   },
   "meta": {
     "title": "乔木阅读",
-    "description": "DSH 里的 EPUB、PDF、TXT 阅读器：书库、划线批注、阅读笔记与 AI 伴读。"
+    "description": "乔木阅读：DSH 的 EPUB、PDF、TXT、Markdown、HTML 阅读器，支持朗读、生词本、阅读笔记与原生 AI 伴读。"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
@@ -49,16 +55,22 @@
     },
     "meta": {
       "title": "乔木阅读",
-      "description": "DSH 里的 EPUB、PDF、TXT 阅读器：书库、划线批注、阅读笔记与 AI 伴读。"
+      "description": "乔木阅读：DSH 的 EPUB、PDF、TXT、Markdown、HTML 阅读器，支持朗读、生词本、阅读笔记与原生 AI 伴读。"
     }
   },
   "dependencies": {
+    "marked": "18.1.2",
+    "parse5": "8.0.1",
     "pdfjs-dist": "^6.2.108"
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2"
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2"
   },
   "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
     "@deepseek-ai/dsh-typert-protocol": {
       "optional": true
     }

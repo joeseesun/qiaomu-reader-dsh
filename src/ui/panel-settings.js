@@ -23,6 +23,8 @@ export function SettingsPanel({ ui }) {
   const bookId = ui.useSel((state) => state.bookId);
   ui.useSel((state) => (state.states || {})[bookId] || null);
   const isLoaded = !!ui.useSel((state) => ((state.states || {})[bookId] ? 1 : 0));
+  /** 伴读独立外观（null = 跟随正文，对照原版 4.5.10） */
+  const companionAppearance = ui.useSel((state) => state.companionAppearance);
 
   React.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
@@ -31,25 +33,29 @@ export function SettingsPanel({ ui }) {
   const settings = ui.settingsOf(bookId);
   const update = (patch) => ui.updateSettings(bookId, patch);
 
-  const themeCards = READER_THEME_IDS.map((id) => {
-    const theme = READER_THEMES[id];
-    return h(
-      'button',
-      {
-        key: id,
-        type: 'button',
-        className: `qmr-theme-card${settings.theme === id ? ' is-active' : ''}`,
-        'aria-pressed': settings.theme === id,
-        onClick: () => update({ theme: id }),
-      },
-      h('span', {
-        className: 'qmr-theme-swatch',
-        style: { background: theme.bg, color: theme.text },
-        'aria-hidden': 'true',
-      }, '文'),
-      h('span', null, id === 'white' ? ui.t('themeWhite', theme.label) : theme.label),
-    );
-  });
+  const themeCardGrid = (activeId, onSelect) => h(
+    'div',
+    { className: 'qmr-theme-grid' },
+    READER_THEME_IDS.map((id) => {
+      const theme = READER_THEMES[id];
+      return h(
+        'button',
+        {
+          key: id,
+          type: 'button',
+          className: `qmr-theme-card${activeId === id ? ' is-active' : ''}`,
+          'aria-pressed': activeId === id,
+          onClick: () => onSelect(id),
+        },
+        h('span', {
+          className: 'qmr-theme-swatch',
+          style: { background: theme.bg, color: theme.text },
+          'aria-hidden': 'true',
+        }, '文'),
+        h('span', null, id === 'white' ? ui.t('themeWhite', theme.label) : theme.label),
+      );
+    }),
+  );
 
   return h(
     React.Fragment,
@@ -72,7 +78,7 @@ export function SettingsPanel({ ui }) {
       !isLoaded ? h('div', { className: 'qmr-muted qmr-small', style: { marginBottom: 8 } }, '正在读取已保存的设置…') : null,
 
       h('div', { className: 'qmr-group-title' }, '主题'),
-      h('div', { className: 'qmr-theme-grid' }, themeCards),
+      themeCardGrid(settings.theme, (id) => update({ theme: id })),
 
       h('div', { className: 'qmr-group-title' }, '排版'),
       h(
@@ -194,6 +200,89 @@ export function SettingsPanel({ ui }) {
             '两端对齐')),
       ),
 
+      h('div', { className: 'qmr-group-title' }, 'AI 伴读外观'),
+      h(
+        'div',
+        { className: 'qmr-field' },
+        h('span', { className: 'qmr-field-label' }, '跟随'),
+        h('span', { className: 'qmr-field-ctl' },
+          h('label', { className: 'qmr-switch' },
+            h('input', {
+              type: 'checkbox',
+              checked: !companionAppearance,
+              'aria-label': '伴读跟随正文外观',
+              onChange: (event) => {
+                if (event.target.checked) {
+                  ui.setCompanionAppearance(null);
+                  return;
+                }
+                // 关闭跟随：以当前生效外观为起点（对照原版 setAiAppearanceFollowing）
+                ui.setCompanionAppearance({
+                  theme: settings.theme,
+                  fontFamily: settings.fontFamily,
+                  fontSize: settings.fontSize,
+                  lineHeight: settings.lineHeight,
+                });
+              },
+            }),
+            '跟随正文')),
+      ),
+      companionAppearance ? h(
+        React.Fragment,
+        null,
+        themeCardGrid(companionAppearance.theme, (id) => ui.setCompanionAppearance({ ...companionAppearance, theme: id })),
+        h(
+          'div',
+          { className: 'qmr-field', style: { marginTop: 10 } },
+          h('span', { className: 'qmr-field-label' }, '字号'),
+          h('span', { className: 'qmr-field-ctl' },
+            h('input', {
+              className: 'qmr-range',
+              type: 'range',
+              min: 12,
+              max: 32,
+              step: 1,
+              value: companionAppearance.fontSize,
+              'aria-label': '伴读字号',
+              onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontSize: Number(event.target.value) }),
+            })),
+          h('span', { className: 'qmr-field-value' }, `${companionAppearance.fontSize}px`),
+        ),
+        h(
+          'div',
+          { className: 'qmr-field' },
+          h('span', { className: 'qmr-field-label' }, '行高'),
+          h('span', { className: 'qmr-field-ctl' },
+            h('input', {
+              className: 'qmr-range',
+              type: 'range',
+              min: 1.4,
+              max: 2.2,
+              step: 0.05,
+              value: companionAppearance.lineHeight,
+              'aria-label': '伴读行高',
+              onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, lineHeight: Number(event.target.value) }),
+            })),
+          h('span', { className: 'qmr-field-value' }, Number(companionAppearance.lineHeight).toFixed(2)),
+        ),
+        h(
+          'div',
+          { className: 'qmr-field' },
+          h('span', { className: 'qmr-field-label' }, '字体'),
+          h('span', { className: 'qmr-field-ctl' },
+            h('select', {
+              className: 'qmr-select',
+              style: { flex: '1 1 auto' },
+              value: companionAppearance.fontFamily,
+              'aria-label': '伴读字体',
+              onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontFamily: event.target.value }),
+            }, Object.keys(READER_FONT_LABELS).map((key) =>
+              h('option', { key, value: key }, READER_FONT_LABELS[key])))),
+        ),
+        h('p', { className: 'qmr-muted qmr-small', style: { marginTop: 8 } },
+          '独立外观只影响 AI 伴读面板，全局生效；重新打开「跟随正文」恢复与书籍设置一致。'),
+      ) : null,
+
       h('div', { className: 'qmr-divider' }),
       h(
         'div',
@@ -205,7 +294,7 @@ export function SettingsPanel({ ui }) {
         }, '恢复默认'),
       ),
       h('p', { className: 'qmr-muted qmr-small', style: { marginTop: 10 } },
-        '主题应用于书页、阅读工具栏与 AI 伴读；设置随这本书保存。'),
+        `主题应用于书页、阅读工具栏与 AI 伴读；设置随这本书保存。伴读默认跟随这里的主题。`),
     ),
   );
 }

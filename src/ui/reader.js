@@ -25,6 +25,9 @@ import {
 } from './icons.js';
 import { CompanionPanel } from './companion.js';
 import { SelectionMenu } from './selection-menu.js';
+import { useSpeech, SpeechPanel } from './panel-speech.js';
+import { IconAudio, IconLanguages } from './icons.js';
+import { LookupCard, VocabularyPanel } from './panel-vocabulary.js';
 import { TocPanel } from './toc.js';
 import { HighlightsPanel } from './panel-highlights.js';
 import { SearchPanel } from './panel-search.js';
@@ -34,6 +37,26 @@ import { PromptManager } from './prompt-manager.js';
 const h = React.createElement;
 /** 相邻两列之间的间距 */
 const COLUMN_GAP = 56;
+
+/**
+ * 翻页键判定（对照原版 4.5.12 reader-keyboard.js）。
+ * 焦点落在控件上时不抢按键：方向键是滑杆/菜单/标签页的原生导航，
+ * 空格是按钮的原生激活——否则进度条聚焦时按方向键会连翻两页，
+ * Tab 到「下一页」按钮后按空格会双触发。
+ * @param {KeyboardEvent} event
+ * @returns {'next'|'prev'|null}
+ */
+export function readerPageDirection(event) {
+  if (event.defaultPrevented || event.isComposing || event.keyCode === 229
+    || event.metaKey || event.ctrlKey || event.altKey) return null;
+  const target = event.composedPath?.()[0] || event.target;
+  if (target?.isContentEditable
+    || target?.closest?.('input,textarea,select,[contenteditable=true],[role=slider],[role=menu],[role=tablist]')) return null;
+  // Space 保留给 Tab 到达的控件做原生激活。
+  if ((event.key === ' ' || event.key === 'Spacebar') && target?.closest?.('button,a[href],[role=button]')) return null;
+  return ['ArrowRight', 'ArrowDown', ' ', 'Spacebar', 'PageDown'].includes(event.key) ? 'next'
+    : ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key) ? 'prev' : null;
+}
 
 /** 取章节 href */
 function chapterHrefOf(engine, index) {
@@ -198,10 +221,15 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const panel = ui.useSel((state) => state.panel);
   const promptManagerOpen = ui.useSel((state) => !!state.promptManagerOpen);
   const selection = ui.useSel((state) => state.selection);
+  const lookupSelection = ui.useSel(state => state.lookupSelection);
+  React.useEffect(() => { ui.store.set({ lookupSelection: null }); }, [bookId]);
   const searchQuery = ui.useSel((state) => state.searchQuery);
   const searchIndex = ui.useSel((state) => Number(state.searchIndex));
   const searchResults = ui.useSel((state) => state.searchResults) || [];
   const restoreScroll = ui.useSel((state) => state.restoreScroll);
+  const jumpToken = ui.useSel(state => state.jumpToken);
+  const jumpReturn = ui.useSel(state => state.jumpReturn);
+  const lastRestoreRef = React.useRef('');
   const focusHighlightId = ui.useSel((state) => state.focusHighlightId);
   const focusToken = ui.useSel((state) => state.focusToken);
   const searchFocusToken = ui.useSel((state) => state.searchFocusToken);
@@ -233,9 +261,15 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const book = ui.bookOf(bookId);
   const sectionUnit = book?.format === 'pdf' ? '页' : book?.format === 'txt' ? '部分' : '章';
   const engine = ui.engineOf(bookId);
+  const speech = useSpeech(ui, bookId, engine);
+  const speechFocus = ui.useSel(state => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
   const settings = book?.format === 'pdf' ? { ...storedSettings, flow: 'scroll' } : storedSettings;
   const themeVars = readerThemeVars(settings.theme);
+  /** 伴读独立外观（null = 跟随正文书籍设置，对照原版 4.5.10） */
+  const companionAppearance = ui.useSel((state) => state.companionAppearance);
+  const companionLook = companionAppearance
+    || { theme: settings.theme, fontFamily: settings.fontFamily, fontSize: settings.fontSize, lineHeight: settings.lineHeight };
   const labels = React.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
 
   const [html, setHtml] = React.useState('');
@@ -423,7 +457,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
     const meta = measure();
 
-    if (isNewHtml) {
+    const restoreKey = `${bookId}:${chapterIndex}:${restoreScroll}:${jumpToken}`;
+    if (isNewHtml || (restoreScroll !== null && lastRestoreRef.current !== restoreKey)) {
+      lastRestoreRef.current = restoreKey;
       if (pendingLandLastRef.current) {
         pendingLandLastRef.current = false;
         setPage(Math.max(0, (meta.pages || 1) - 1));
@@ -434,7 +470,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           });
         }
       } else {
-        setPage(0);
+        const fraction = Math.min(1, Math.max(0, Number(restoreScroll) || 0));
+        setPage(Math.round(fraction * Math.max(0, (meta.pages || 1) - 1)));
         if (settings.flow === 'scroll') {
           const fraction = Math.min(1, Math.max(0, Number(restoreScroll) || 0));
           requestAnimationFrame(() => {
@@ -451,6 +488,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     searchQuery,
     chapterIndex,
     restoreScroll,
+    jumpToken,
     settings.flow,
     settings.spread,
     engine,
@@ -538,6 +576,24 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     chapterBusy,
     revealNode,
   ]);
+
+  React.useLayoutEffect(() => {
+    if (!speechFocus?.text || speechFocus.chapterIndex !== chapterIndex || chapterBusy || !html) return;
+    const flow = flowRef.current;
+    if (!flow) return;
+    const { text, map } = buildTextIndex(flow);
+    const matches = findRanges(text, speechFocus.text, 1000);
+    matches.sort((a, b) => Math.abs(a.start - speechFocus.offset) - Math.abs(b.start - speechFocus.offset));
+    const match = matches[0];
+    if (!match) return;
+    const node = map[match.start]?.node;
+    if (!node) return;
+    const range = document.createRange();
+    range.setStart(node, map[match.start].offset);
+    range.setEnd(map[match.end - 1].node, map[match.end - 1].offset + 1);
+    if (settings.flow === 'scroll') revealNode(node.parentElement);
+    else revealNode(range);
+  }, [speechFocus, chapterIndex, chapterBusy, html, revealNode, settings.flow]);
 
   // 平移当前页
   React.useEffect(() => {
@@ -693,32 +749,18 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const onKeyDown = (event) => {
       const state = ui.store.get();
       if (!state.visible || state.view !== 'reader') return;
-      const target = event.target;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)) return;
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      switch (event.key) {
-        case 'ArrowLeft':
-        case 'PageUp':
-          ui.turnPage(-1);
-          break;
-        case 'ArrowRight':
-        case 'PageDown':
-          ui.turnPage(1);
-          break;
-        case ' ':
-        case 'Spacebar':
-          if (event.shiftKey) ui.turnPage(-1);
-          else ui.turnPage(1);
-          break;
-        case 'Home':
-          ui.goChapter(0);
-          break;
-        case 'End':
-          ui.goChapter(Math.max(0, (Number(state.chapterCount) || 1) - 1));
-          break;
-        default:
-          return;
+      if (event.key === 'Home' || event.key === 'End') {
+        const target = event.composedPath?.()[0] || event.target;
+        if (event.metaKey || event.ctrlKey || event.altKey || target?.isContentEditable
+          || target?.closest?.('input,textarea,select,[contenteditable=true],[role=slider],[role=menu],[role=tablist]')) return;
+        event.preventDefault();
+        ui.goChapter(event.key === 'Home' ? 0 : Math.max(0, (Number(state.chapterCount) || 1) - 1));
+        return;
       }
+      const direction = readerPageDirection(event);
+      if (!direction) return;
+      if (direction === 'next') ui.turnPage(event.shiftKey && (event.key === ' ' || event.key === 'Spacebar') ? -1 : 1);
+      else ui.turnPage(-1);
       event.preventDefault();
     };
     window.addEventListener('keydown', onKeyDown);
@@ -932,6 +974,10 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   const panelNode = panel === 'toc'
     ? h(TocPanel, { ui })
+    : panel === 'vocabulary'
+      ? h(VocabularyPanel, { ui, bookId })
+    : panel === 'speech'
+      ? h(SpeechPanel, { ui, speech })
     : panel === 'search'
       ? h(SearchPanel, { ui })
       : panel === 'highlights' || panel === 'notes'
@@ -979,6 +1025,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       h(
         'div',
         { className: 'qmr-actions' },
+        toolbarButton('speech', h(IconAudio, { width: 16, height: 16 }), ui.t('speech.title', '连续朗读'), () => ui.setPanel('speech'), panel === 'speech'),
+        toolbarButton('vocabulary', h(IconLanguages, { width: 16, height: 16 }), ui.t('lookup.vocabulary', '生词本'), () => ui.setPanel('vocabulary'), panel === 'vocabulary'),
         toolbarButton('search', h(IconSearch, { width: 16, height: 16 }), '搜索', () => ui.setPanel('search'), panel === 'search'),
         toolbarButton('hl', h(IconHighlight, { width: 16, height: 16 }), '划线', () => ui.setPanel('highlights'), panel === 'highlights' || panel === 'notes'),
         toolbarButton('ai', h(IconSparkles, { width: 16, height: 16 }), 'AI 伴读', () => ui.setPanel('companion'), panel === 'companion'),
@@ -1041,6 +1089,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       ),
       h('span', { className: 'qmr-bottom-text' }, `第 ${chapterIndex + 1} / ${chapterCount || '?'} ${sectionUnit}`),
       h('span', { className: 'qmr-bottom-text' }, formatPercent(progress)),
+      jumpReturn ? h('button', { className: 'qmr-icon-btn', 'aria-label': ui.t('navigation.return', '回到跳转前'), title: ui.t('navigation.return', '回到跳转前'), onClick: () => ui.returnFromJump() }, h(IconBack, { width: 16, height: 16 })) : null,
       h('button', {
         type: 'button',
         className: 'qmr-icon-btn',
@@ -1107,7 +1156,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
               onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 }),
             }, '重试'))
           : null,
-        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk }) : null,
+        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onLookup: () => { ui.store.set({ lookupSelection: { ...selection } }); ui.clearSelection(); } }) : null,
+        lookupSelection ? h(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
         bottomBar,
       ),
       panel === 'companion' ? h('div', {
@@ -1139,7 +1189,16 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         onDoubleClick: () => { companionWidthRef.current = 44; setCompanionWidth(44); localStorage.setItem('qmr.companionWidth', '44'); },
       }) : null,
       panelNode
-        ? h('div', { className: `qmr-panel${panel === 'companion' ? ' qmr-panel-companion' : ''}${narrow && panel !== 'companion' ? ' qmr-panel-overlay' : ''}` }, panelNode)
+        ? h('div', {
+          className: `qmr-panel${panel === 'companion' ? ' qmr-panel-companion' : ''}${narrow && panel !== 'companion' ? ' qmr-panel-overlay' : ''}`,
+          style: panel === 'companion' ? {
+            ...readerThemeVars(companionLook.theme),
+            '--qmr-ai-font': fontStackOf(companionLook.fontFamily),
+            '--qmr-ai-size': `${companionLook.fontSize}px`,
+            '--qmr-ai-line-height': String(companionLook.lineHeight),
+          } : undefined,
+          'data-qmr-ai-appearance': panel === 'companion' && companionAppearance ? 'custom' : undefined,
+        }, panelNode)
         : null,
     ),
     promptManagerOpen ? h(PromptManager, { onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null,

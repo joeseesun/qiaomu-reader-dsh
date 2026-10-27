@@ -1,8 +1,8 @@
-/** Shared client catalogue messages. */
+/** Shared client messages; kept in sync with locale/*.json. */
 export const LIBRARY_MESSAGES = {
   "zh": {
     "catalog": {
-      "deleteConfirm": "从书库删除《{title}》？\n只删除书库副本，不影响原始文件。",
+      "deleteConfirm": "从书库移除《{title}》？\n文件、进度、划线与笔记均保留，可在已移除书籍中恢复。",
       "finished": "已读完",
       "justStarted": "刚开始",
       "unread": "未读",
@@ -15,7 +15,7 @@ export const LIBRARY_MESSAGES = {
       "more": "更多操作",
       "notes": "阅读笔记",
       "highlights": "查看划线",
-      "delete": "从书库删除",
+      "delete": "从书库移除",
       "pickerError": "当前环境无法打开文件选择器",
       "importing": "导入中…",
       "import": "导入书籍",
@@ -41,7 +41,7 @@ export const LIBRARY_MESSAGES = {
       "noResults": "没有符合条件的书",
       "empty": "从第一本书开始",
       "noResultsHelp": "换个关键词，或清空筛选。",
-      "emptyHelp": "导入 EPUB、PDF 或 TXT，开始阅读。",
+      "emptyHelp": "导入 EPUB、PDF、TXT、Markdown 或 HTML，开始阅读。",
       "clear": "清空筛选",
       "titleAuthor": "书名 / 作者",
       "format": "格式",
@@ -49,7 +49,64 @@ export const LIBRARY_MESSAGES = {
       "annotations": "划线",
       "all": "全部书籍",
       "reading": "正在阅读",
-      "highlighted": "有划线"
+      "highlighted": "有划线",
+      "removedBooks": "已移除书籍",
+      "restore": "恢复到书库",
+      "removed": "已移除，阅读数据已保留",
+      "restored": "已恢复到书库"
+    },
+    "speech": {
+      "title": "连续朗读",
+      "close": "关闭面板",
+      "provider": "语音来源",
+      "browser": "浏览器系统语音",
+      "macos": "macOS 系统语音",
+      "voice": "音色",
+      "default": "系统默认",
+      "rate": "语速",
+      "follow": "跟随朗读翻页",
+      "pause": "暂停",
+      "resume": "继续朗读",
+      "here": "从当前页朗读",
+      "back": "回到朗读处",
+      "idle": "选择音色后开始朗读",
+      "playing": "正在朗读",
+      "loading": "正在准备语音…",
+      "paused": "已暂停",
+      "ended": "已读完全书",
+      "error": "朗读失败，可重试"
+    },
+    "lookup": {
+      "title": "查词与翻译",
+      "close": "关闭查词",
+      "meaning": "释义（可编辑）",
+      "generate": "生成解释",
+      "save": "加入生词本",
+      "saved": "已加入生词本",
+      "vocabulary": "生词本",
+      "export": "导出 Markdown",
+      "empty": "选中文字，点击查词后加入生词本。",
+      "back": "回到原文",
+      "anki": "发送到 Anki",
+      "ankiSaved": "已发送到 Anki",
+      "unavailable": "原生对话尚未就绪，请先在 Harness 中选择工作区与模型",
+      "saveFailed": "无法保存原文位置"
+    },
+    "discover": {
+      "title": "找书 · Project Gutenberg",
+      "query": "书名或作者",
+      "search": "搜索",
+      "offline": "请连接宿主后再搜索书源",
+      "searching": "正在搜索…",
+      "downloading": "正在下载并校验 EPUB…",
+      "importing": "正在加入书库…",
+      "added": "已加入书库",
+      "empty": "没有匹配的书籍",
+      "owned": "已拥有",
+      "download": "下载 EPUB"
+    },
+    "navigation": {
+      "return": "回到跳转前"
     }
   },
   "en": {
@@ -58,7 +115,7 @@ export const LIBRARY_MESSAGES = {
       "reading": "Reading",
       "finished": "Finished",
       "highlighted": "Highlighted",
-      "deleteConfirm": "Remove “{title}” from your library?\nOnly the library copy will be removed; the original file is kept.",
+      "deleteConfirm": "Remove “{title}” from your library?\nFiles, progress and notes are kept. Restore it from Removed books.",
       "justStarted": "Just started",
       "unread": "Unread",
       "opening": "Opening…",
@@ -96,12 +153,77 @@ export const LIBRARY_MESSAGES = {
       "noResults": "No matching books",
       "empty": "Start with your first book",
       "noResultsHelp": "Try another keyword or clear the filters.",
-      "emptyHelp": "Import an EPUB, PDF or TXT to start reading.",
+      "emptyHelp": "Import EPUB, PDF, TXT, Markdown or HTML to start reading.",
       "clear": "Clear filters",
       "titleAuthor": "Title / Author",
       "format": "Format",
       "progress": "Reading progress",
-      "annotations": "Highlights"
+      "annotations": "Highlights",
+      "removedBooks": "Removed books",
+      "restore": "Restore to library",
+      "removed": "Removed; reading data kept",
+      "restored": "Restored to library"
+    },
+    "speech": {
+      "title": "Read aloud",
+      "close": "Close panel",
+      "provider": "Speech source",
+      "browser": "Browser system voices",
+      "macos": "macOS system voices",
+      "voice": "Voice",
+      "default": "System default",
+      "rate": "Speed",
+      "follow": "Follow reading position",
+      "pause": "Pause",
+      "resume": "Resume",
+      "here": "Read from this page",
+      "back": "Back to speech",
+      "idle": "Choose a voice to start",
+      "playing": "Reading aloud",
+      "loading": "Preparing audio…",
+      "paused": "Paused",
+      "ended": "Book finished",
+      "error": "Speech failed; retry"
+    },
+    "lookup": {
+      "title": "Dictionary and translation",
+      "close": "Close lookup",
+      "meaning": "Meaning (editable)",
+      "generate": "Explain selection",
+      "save": "Save word",
+      "saved": "Word saved",
+      "vocabulary": "Vocabulary",
+      "export": "Export Markdown",
+      "empty": "Select text and look it up to save a word.",
+      "back": "Return to source",
+      "anki": "Send to Anki",
+      "ankiSaved": "Sent to Anki",
+      "unavailable": "Choose a workspace and model in Harness first",
+      "saveFailed": "Unable to save source position"
+    },
+    "discover": {
+      "title": "Find books · Project Gutenberg",
+      "query": "Title or author",
+      "search": "Search",
+      "offline": "Connect the host to search for books",
+      "searching": "Searching…",
+      "downloading": "Downloading and validating EPUB…",
+      "importing": "Adding to library…",
+      "added": "Added to library",
+      "empty": "No matching books",
+      "owned": "In library",
+      "download": "Download EPUB"
+    },
+    "navigation": {
+      "return": "Back before jump"
     }
   }
 };
+
+// DSH LocaleFace looks up literal keys; it does not traverse nested objects.
+export function flatMessages(messages, prefix = '') {
+  return Object.fromEntries(Object.entries(messages).flatMap(([key, value]) => {
+    const name = prefix ? `${prefix}.${key}` : key;
+    return value && typeof value === 'object' ? Object.entries(flatMessages(value, name)) : [[name, value]];
+  }));
+}

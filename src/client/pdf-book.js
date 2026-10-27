@@ -1,5 +1,6 @@
 import { getDocument, Util } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { WorkerMessageHandler } from 'pdfjs-dist/legacy/build/pdf.worker.mjs';
+import { PDF_EMBEDDED_RESOURCE_OPTIONS } from './pdf-resources.js';
 
 // The plugin is one self-contained client bundle. PDF.js uses its in-process
 // worker handler so it never requests a separate unserved worker URL.
@@ -9,7 +10,7 @@ const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&'
 const escapeAttr = escapeHtml;
 
 export async function parsePdfBook(bytes, title = 'PDF') {
-  const task = getDocument({ data: bytes.slice(), useSystemFonts: true });
+  const task = getDocument({ data: bytes.slice(), useSystemFonts: true, ...PDF_EMBEDDED_RESOURCE_OPTIONS });
   let document;
   try { document = await task.promise; }
   catch (error) { await task.destroy(); throw new Error(`PDF 解析失败：${error?.message || error}`); }
