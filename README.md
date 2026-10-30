@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.1.1：DeepSeek Harness **0.2.1-rc.3** 兼容更新。[本次验证范围](docs/RC3-COMPATIBILITY.md)。
+> v1.1.2：DeepSeek Harness **0.2.1-rc.3** 兼容更新。[本次验证范围](docs/RC3-COMPATIBILITY.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -16,11 +16,11 @@
 
 ## 安装预构建发布包
 
-从 [v1.1.1 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.1.1) 下载 `qiaomu-reader-dsh-1.1.1.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
+从 [v1.1.2 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.1.2) 下载 `qiaomu-reader-dsh-1.1.2.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
 
 ```sh
 shasum -a 256 -c SHA256SUMS
-dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.1.1.tgz
+dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.1.2.tgz
 ```
 
 `YOUR_PROFILE` 需要替换为目标 profile。macOS 桌面版请使用应用自带 CLI：`/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh`。不要把隔离测试配置直接覆盖日用配置。
@@ -57,7 +57,7 @@ npm pack --pack-destination /tmp
 
 ## English
 
-Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.1.1 GitHub Release; no npm publication is provided.
+Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.1.2 GitHub Release; no npm publication is provided.
 
 Tested on macOS with bundled DSH 0.2.1-rc.3 in an isolated Web profile. The regular desktop process, Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Kindle, activated Qiaomu Library, additional TTS engines, MOBI/FB2/comics and stable whole-book pagination are outside this candidate.
 
