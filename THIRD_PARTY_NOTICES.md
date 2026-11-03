@@ -287,3 +287,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Speech protocol/controller code is adapted from Qiaomu Reader4.9.4 under GPL-3.0-only. Edge interoperability follows rany2/edge-tts (LGPL-3.0); see `licenses/edge-tts-LGPL.txt`. Bundled `ws`8.22.0 uses MIT (`licenses/ws-MIT.txt`); JSZip3.10.1 is used under its MIT option (`licenses/jszip-license.txt`).
 
 Kokoro and MeloTTS model files, uv,managed Python,Sherpa and Python dependencies are downloaded separately into device-local application data; they are not bundled in this tgz. The fixed model registry records source URLs,content hashes and per-model licenses. Installing a local model displays its size/source/license before download. Model setup never modifies the book library or global Python.
+
+## Zhuque Fangsong reading subset
+
+`media/fonts/QiaomuReadingFangsong.woff2` is the unchanged Qiaomu Reader subset of Zhuque Fangsong v0.212, containing 7,554 Unicode codepoints, maintained by 向阳乔木. Copyright (c) 2023 Zhejiang JadeFoci Techonology Co. LTD. Licensed under SIL Open Font License 1.1; see `licenses/zhuque-OFL.txt`. Embedded in the Host bundle and transferred locally when selected; no font CDN request or OS installation. Upstream: https://github.com/TrionesType/zhuque

@@ -486,13 +486,13 @@ function RGBToHSL(rgb, output) {
   output[2] = l;
 }
 function HSLToRGB(hsl, output) {
-  const h21 = hsl[0];
+  const h22 = hsl[0];
   const s = hsl[1];
   const l = hsl[2];
   const c2 = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c2 * (1 - Math.abs(h21 / 60 % 2 - 1));
+  const x = c2 * (1 - Math.abs(h22 / 60 % 2 - 1));
   const m2 = l - c2 / 2;
-  switch (Math.floor(h21 / 60)) {
+  switch (Math.floor(h22 / 60)) {
     case 0:
       output[0] = c2 + m2;
       output[1] = x + m2;
@@ -2584,9 +2584,9 @@ var init_pdf = __esm({
       5917(module2, __unused_webpack_exports, __webpack_require__3) {
         var DESCRIPTORS = __webpack_require__3(3724);
         var fails = __webpack_require__3(9039);
-        var createElement22 = __webpack_require__3(4055);
+        var createElement23 = __webpack_require__3(4055);
         module2.exports = !DESCRIPTORS && !fails(function() {
-          return Object.defineProperty(createElement22("div"), "a", {
+          return Object.defineProperty(createElement23("div"), "a", {
             get: function() {
               return 7;
             }
@@ -5443,7 +5443,7 @@ var init_pdf = __esm({
           }
         })();
         if (Uint8Array2) $3({ target: "Uint8Array", stat: true, forced: INCORRECT_BEHAVIOR_OR_DOESNT_EXISTS }, {
-          fromBase64: function fromBase64(string) {
+          fromBase64: function fromBase642(string) {
             var result = $fromBase64(string, arguments.length > 1 ? arguments[1] : void 0, null, 9007199254740991);
             return arrayFromConstructorAndList(Uint8Array2, result.bytes);
           }
@@ -9225,35 +9225,35 @@ var init_pdf = __esm({
         let rotator;
         switch (textLayer.getAttribute("data-main-rotation")) {
           case "90":
-            rotator = (x, y2, w2, h21) => ({
+            rotator = (x, y2, w2, h22) => ({
               x: (y2 - layerY) / parentHeight,
               y: 1 - (x + w2 - layerX) / parentWidth,
-              width: h21 / parentHeight,
+              width: h22 / parentHeight,
               height: w2 / parentWidth
             });
             break;
           case "180":
-            rotator = (x, y2, w2, h21) => ({
+            rotator = (x, y2, w2, h22) => ({
               x: 1 - (x + w2 - layerX) / parentWidth,
-              y: 1 - (y2 + h21 - layerY) / parentHeight,
+              y: 1 - (y2 + h22 - layerY) / parentHeight,
               width: w2 / parentWidth,
-              height: h21 / parentHeight
+              height: h22 / parentHeight
             });
             break;
           case "270":
-            rotator = (x, y2, w2, h21) => ({
-              x: 1 - (y2 + h21 - layerY) / parentHeight,
+            rotator = (x, y2, w2, h22) => ({
+              x: 1 - (y2 + h22 - layerY) / parentHeight,
               y: (x - layerX) / parentWidth,
-              width: h21 / parentHeight,
+              width: h22 / parentHeight,
               height: w2 / parentWidth
             });
             break;
           default:
-            rotator = (x, y2, w2, h21) => ({
+            rotator = (x, y2, w2, h22) => ({
               x: (x - layerX) / parentWidth,
               y: (y2 - layerY) / parentHeight,
               width: w2 / parentWidth,
-              height: h21 / parentHeight
+              height: h22 / parentHeight
             });
             break;
         }
@@ -10623,41 +10623,41 @@ var init_pdf = __esm({
         switch (name) {
           case "topLeft":
             isDiagonal = true;
-            getPoint = (w2, h21) => [0, 0];
-            getOpposite = (w2, h21) => [w2, h21];
+            getPoint = (w2, h22) => [0, 0];
+            getOpposite = (w2, h22) => [w2, h22];
             break;
           case "topMiddle":
-            getPoint = (w2, h21) => [w2 / 2, 0];
-            getOpposite = (w2, h21) => [w2 / 2, h21];
+            getPoint = (w2, h22) => [w2 / 2, 0];
+            getOpposite = (w2, h22) => [w2 / 2, h22];
             break;
           case "topRight":
             isDiagonal = true;
-            getPoint = (w2, h21) => [w2, 0];
-            getOpposite = (w2, h21) => [0, h21];
+            getPoint = (w2, h22) => [w2, 0];
+            getOpposite = (w2, h22) => [0, h22];
             break;
           case "middleRight":
             isHorizontal = true;
-            getPoint = (w2, h21) => [w2, h21 / 2];
-            getOpposite = (w2, h21) => [0, h21 / 2];
+            getPoint = (w2, h22) => [w2, h22 / 2];
+            getOpposite = (w2, h22) => [0, h22 / 2];
             break;
           case "bottomRight":
             isDiagonal = true;
-            getPoint = (w2, h21) => [w2, h21];
-            getOpposite = (w2, h21) => [0, 0];
+            getPoint = (w2, h22) => [w2, h22];
+            getOpposite = (w2, h22) => [0, 0];
             break;
           case "bottomMiddle":
-            getPoint = (w2, h21) => [w2 / 2, h21];
-            getOpposite = (w2, h21) => [w2 / 2, 0];
+            getPoint = (w2, h22) => [w2 / 2, h22];
+            getOpposite = (w2, h22) => [w2 / 2, 0];
             break;
           case "bottomLeft":
             isDiagonal = true;
-            getPoint = (w2, h21) => [0, h21];
-            getOpposite = (w2, h21) => [w2, 0];
+            getPoint = (w2, h22) => [0, h22];
+            getOpposite = (w2, h22) => [w2, 0];
             break;
           case "middleLeft":
             isHorizontal = true;
-            getPoint = (w2, h21) => [0, h21 / 2];
-            getOpposite = (w2, h21) => [w2, h21 / 2];
+            getPoint = (w2, h22) => [0, h22 / 2];
+            getOpposite = (w2, h22) => [w2, h22 / 2];
             break;
         }
         const point = getPoint(savedWidth, savedHeight);
@@ -11980,9 +11980,9 @@ var init_pdf = __esm({
         }
         let hash = "";
         if (ids.length) {
-          const h21 = new MurmurHash3_64();
-          h21.update(ids.join(","));
-          hash = h21.hexdigest();
+          const h22 = new MurmurHash3_64();
+          h22.update(ids.join(","));
+          hash = h22.hexdigest();
         }
         return this.#modifiedIds = {
           ids: new Set(ids),
@@ -15714,22 +15714,22 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
         this.smaskPreparedOffsetY = offsetY;
         this.smaskPreparedOOBAlpha = !useLayerSize && filteredOOBAlpha !== 0 ? filteredOOBAlpha : null;
       }
-      _bakeSMaskCanvas(maskCanvas, drawX, drawY, w2, h21, backdrop, filterSpec) {
+      _bakeSMaskCanvas(maskCanvas, drawX, drawY, w2, h22, backdrop, filterSpec) {
         if (!backdrop && !filterSpec) {
           unreachable("_bakeSMaskCanvas with neither backdrop nor filter");
         }
-        const srcEntry = this.canvasFactory.create(w2, h21);
+        const srcEntry = this.canvasFactory.create(w2, h22);
         const sCtx = srcEntry.context;
         sCtx.drawImage(maskCanvas, drawX, drawY);
         if (backdrop) {
           sCtx.globalCompositeOperation = "destination-atop";
           sCtx.fillStyle = backdrop;
-          sCtx.fillRect(0, 0, w2, h21);
+          sCtx.fillRect(0, 0, w2, h22);
         }
         if (!filterSpec) {
           return srcEntry;
         }
-        const preparedEntry = this.canvasFactory.create(w2, h21);
+        const preparedEntry = this.canvasFactory.create(w2, h22);
         const pCtx = preparedEntry.context;
         pCtx.filter = filterSpec.url;
         const filterApplied = FeatureTest.isCanvasFilterSupported && pCtx.filter !== "none" && pCtx.filter !== "";
@@ -15738,7 +15738,7 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           pCtx.filter = "none";
         }
         if (!filterApplied) {
-          const img = pCtx.getImageData(0, 0, w2, h21);
+          const img = pCtx.getImageData(0, 0, w2, h22);
           const {
             data
           } = img;
@@ -17373,8 +17373,8 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           imgToPaint = imgData.bitmap;
         } else {
           const w2 = imgData.width;
-          const h21 = imgData.height;
-          const tmpCanvas = this.canvasFactory.create(w2, h21);
+          const h22 = imgData.height;
+          const tmpCanvas = this.canvasFactory.create(w2, h22);
           putBinaryImageData(tmpCanvas.context, imgData);
           imgToPaint = this.applyTransferMapsToCanvas(tmpCanvas.context);
           inlineImgCanvas = tmpCanvas;
@@ -31362,11 +31362,11 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           let rotator = rotators.get(textLayer);
           if (!rotator) {
             const clientRect = textLayer.getBoundingClientRect();
-            rotator = (x, y2, w2, h21) => ({
+            rotator = (x, y2, w2, h22) => ({
               x: (x - clientRect.x) / clientRect.width,
               y: (y2 - clientRect.y) / clientRect.height,
               width: w2 / clientRect.width,
-              height: h21 / clientRect.height
+              height: h22 / clientRect.height
             });
             rotators.set(textLayer, rotator);
           }
@@ -33065,7 +33065,7 @@ function decodeScan(data, view, offset, frame, components, resetInterval, spectr
   }
   let mcu = 0, fileMarker;
   const mcuExpected = componentsLength === 1 ? components[0].blocksPerLine * components[0].blocksPerColumn : mcusPerLine * frame.mcusPerColumn;
-  let h21, v2;
+  let h22, v2;
   while (mcu <= mcuExpected) {
     const mcuToRead = resetInterval ? Math.min(mcuExpected - mcu, resetInterval) : mcuExpected;
     if (mcuToRead > 0) {
@@ -33083,10 +33083,10 @@ function decodeScan(data, view, offset, frame, components, resetInterval, spectr
         for (n = 0; n < mcuToRead; n++) {
           for (i = 0; i < componentsLength; i++) {
             component = components[i];
-            h21 = component.h;
+            h22 = component.h;
             v2 = component.v;
             for (j = 0; j < v2; j++) {
-              for (k = 0; k < h21; k++) {
+              for (k = 0; k < h22; k++) {
                 decodeMcu(component, decodeFn, mcu, j, k);
               }
             }
@@ -38821,11 +38821,11 @@ function flushHTML(node) {
 function addHTML(node, html, bbox) {
   const extra = node[$extra];
   const availableSpace = extra.availableSpace;
-  const [x, y2, w2, h21] = bbox;
+  const [x, y2, w2, h22] = bbox;
   switch (node.layout) {
     case "position": {
       extra.width = Math.max(extra.width, x + w2);
-      extra.height = Math.max(extra.height, y2 + h21);
+      extra.height = Math.max(extra.height, y2 + h22);
       extra.children.push(html);
       break;
     }
@@ -38840,11 +38840,11 @@ function addHTML(node, html, bbox) {
       extra.line.children.push(html);
       if (extra.attempt === 0) {
         extra.currentWidth += w2;
-        extra.height = Math.max(extra.height, extra.prevHeight + h21);
+        extra.height = Math.max(extra.height, extra.prevHeight + h22);
       } else {
         extra.currentWidth = w2;
         extra.prevHeight = extra.height;
-        extra.height += h21;
+        extra.height += h22;
         extra.attempt = 0;
       }
       extra.width = Math.max(extra.width, extra.currentWidth);
@@ -38853,7 +38853,7 @@ function addHTML(node, html, bbox) {
     case "row": {
       extra.children.push(html);
       extra.width += w2;
-      extra.height = Math.max(extra.height, h21);
+      extra.height = Math.max(extra.height, h22);
       const height = measureToString(extra.height);
       for (const child of extra.children) {
         child.attributes.style.height = height;
@@ -38862,13 +38862,13 @@ function addHTML(node, html, bbox) {
     }
     case "table": {
       extra.width = MathClamp2(w2, extra.width, availableSpace.width);
-      extra.height += h21;
+      extra.height += h22;
       extra.children.push(html);
       break;
     }
     case "tb": {
       extra.width = MathClamp2(w2, extra.width, availableSpace.width);
-      extra.height += h21;
+      extra.height += h22;
       extra.children.push(html);
       break;
     }
@@ -38911,26 +38911,26 @@ function getAvailableSpace(node) {
 }
 function getTransformedBBox(node) {
   let w2 = node.w === "" ? NaN : node.w;
-  let h21 = node.h === "" ? NaN : node.h;
+  let h22 = node.h === "" ? NaN : node.h;
   let [centerX, centerY] = [0, 0];
   switch (node.anchorType || "") {
     case "bottomCenter":
-      [centerX, centerY] = [w2 / 2, h21];
+      [centerX, centerY] = [w2 / 2, h22];
       break;
     case "bottomLeft":
-      [centerX, centerY] = [0, h21];
+      [centerX, centerY] = [0, h22];
       break;
     case "bottomRight":
-      [centerX, centerY] = [w2, h21];
+      [centerX, centerY] = [w2, h22];
       break;
     case "middleCenter":
-      [centerX, centerY] = [w2 / 2, h21 / 2];
+      [centerX, centerY] = [w2 / 2, h22 / 2];
       break;
     case "middleLeft":
-      [centerX, centerY] = [0, h21 / 2];
+      [centerX, centerY] = [0, h22 / 2];
       break;
     case "middleRight":
-      [centerX, centerY] = [w2, h21 / 2];
+      [centerX, centerY] = [w2, h22 / 2];
       break;
     case "topCenter":
       [centerX, centerY] = [w2 / 2, 0];
@@ -38946,18 +38946,18 @@ function getTransformedBBox(node) {
       break;
     case 90:
       [x, y2] = [-centerY, centerX];
-      [w2, h21] = [h21, -w2];
+      [w2, h22] = [h22, -w2];
       break;
     case 180:
       [x, y2] = [centerX, centerY];
-      [w2, h21] = [-w2, -h21];
+      [w2, h22] = [-w2, -h22];
       break;
     case 270:
       [x, y2] = [centerY, -centerX];
-      [w2, h21] = [-h21, w2];
+      [w2, h22] = [-h22, w2];
       break;
   }
-  return [node.x + x + Math.min(0, w2), node.y + y2 + Math.min(0, h21), Math.abs(w2), Math.abs(h21)];
+  return [node.x + x + Math.min(0, w2), node.y + y2 + Math.min(0, h22), Math.abs(w2), Math.abs(h22)];
 }
 function checkDimensions(node, space) {
   if (node[$getTemplateRoot]()[$extra].firstUnsplittable === null) {
@@ -38969,13 +38969,13 @@ function checkDimensions(node, space) {
   const ERROR = 2;
   const parent = node[$getSubformParent]();
   const attempt = parent[$extra]?.attempt || 0;
-  const [, y2, w2, h21] = getTransformedBBox(node);
+  const [, y2, w2, h22] = getTransformedBBox(node);
   switch (parent.layout) {
     case "lr-tb":
     case "rl-tb":
       if (attempt === 0) {
         if (!node[$getTemplateRoot]()[$extra].noLayoutFailure) {
-          if (node.h !== "" && Math.round(h21 - space.height) > ERROR) {
+          if (node.h !== "" && Math.round(h22 - space.height) > ERROR) {
             return false;
           }
           if (node.w !== "") {
@@ -38997,7 +38997,7 @@ function checkDimensions(node, space) {
       if (node[$getTemplateRoot]()[$extra].noLayoutFailure) {
         return true;
       }
-      if (node.h !== "" && Math.round(h21 - space.height) > ERROR) {
+      if (node.h !== "" && Math.round(h22 - space.height) > ERROR) {
         return false;
       }
       if (node.w === "" || Math.round(w2 - space.width) <= ERROR) {
@@ -39013,7 +39013,7 @@ function checkDimensions(node, space) {
         return true;
       }
       if (node.h !== "" && !node[$isSplittable]()) {
-        return Math.round(h21 - space.height) <= ERROR;
+        return Math.round(h22 - space.height) <= ERROR;
       }
       if (node.w === "" || Math.round(w2 - space.width) <= ERROR) {
         return space.height > ERROR;
@@ -39026,18 +39026,18 @@ function checkDimensions(node, space) {
       if (node[$getTemplateRoot]()[$extra].noLayoutFailure) {
         return true;
       }
-      if (node.h === "" || Math.round(h21 + y2 - space.height) <= ERROR) {
+      if (node.h === "" || Math.round(h22 + y2 - space.height) <= ERROR) {
         return true;
       }
       const area = node[$getTemplateRoot]()[$extra].currentContentArea;
-      return h21 + y2 > area.h;
+      return h22 + y2 > area.h;
     case "rl-row":
     case "row":
       if (node[$getTemplateRoot]()[$extra].noLayoutFailure) {
         return true;
       }
       if (node.h !== "") {
-        return Math.round(h21 - space.height) <= ERROR;
+        return Math.round(h22 - space.height) <= ERROR;
       }
       return true;
     default:
@@ -39539,7 +39539,7 @@ function calculateSHA512(data, offset, length, mode384 = false) {
   } = calculate_sha_other_PARAMS;
   let a3 = new Word64(0, 0), b = new Word64(0, 0), c2 = new Word64(0, 0);
   let d = new Word64(0, 0), e = new Word64(0, 0), f = new Word64(0, 0);
-  let g = new Word64(0, 0), h21 = new Word64(0, 0);
+  let g = new Word64(0, 0), h23 = new Word64(0, 0);
   const t1 = new Word64(0, 0), t2 = new Word64(0, 0);
   const tmp1 = new Word64(0, 0), tmp2 = new Word64(0, 0);
   let tmp3;
@@ -39564,9 +39564,9 @@ function calculateSHA512(data, offset, length, mode384 = false) {
     e.assign(h42);
     f.assign(h52);
     g.assign(h62);
-    h21.assign(h72);
+    h23.assign(h72);
     for (j = 0; j < 80; ++j) {
-      t1.assign(h21);
+      t1.assign(h23);
       sigmaPrime(tmp1, e, tmp2);
       t1.add(tmp1);
       ch(tmp1, e, f, g, tmp2);
@@ -39576,8 +39576,8 @@ function calculateSHA512(data, offset, length, mode384 = false) {
       sigma(t2, a3, tmp2);
       maj(tmp1, a3, b, c2, tmp2);
       t2.add(tmp1);
-      tmp3 = h21;
-      h21 = g;
+      tmp3 = h23;
+      h23 = g;
       g = f;
       f = e;
       d.add(t1);
@@ -39596,7 +39596,7 @@ function calculateSHA512(data, offset, length, mode384 = false) {
     h42.add(e);
     h52.add(f);
     h62.add(g);
-    h72.add(h21);
+    h72.add(h23);
   }
   let result;
   if (!mode384) {
@@ -39675,11 +39675,11 @@ function calculateSHA256(data, offset, length) {
     for (j = 16; j < 64; ++j) {
       w2[j] = calculate_sha256_littleSigmaPrime(w2[j - 2]) + w2[j - 7] + calculate_sha256_littleSigma(w2[j - 15]) + w2[j - 16] | 0;
     }
-    let a3 = h0, b = h1, c2 = h22, d = h32, e = h42, f = h52, g = h62, h21 = h72, t1, t2;
+    let a3 = h0, b = h1, c2 = h22, d = h32, e = h42, f = h52, g = h62, h23 = h72, t1, t2;
     for (j = 0; j < 64; ++j) {
-      t1 = h21 + calculate_sha256_sigmaPrime(e) + calculate_sha256_ch(e, f, g) + k[j] + w2[j];
+      t1 = h23 + calculate_sha256_sigmaPrime(e) + calculate_sha256_ch(e, f, g) + k[j] + w2[j];
       t2 = calculate_sha256_sigma(a3) + calculate_sha256_maj(a3, b, c2);
-      h21 = g;
+      h23 = g;
       g = f;
       f = e;
       e = d + t1 | 0;
@@ -39695,7 +39695,7 @@ function calculateSHA256(data, offset, length) {
     h42 = h42 + e | 0;
     h52 = h52 + f | 0;
     h62 = h62 + g | 0;
-    h72 = h72 + h21 | 0;
+    h72 = h72 + h23 | 0;
   }
   return new Uint8Array([h0 >> 24 & 255, h0 >> 16 & 255, h0 >> 8 & 255, h0 & 255, h1 >> 24 & 255, h1 >> 16 & 255, h1 >> 8 & 255, h1 & 255, h22 >> 24 & 255, h22 >> 16 & 255, h22 >> 8 & 255, h22 & 255, h32 >> 24 & 255, h32 >> 16 & 255, h32 >> 8 & 255, h32 & 255, h42 >> 24 & 255, h42 >> 16 & 255, h42 >> 8 & 255, h42 & 255, h52 >> 24 & 255, h52 >> 16 & 255, h52 >> 8 & 255, h52 & 255, h62 >> 24 & 255, h62 >> 16 & 255, h62 >> 8 & 255, h62 & 255, h72 >> 24 & 255, h72 >> 16 & 255, h72 >> 8 & 255, h72 & 255]);
 }
@@ -41133,9 +41133,9 @@ var init_pdf_worker = __esm({
       5917(module2, __unused_webpack_exports, __webpack_require__3) {
         var DESCRIPTORS = __webpack_require__3(3724);
         var fails = __webpack_require__3(9039);
-        var createElement22 = __webpack_require__3(4055);
+        var createElement23 = __webpack_require__3(4055);
         module2.exports = !DESCRIPTORS && !fails(function() {
-          return Object.defineProperty(createElement22("div"), "a", {
+          return Object.defineProperty(createElement23("div"), "a", {
             get: function() {
               return 7;
             }
@@ -43618,7 +43618,7 @@ var init_pdf_worker = __esm({
           }
         })();
         if (Uint8Array2) $3({ target: "Uint8Array", stat: true, forced: INCORRECT_BEHAVIOR_OR_DOESNT_EXISTS }, {
-          fromBase64: function fromBase64(string) {
+          fromBase64: function fromBase642(string) {
             var result = $fromBase64(string, arguments.length > 1 ? arguments[1] : void 0, null, 9007199254740991);
             return arrayFromConstructorAndList(Uint8Array2, result.bytes);
           }
@@ -46348,7 +46348,7 @@ var init_pdf_worker = __esm({
         const step = Math.ceil(height / maxHeight);
         const remainder = height % maxHeight === 0 ? height : height % maxHeight;
         for (let k = 0; k < step; k++) {
-          const h21 = k < step - 1 ? maxHeight : remainder;
+          const h22 = k < step - 1 ? maxHeight : remainder;
           ({
             srcPos
           } = convertToRGBA({
@@ -46356,11 +46356,11 @@ var init_pdf_worker = __esm({
             src: data,
             dest: src32,
             width,
-            height: h21,
+            height: h22,
             inverseDecode: this._isMask,
             srcPos
           }));
-          for (let i = 0, ii = h21 >> K2; i < ii; i++) {
+          for (let i = 0, ii = h22 >> K2; i < ii; i++) {
             const buf = src32.subarray((i << K2) * width);
             for (let j = 0; j < newWidth; j++) {
               dest32[newIndex++] = buf[j << K2];
@@ -47124,17 +47124,17 @@ var init_pdf_worker = __esm({
               let maxH = 0, maxV = 0;
               for (i = 0; i < componentsCount; i++) {
                 const componentId = data[offset];
-                const h21 = data[offset + 1] >> 4;
+                const h22 = data[offset + 1] >> 4;
                 const v2 = data[offset + 1] & 15;
-                if (maxH < h21) {
-                  maxH = h21;
+                if (maxH < h22) {
+                  maxH = h22;
                 }
                 if (maxV < v2) {
                   maxV = v2;
                 }
                 const qId = data[offset + 2];
                 l = frame.components.push({
-                  h: h21,
+                  h: h22,
                   v: v2,
                   quantizationId: qId,
                   quantizationTable: null
@@ -71823,12 +71823,12 @@ var init_pdf_worker = __esm({
         } = image;
         const imageRef = dict.objId;
         const w2 = dict.get("W", "Width");
-        const h21 = dict.get("H", "Height");
-        if (!(w2 && typeof w2 === "number") || !(h21 && typeof h21 === "number")) {
+        const h22 = dict.get("H", "Height");
+        if (!(w2 && typeof w2 === "number") || !(h22 && typeof h22 === "number")) {
           warn2("Image dimensions are missing, or not numbers.");
           return;
         }
-        if (maxImageSize !== -1 && w2 * h21 > maxImageSize) {
+        if (maxImageSize !== -1 && w2 * h22 > maxImageSize) {
           const msg = "Image exceeded maximum allowed size and was removed.";
           if (!ignoreErrors) {
             throw new Error(msg);
@@ -71903,7 +71903,7 @@ var init_pdf_worker = __esm({
         }
         const SMALL_IMAGE_DIMENSIONS = 200;
         const hasMask = dict.has("SMask") || dict.has("Mask");
-        if (isInline && w2 + h21 < SMALL_IMAGE_DIMENSIONS && !hasMask) {
+        if (isInline && w2 + h22 < SMALL_IMAGE_DIMENSIONS && !hasMask) {
           try {
             const imageObj = new PDFImage({
               xref: this.xref,
@@ -71937,7 +71937,7 @@ var init_pdf_worker = __esm({
         }
         operatorList.addDependency(objId);
         fn = OPS2.paintImageXObject;
-        args = [objId, w2, h21];
+        args = [objId, w2, h22];
         operatorList.addImageOps(fn, args, optionalContent, hasMask);
         if (cacheGlobally) {
           globalCacheData = {
@@ -71953,7 +71953,7 @@ var init_pdf_worker = __esm({
             this._sendImgData(objId, null, cacheGlobally);
             return;
           }
-          if (w2 * h21 > 25e4 || hasMask) {
+          if (w2 * h22 > 25e4 || hasMask) {
             const localLength = await this.handler.sendWithPromise("commonobj", [objId, "CopyLocalImage", {
               imageRef
             }]);
@@ -75798,9 +75798,9 @@ var init_pdf_worker = __esm({
       static getFirstPositionInfo(rect, rotation, fontSize) {
         const [x1, y1, x2, y2] = rect;
         let w2 = x2 - x1;
-        let h21 = y2 - y1;
+        let h22 = y2 - y1;
         if (rotation % 180 !== 0) {
-          [w2, h21] = [h21, w2];
+          [w2, h22] = [h22, w2];
         }
         const lineHeight = (
           /* inlined export .LINE_FACTOR */
@@ -75811,9 +75811,9 @@ var init_pdf_worker = __esm({
           0.35 * fontSize
         );
         return {
-          coords: [0, h21 + lineDescent - lineHeight],
-          bbox: [0, 0, w2, h21],
-          matrix: rotation !== 0 ? getRotationMatrix(rotation, h21, lineHeight) : void 0
+          coords: [0, h22 + lineDescent - lineHeight],
+          bbox: [0, 0, w2, h22],
+          matrix: rotation !== 0 ? getRotationMatrix(rotation, h22, lineHeight) : void 0
         };
       }
       createAppearance(text, rect, rotation, fontSize, bgColor, strokeAlpha) {
@@ -75839,9 +75839,9 @@ var init_pdf_worker = __esm({
         maxWidth *= fontSize / 1e3;
         const [x1, y1, x2, y2] = rect;
         let w2 = x2 - x1;
-        let h21 = y2 - y1;
+        let h22 = y2 - y1;
         if (rotation % 180 !== 0) {
-          [w2, h21] = [h21, w2];
+          [w2, h22] = [h22, w2];
         }
         const hscale = maxWidth > w2 ? w2 / maxWidth : 1;
         let vscale = 1;
@@ -75854,12 +75854,12 @@ var init_pdf_worker = __esm({
           0.35 * fontSize
         );
         const maxHeight = lineHeight * lines.length;
-        if (maxHeight > h21) {
-          vscale = h21 / maxHeight;
+        if (maxHeight > h22) {
+          vscale = h22 / maxHeight;
         }
         const fscale = Math.min(hscale, vscale);
         const newFontSize = fontSize * fscale;
-        const buffer = ["q", `0 0 ${numberToString(w2)} ${numberToString(h21)} re W n`, `BT`, `1 0 0 1 0 ${numberToString(h21 + lineDescent)} Tm 0 Tc ${getPdfColor(bgColor, true)}`, `/${this.fontName.name} ${numberToString(newFontSize)} Tf`];
+        const buffer = ["q", `0 0 ${numberToString(w2)} ${numberToString(h22)} re W n`, `BT`, `1 0 0 1 0 ${numberToString(h22 + lineDescent)} Tm 0 Tc ${getPdfColor(bgColor, true)}`, `/${this.fontName.name} ${numberToString(newFontSize)} Tf`];
         const {
           resources
         } = this;
@@ -75883,11 +75883,11 @@ var init_pdf_worker = __esm({
         const appearanceStreamDict = new Dict(this.xref);
         appearanceStreamDict.setIfName("Subtype", "Form");
         appearanceStreamDict.setIfName("Type", "XObject");
-        appearanceStreamDict.set("BBox", [0, 0, w2, h21]);
+        appearanceStreamDict.set("BBox", [0, 0, w2, h22]);
         appearanceStreamDict.set("Length", appearance.length);
         appearanceStreamDict.set("Resources", resources);
         if (rotation) {
-          const matrix = getRotationMatrix(rotation, w2, h21);
+          const matrix = getRotationMatrix(rotation, w2, h22);
           appearanceStreamDict.set("Matrix", matrix);
         }
         return new StringStream(appearance, appearanceStreamDict);
@@ -80564,9 +80564,9 @@ var init_pdf_worker = __esm({
         return true;
       }
       [$addHTML](html, bbox) {
-        const [x, y2, w2, h21] = bbox;
+        const [x, y2, w2, h22] = bbox;
         this[$extra].width = Math.max(this[$extra].width, x + w2);
-        this[$extra].height = Math.max(this[$extra].height, y2 + h21);
+        this[$extra].height = Math.max(this[$extra].height, y2 + h22);
         this[$extra].children.push(html);
       }
       [$getAvailableSpace]() {
@@ -80987,7 +80987,7 @@ var init_pdf_worker = __esm({
         if (this.reserve <= 0) {
           const {
             w: w2,
-            h: h21
+            h: h22
           } = this[$getExtra](availableSpace);
           switch (this.placement) {
             case "left":
@@ -80997,7 +80997,7 @@ var init_pdf_worker = __esm({
               break;
             case "top":
             case "bottom":
-              this.reserve = h21;
+              this.reserve = h22;
               break;
           }
         }
@@ -81535,7 +81535,7 @@ var init_pdf_worker = __esm({
         const savedH = this.h;
         const {
           w: w2,
-          h: h21,
+          h: h22,
           isBroken
         } = layoutNode(this, availableSpace);
         if (w2 && this.w === "") {
@@ -81545,8 +81545,8 @@ var init_pdf_worker = __esm({
           }
           this.w = w2;
         }
-        if (h21 && this.h === "") {
-          this.h = h21;
+        if (h22 && this.h === "") {
+          this.h = h22;
         }
         setFirstUnsplittable(this);
         if (!checkDimensions(this, availableSpace)) {
@@ -82149,11 +82149,11 @@ var init_pdf_worker = __esm({
           } else {
             const {
               w: w2,
-              h: h21
+              h: h22
             } = layoutNode(this, availableSpace);
             if (w2 !== null) {
               uiW = w2;
-              uiH = h21;
+              uiH = h22;
             } else {
               uiH = fonts_getMetrics(this.font, true).lineNoGap;
             }
@@ -82164,7 +82164,7 @@ var init_pdf_worker = __esm({
           if (this.caption) {
             const {
               w: w2,
-              h: h21,
+              h: h22,
               isBroken
             } = this.caption[$getExtra](availableSpace);
             if (isBroken && this[$getSubformParent]()[$isThereMoreWidth]()) {
@@ -82172,7 +82172,7 @@ var init_pdf_worker = __esm({
               return HTMLResult.FAILURE;
             }
             width = w2;
-            height = h21;
+            height = h22;
             switch (this.caption.placement) {
               case "left":
               case "right":
@@ -90956,9 +90956,9 @@ var init_pdf_worker = __esm({
         }, resources);
         const [x1, y1, x2, y2] = rect;
         let w2 = x2 - x1;
-        let h21 = y2 - y1;
+        let h22 = y2 - y1;
         if (rotation % 180 !== 0) {
-          [w2, h21] = [h21, w2];
+          [w2, h22] = [h22, w2];
         }
         const lines = value.split("\n");
         const scale = fontSize / 1e3;
@@ -90990,8 +90990,8 @@ var init_pdf_worker = __esm({
           0.35) * fontSize
         );
         const totalHeight = lineHeight * lines.length;
-        if (totalHeight > h21) {
-          vscale = h21 / totalHeight;
+        if (totalHeight > h22) {
+          vscale = h22 / totalHeight;
         }
         const fscale = Math.min(hscale, vscale);
         const newFontSize = fontSize * fscale;
@@ -90999,22 +90999,22 @@ var init_pdf_worker = __esm({
         switch (rotation) {
           case 0:
             matrix = [1, 0, 0, 1];
-            clipBox = [rect[0], rect[1], w2, h21];
+            clipBox = [rect[0], rect[1], w2, h22];
             firstPoint = [rect[0], rect[3] - lineAscent];
             break;
           case 90:
             matrix = [0, 1, -1, 0];
-            clipBox = [rect[1], -rect[2], w2, h21];
+            clipBox = [rect[1], -rect[2], w2, h22];
             firstPoint = [rect[1], -rect[0] - lineAscent];
             break;
           case 180:
             matrix = [-1, 0, 0, -1];
-            clipBox = [-rect[2], -rect[3], w2, h21];
+            clipBox = [-rect[2], -rect[3], w2, h22];
             firstPoint = [-rect[2], -rect[1] - lineAscent];
             break;
           case 270:
             matrix = [0, -1, 1, 0];
-            clipBox = [-rect[3], rect[0], w2, h21];
+            clipBox = [-rect[3], rect[0], w2, h22];
             firstPoint = [-rect[3], rect[2] - lineAscent];
             break;
         }
@@ -92208,8 +92208,8 @@ var init_pdf_worker = __esm({
           const iMin = this.#getGridIndex(intersector.minX, intersector.minY);
           const iMax = this.#getGridIndex(intersector.maxX, intersector.maxY);
           const w2 = (iMax - iMin) % STEPS;
-          const h21 = Math.floor((iMax - iMin) / STEPS);
-          for (let i = iMin; i <= iMin + h21 * STEPS; i += STEPS) {
+          const h22 = Math.floor((iMax - iMin) / STEPS);
+          for (let i = iMin; i <= iMin + h22 * STEPS; i += STEPS) {
             for (let j = 0; j <= w2; j++) {
               (this.#grid[i + j] ??= []).push(intersector);
             }
@@ -99787,10 +99787,10 @@ function V(a3, e = 0) {
   return n;
 }
 function _e(a3, e, t, n, s) {
-  let r = e.href, o = e.title || null, i = a3[1].replace(s.other.outputLinkReplace, "$1"), l = a3[0].charAt(0) === "!", u = n.state.inLink, h21 = n.state.linkEmitted, p2 = n.state.inRawBlock;
+  let r = e.href, o = e.title || null, i = a3[1].replace(s.other.outputLinkReplace, "$1"), l = a3[0].charAt(0) === "!", u = n.state.inLink, h22 = n.state.linkEmitted, p2 = n.state.inRawBlock;
   n.state.inLink = true, n.state.linkEmitted = false;
   let d = n.inlineTokens(i), g = n.state.linkEmitted;
-  if (n.state.linkEmitted = h21, n.state.inLink = u, !l) {
+  if (n.state.linkEmitted = h22, n.state.inLink = u, !l) {
     if (g) {
       n.state.inRawBlock = p2;
       return;
@@ -99991,11 +99991,11 @@ var init_marked_esm = __esm({
             else if (!i) l.push(n[u]);
             else break;
             n = n.slice(u);
-            let h21 = l.join(`
-`), p2 = h21.replace(this.rules.other.blockquoteMarkerWhitespace, (k, b, x) => b + V(x, b.length)).replace(this.rules.other.blockquoteSetextReplace, `
+            let h22 = l.join(`
+`), p2 = h22.replace(this.rules.other.blockquoteMarkerWhitespace, (k, b, x) => b + V(x, b.length)).replace(this.rules.other.blockquoteSetextReplace, `
     $1`).replace(this.rules.other.blockquoteSetextReplace2, "");
             s = s ? `${s}
-${h21}` : h21, r = r ? `${r}
+${h22}` : h22, r = r ? `${r}
 ${p2}` : p2;
             let d = this.lexer.state.top;
             if (this.lexer.state.top = true, this.lexer.blockTokens(p2, o, true), this.lexer.state.top = d, n.length === 0) break;
@@ -100068,8 +100068,8 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
             let C = n.slice(g, s());
             i.loose || (u ? i.loose = true : this.rules.other.doubleBlankLine.test(C) && (u = true)), i.items.push({ type: "list_item", raw: C, task: !!this.options.gfm && this.rules.other.listIsTask.test(d), loose: false, text: d, tokens: [] });
           }
-          let h21 = i.items.at(-1);
-          if (h21) h21.raw = h21.raw.trimEnd(), h21.text = h21.text.trimEnd();
+          let h22 = i.items.at(-1);
+          if (h22) h22.raw = h22.raw.trimEnd(), h22.text = h22.text.trimEnd();
           else return;
           i.raw = n.slice(0, s()).trimEnd();
           for (let p2 of i.items) if (this.lexer.state.top = false, p2.tokens = this.lexer.blockTokens(p2.text, []), !i.loose) {
@@ -100200,13 +100200,13 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
         if (!s || !s[1] && !s[2] && !s[3] && !s[4]) return;
         let r = s[0][0], o = n === r, i = t.length - e.length, l = i;
         for (; !this.options.pedantic && l > 0 && t[l - 1] === r; ) l--;
-        let u = [...t.slice(Math.max(0, l - 2), l)].at(-1) ?? "", h21 = u === "*" || u === "_" || !!this.rules.inline.punctuation.exec(u);
+        let u = [...t.slice(Math.max(0, l - 2), l)].at(-1) ?? "", h22 = u === "*" || u === "_" || !!this.rules.inline.punctuation.exec(u);
         l < i && (n = u);
-        let p2 = l < i ? h21 : !!this.rules.inline.punctuation.exec(n);
+        let p2 = l < i ? h22 : !!this.rules.inline.punctuation.exec(n);
         if (s[4] && n.match(this.rules.other.unicodeAlphaNumeric)) return;
         let d = s[1] || s[3] || "";
         if (!d || !n || p2) {
-          let g = [...s[0]].length - 1, k, b, x = g, f = 0, S = i - l + g, R = !this.options.pedantic && !!u.trim() && (!!d || r === "*" && !h21), C = r === "*" ? this.rules.inline.emStrongRDelimAst : this.rules.inline.emStrongRDelimUnd;
+          let g = [...s[0]].length - 1, k, b, x = g, f = 0, S = i - l + g, R = !this.options.pedantic && !!u.trim() && (!!d || r === "*" && !h22), C = r === "*" ? this.rules.inline.emStrongRDelimAst : this.rules.inline.emStrongRDelimUnd;
           for (C.lastIndex = 0, t = t.slice(-1 * e.length + g); (s = C.exec(t)) !== null; ) {
             if (k = s[1] || s[2] || s[3] || s[4] || s[5] || s[6], !k) continue;
             if (b = [...k].length, s[3] || s[4]) {
@@ -100246,8 +100246,8 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
         let s = this.rules.inline.delLDelim.exec(e);
         if (!s) return;
         if (!(s[1] || "") || !n || this.rules.inline.punctuation.exec(n)) {
-          let o = [...s[0]].length - 1, i, l, u = o, h21 = this.rules.inline.delRDelim;
-          for (h21.lastIndex = 0, t = t.slice(-1 * e.length + o); (s = h21.exec(t)) !== null; ) {
+          let o = [...s[0]].length - 1, i, l, u = o, h22 = this.rules.inline.delRDelim;
+          for (h22.lastIndex = 0, t = t.slice(-1 * e.length + o); (s = h22.exec(t)) !== null; ) {
             if (i = s[1] || s[2] || s[3] || s[4] || s[5] || s[6], !i || (l = [...i].length, l !== o)) continue;
             if (s[3] || s[4]) {
               u += l;
@@ -100390,8 +100390,8 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
           let o = e;
           if (this.options.extensions?.startBlock) {
             let i = 1 / 0, l = e.slice(1), u;
-            this.options.extensions.startBlock.forEach((h21) => {
-              u = h21.call({ lexer: this }, l), typeof u == "number" && u >= 0 && (i = Math.min(i, u));
+            this.options.extensions.startBlock.forEach((h22) => {
+              u = h22.call({ lexer: this }, l), typeof u == "number" && u >= 0 && (i = Math.min(i, u));
             }), i < 1 / 0 && i >= 0 && (o = e.substring(0, i + 1));
           }
           if (this.state.top && (r = this.tokenizer.paragraph(o))) {
@@ -100496,9 +100496,9 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
           }
           let l = e;
           if (this.options.extensions?.startInline) {
-            let u = 1 / 0, h21 = e.slice(1), p2;
+            let u = 1 / 0, h22 = e.slice(1), p2;
             this.options.extensions.startInline.forEach((d) => {
-              p2 = d.call({ lexer: this }, h21), typeof p2 == "number" && p2 >= 0 && (u = Math.min(u, p2));
+              p2 = d.call({ lexer: this }, h22), typeof p2 == "number" && p2 >= 0 && (u = Math.min(u, p2));
             }), u < 1 / 0 && u >= 0 && (l = e.substring(0, u + 1));
           }
           if (i = this.tokenizer.inlineText(l)) {
@@ -100932,9 +100932,9 @@ ${e}</tr>
               if (!(o in r)) throw new Error(`renderer '${o}' does not exist`);
               if (["options", "parser"].includes(o)) continue;
               let i = o, l = n.renderer[i], u = r[i];
-              r[i] = (...h21) => {
-                let p2 = l.apply(r, h21);
-                return p2 === false && (p2 = u.apply(r, h21)), p2 || "";
+              r[i] = (...h22) => {
+                let p2 = l.apply(r, h22);
+                return p2 === false && (p2 = u.apply(r, h22)), p2 || "";
               };
             }
             s.renderer = r;
@@ -100945,9 +100945,9 @@ ${e}</tr>
               if (!(o in r)) throw new Error(`tokenizer '${o}' does not exist`);
               if (["options", "rules", "lexer"].includes(o)) continue;
               let i = o, l = n.tokenizer[i], u = r[i];
-              r[i] = (...h21) => {
-                let p2 = l.apply(r, h21);
-                return p2 === false && (p2 = u.apply(r, h21)), p2;
+              r[i] = (...h22) => {
+                let p2 = l.apply(r, h22);
+                return p2 === false && (p2 = u.apply(r, h22)), p2;
               };
             }
             s.tokenizer = r;
@@ -100958,20 +100958,20 @@ ${e}</tr>
               if (!(o in r)) throw new Error(`hook '${o}' does not exist`);
               if (["options", "block"].includes(o)) continue;
               let i = o, l = n.hooks[i], u = r[i];
-              A2.passThroughHooks.has(o) ? r[i] = (h21) => {
+              A2.passThroughHooks.has(o) ? r[i] = (h22) => {
                 if (r.options.async && A2.passThroughHooksRespectAsync.has(o)) return (async () => {
-                  let d = await l.call(r, h21);
+                  let d = await l.call(r, h22);
                   return u.call(r, d);
                 })();
-                let p2 = l.call(r, h21);
+                let p2 = l.call(r, h22);
                 return u.call(r, p2);
-              } : r[i] = (...h21) => {
+              } : r[i] = (...h22) => {
                 if (r.options.async) return (async () => {
-                  let d = await l.apply(r, h21);
-                  return d === false && (d = await u.apply(r, h21)), d;
+                  let d = await l.apply(r, h22);
+                  return d === false && (d = await u.apply(r, h22)), d;
                 })();
-                let p2 = l.apply(r, h21);
-                return p2 === false && (p2 = u.apply(r, h21)), p2;
+                let p2 = l.apply(r, h22);
+                return p2 === false && (p2 = u.apply(r, h22)), p2;
               };
             }
             s.hooks = r;
@@ -101002,7 +101002,7 @@ ${e}</tr>
           if (typeof n > "u" || n === null) return i(new Error("marked(): input parameter is undefined or null"));
           if (typeof n != "string") return i(new Error("marked(): input parameter is of type " + Object.prototype.toString.call(n) + ", string expected"));
           if (o.hooks && (o.hooks.options = o, o.hooks.block = e), o.async) return (async () => {
-            let l = o.hooks ? await o.hooks.preprocess(n) : n, h21 = await (o.hooks ? await o.hooks.provideLexer(e) : e ? O.lex : O.lexInline)(l, o), p2 = o.hooks ? await o.hooks.processAllTokens(h21) : h21;
+            let l = o.hooks ? await o.hooks.preprocess(n) : n, h22 = await (o.hooks ? await o.hooks.provideLexer(e) : e ? O.lex : O.lexInline)(l, o), p2 = o.hooks ? await o.hooks.processAllTokens(h22) : h22;
             o.walkTokens && await Promise.all(this.walkTokens(p2, o.walkTokens));
             let g = await (o.hooks ? await o.hooks.provideParser(e) : e ? w.parse : w.parseInline)(p2, o);
             return o.hooks ? await o.hooks.postprocess(g) : g;
@@ -110858,6 +110858,193 @@ __export(client_entry_exports, {
 });
 module.exports = __toCommonJS(client_entry_exports);
 
+// src/core/reader-fonts.js
+var BUNDLED_FONT_FAMILIES = { zhuque: "QMR Zhuque Fangsong" };
+var READER_FONTS = Object.freeze({
+  custom: {
+    id: "custom",
+    stack: "Georgia,serif",
+    labels: { ru: "custom-font", en: "Custom font", zh: "\u81EA\u5B9A\u4E49\u5B57\u4F53" }
+  },
+  georgia: {
+    id: "georgia",
+    stack: "Georgia,'Times New Roman',serif",
+    labels: { ru: "Georgia", en: "Georgia", zh: "Georgia" }
+  },
+  lora: {
+    id: "lora",
+    stack: "'Lora',Georgia,serif",
+    labels: { ru: "Lora", en: "Lora", zh: "Lora" }
+  },
+  inter: {
+    id: "inter",
+    stack: "'Inter',system-ui,sans-serif",
+    labels: { ru: "Inter", en: "Inter", zh: "Inter" }
+  },
+  systemSans: {
+    id: "systemSans",
+    stack: "-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC','Noto Sans SC',sans-serif",
+    labels: { ru: "system-sans-serif", en: "System sans", zh: "\u7CFB\u7EDF\u9ED1\u4F53" },
+    cjk: true
+  },
+  sourceHanSerif: {
+    id: "sourceHanSerif",
+    stack: `'Source Han Serif CN','Source Han Serif SC','\u601D\u6E90\u5B8B\u4F53 CN','Noto Serif CJK SC','Noto Serif SC','Songti SC','STSong','SimSun',serif`,
+    labels: { ru: "Source Han Serif", en: "Source Han Serif", zh: "\u601D\u6E90\u5B8B\u4F53" },
+    cjk: true
+  },
+  sourceHanSans: {
+    id: "sourceHanSans",
+    stack: `'Source Han Sans CN','Source Han Sans SC','\u601D\u6E90\u9ED1\u4F53 CN','Noto Sans CJK SC','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif`,
+    labels: { ru: "Source Han Sans", en: "Source Han Sans", zh: "\u601D\u6E90\u9ED1\u4F53" },
+    cjk: true
+  },
+  songti: {
+    id: "songti",
+    stack: "'Songti SC','STSong','SimSun','Noto Serif CJK SC','Noto Serif SC',serif",
+    labels: { ru: "cjk-serif", en: "CJK serif", zh: "\u5B8B\u4F53" },
+    cjk: true
+  },
+  kaiti: {
+    id: "kaiti",
+    stack: "'Kaiti SC','STKaiti','KaiTi','Noto Serif CJK SC','Songti SC',serif",
+    labels: { ru: "kaiti", en: "Kaiti", zh: "\u6977\u4F53" },
+    cjk: true
+  },
+  lxgw: {
+    id: "lxgw",
+    stack: `'LXGW WenKai GB Screen','LXGW WenKai Screen','LXGW WenKai','\u971E\u9E5C\u6587\u6977','Songti SC','STSong','Noto Serif CJK SC',serif`,
+    labels: { ru: "LXGW WenKai", en: "LXGW WenKai", zh: "\u971E\u9E5C\u6587\u6977" },
+    cjk: true
+  },
+  zhenkai: {
+    id: "zhenkai",
+    stack: `'LXGW ZhenKai GB','\u971E\u9E5C\u81FB\u6977 GB','Kaiti SC','STKaiti','KaiTi','Noto Serif CJK SC',serif`,
+    labels: { ru: "LXGW ZhenKai GB", en: "LXGW ZhenKai GB", zh: "\u971E\u9E5C\u81FB\u6977 GB" },
+    cjk: true
+  },
+  zhuque: {
+    id: "zhuque",
+    stack: `'${BUNDLED_FONT_FAMILIES.zhuque}','Zhuque Fangsong (technical preview)','\u6731\u96C0\u4EFF\u5B8B\uFF08\u9884\u89C8\u6D4B\u8BD5\u7248\uFF09','FangSong','STFangsong','Noto Serif CJK SC','Songti SC',serif`,
+    labels: { ru: "Zhuque Fangsong", en: "Zhuque Fangsong", zh: "\u6731\u96C0\u4EFF\u5B8B" },
+    cjk: true
+  }
+});
+var MAX_FONT_BYTES = 64 * 1024 * 1024;
+var FONT_FILE_ACCEPT = ".ttf,.otf,.woff,.woff2";
+function fontFileFormat(bytes) {
+  if (!bytes || !Number.isInteger(bytes.byteLength) || bytes.byteLength < 4) return "";
+  const h22 = new Uint8Array(bytes.buffer || bytes, bytes.byteOffset || 0, 4);
+  if ([...h22].join(",") === "0,1,0,0") return "ttf";
+  return { true: "ttf", OTTO: "otf", wOFF: "woff", wOF2: "woff2" }[String.fromCharCode(...h22)] || "";
+}
+function safeFontFamily(value) {
+  return typeof value === "string" && value.trim().length > 0 && value.length <= 160 && !/[";{}<>\\\x00-\x1f\x7f]/u.test(value);
+}
+function importedFontFamily(id) {
+  return /^[a-f0-9]{64}$/.test(id || "") ? "QMR Imported " + id : "";
+}
+function isReaderFontKey(value) {
+  if (typeof value !== "string") return false;
+  return value.startsWith("custom:") && !!readerFontStack(value.slice(7)) || ["serif", "sans-serif", "mono"].includes(value) || Object.hasOwn(READER_FONTS, value) || value?.startsWith("system:") && safeFontFamily(value.slice(7)) || !!importedFontFamily(String(value || "").replace(/^imported:/, "")) && String(value).startsWith("imported:");
+}
+function readerFontStack(value) {
+  if (typeof value !== "string" || value.length > 512) return "";
+  let quote = "", part = "", parts = [];
+  for (const char of value) {
+    if (char === '"' || char === "'") {
+      if (!quote) quote = char;
+      else if (quote === char) quote = "";
+      part += char;
+    } else if (char === "," && !quote) {
+      parts.push(part);
+      part = "";
+    } else part += char;
+  }
+  if (quote) return "";
+  parts.push(part);
+  if (parts.length > 12) return "";
+  const generic = /* @__PURE__ */ new Set(["serif", "sans-serif", "monospace", "system-ui", "cursive", "fantasy", "ui-serif", "ui-sans-serif", "ui-monospace", "ui-rounded", "emoji", "math", "fangsong"]);
+  const result = [];
+  for (let name of parts) {
+    name = name.trim();
+    const quoted = /^["']/.test(name);
+    if (quoted) {
+      if (name.length < 2 || name.at(-1) !== name[0]) return "";
+      name = name.slice(1, -1);
+    } else if (/["']/.test(name)) return "";
+    if (!safeFontFamily(name)) return "";
+    result.push(!quoted && generic.has(name) ? name : JSON.stringify(name));
+  }
+  return result.join(", ");
+}
+
+// src/client/reader-fonts.js
+var documents = /* @__PURE__ */ new WeakMap();
+var fromBase64 = (text) => {
+  const value = atob(text), bytes = new Uint8Array(value.length);
+  for (let i = 0; i < value.length; i++) bytes[i] = value.charCodeAt(i);
+  return bytes;
+};
+function fontBase64(bytes) {
+  let text = "";
+  for (let i = 0; i < bytes.length; i += 32768) text += String.fromCharCode(...bytes.subarray(i, i + 32768));
+  return btoa(text);
+}
+async function sha256(bytes, doc) {
+  return [...new Uint8Array(await doc.defaultView.crypto.subtle.digest("SHA-256", bytes))].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function validateFontFile(file, doc = globalThis.document) {
+  if (!file?.size || file.size > MAX_FONT_BYTES) throw Error("\u8BF7\u9009\u62E964MB\u4EE5\u5185\u7684\u5B57\u4F53\u6587\u4EF6");
+  const bytes = new Uint8Array(await file.arrayBuffer()), format = fontFileFormat(bytes);
+  if (!format || !/\.(ttf|otf|woff|woff2)$/i.test(file.name)) throw Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684TTF\u3001OTF\u3001WOFF\u6216WOFF2\u5B57\u4F53");
+  try {
+    await new doc.defaultView.FontFace("QMR Font Validation", bytes).load();
+  } catch {
+    throw Error("\u5B57\u4F53\u65E0\u6CD5\u89E3\u7801\uFF0C\u8BF7\u9009\u62E9\u5B8C\u6574\u6709\u6548\u7684\u5B57\u4F53\u6587\u4EF6");
+  }
+  return bytes;
+}
+function loadReaderFont(host, key, doc = globalThis.document) {
+  const id = key === "zhuque" ? "zhuque" : String(key).startsWith("imported:") ? key.slice(9) : null;
+  if (!id) return Promise.resolve(false);
+  if (!doc?.fonts || !host?.fontAction) return Promise.reject(Error("\u5B57\u4F53\u670D\u52A1\u5C1A\u672A\u5C31\u7EEA\uFF0C\u8BF7\u91CD\u8BD5"));
+  let cache = documents.get(doc);
+  if (!cache) {
+    cache = { hosts: /* @__PURE__ */ new Map(), disposed: false, faces: /* @__PURE__ */ new Set() };
+    documents.set(doc, cache);
+  }
+  let fonts = cache.hosts.get(host);
+  if (!fonts) {
+    fonts = /* @__PURE__ */ new Map();
+    cache.hosts.set(host, fonts);
+  }
+  if (fonts.has(id)) return fonts.get(id);
+  const promise = (async () => {
+    const result = await host.fontAction({ kind: "read", id });
+    if (typeof result.base64 !== "string" || result.base64.length > Math.ceil(MAX_FONT_BYTES / 3) * 4) throw Error("\u5B57\u4F53\u6570\u636E\u8D85\u51FA\u9650\u5236");
+    const bytes = fromBase64(result.base64);
+    if (fontFileFormat(bytes) !== result.format || await sha256(bytes, doc) !== result.sha256) throw Error("\u5B57\u4F53\u6821\u9A8C\u5931\u8D25\uFF0C\u8BF7\u91CD\u65B0\u5BFC\u5165");
+    const family = id === "zhuque" ? "QMR Zhuque Fangsong" : importedFontFamily(id);
+    if (!family) throw Error("\u65E0\u6548\u5B57\u4F53");
+    const face = await new doc.defaultView.FontFace(family, bytes).load();
+    if (cache.disposed) throw Object.assign(Error("Reader closed"), { name: "AbortError" });
+    doc.fonts.add(face);
+    cache.faces.add(face);
+    return true;
+  })();
+  fonts.set(id, promise);
+  void promise.catch(() => fonts.delete(id));
+  return promise;
+}
+function disposeReaderFonts(doc = globalThis.document) {
+  const cache = documents.get(doc);
+  if (!cache) return;
+  cache.disposed = true;
+  for (const face of cache.faces) doc.fonts.delete(face);
+  documents.delete(doc);
+}
+
 // src/ui/navigation-locale.js
 var NAVIGATION_COPY = {
   "waitForPage": ["\u8BF7\u7B49\u5F85\u5F53\u524D\u9875\u9762\u52A0\u8F7D\u5B8C\u6210", "Wait for the current page to finish loading"],
@@ -111836,14 +112023,14 @@ function flatMessages(messages2, prefix = "") {
 }
 
 // src/client/index.js
-var React23 = __toESM(require("react"), 1);
+var React25 = __toESM(require("react"), 1);
 
 // src/core/state.js
 var DEFAULT_READER_SETTINGS = Object.freeze({
   theme: "paper",
   fontSize: 18,
   lineHeight: 1.75,
-  fontFamily: "serif",
+  fontFamily: "zhuque",
   margin: 64,
   flow: "paginated",
   justify: true
@@ -113187,6 +113374,7 @@ function remoteHostApi(ctx) {
     import: (request) => call("importBook", request),
     remove: (bookId) => call("removeBook", { bookId }),
     restore: (bookId) => call("restoreBook", { bookId }),
+    fontAction: (request) => call("fontAction", request),
     speechVoices: () => call("speechVoices"),
     speechAudio: (request) => call("speechAudio", request),
     speechAction: (request) => call("speechAction", request),
@@ -113304,7 +113492,7 @@ __export(shell_exports, {
   ReaderOverlay: () => ReaderOverlay,
   default: () => shell_default
 });
-var React22 = __toESM(require("react"), 1);
+var React24 = __toESM(require("react"), 1);
 
 // src/ui/hooks.js
 var React = __toESM(require("react"), 1);
@@ -113657,7 +113845,7 @@ var UI_SETTING_DEFAULTS = Object.freeze({
   theme: "paper",
   fontSize: 18,
   lineHeight: 1.75,
-  fontFamily: "serif",
+  fontFamily: "zhuque",
   margin: 64,
   flow: "paginated",
   justify: true,
@@ -113669,7 +113857,12 @@ function highlightPaint(themeId, color) {
   return theme.paints && theme.paints[color] || theme.paints.yellow;
 }
 function fontStackOf(fontFamily) {
-  return READER_FONT_STACKS[fontFamily] || READER_FONT_STACKS.serif;
+  if (String(fontFamily).startsWith("custom:")) return readerFontStack(fontFamily.slice(7)) || READER_FONT_STACKS.serif;
+  if (READER_FONT_STACKS[fontFamily]) return READER_FONT_STACKS[fontFamily];
+  if (READER_FONTS[fontFamily]) return READER_FONTS[fontFamily].stack;
+  if (String(fontFamily).startsWith("system:") && safeFontFamily(fontFamily.slice(7))) return JSON.stringify(fontFamily.slice(7)) + "," + READER_FONT_STACKS.serif;
+  const family = String(fontFamily).startsWith("imported:") ? importedFontFamily(fontFamily.slice(9)) : "";
+  return family ? JSON.stringify(family) + "," + READER_FONT_STACKS.serif : READER_FONT_STACKS.serif;
 }
 function readerThemeVars(themeId) {
   const theme = READER_THEMES2[themeId] || READER_THEMES2.paper;
@@ -113894,16 +114087,16 @@ var UI_CSS = `
 .qmr-page-zone{position:absolute;top:52px;bottom:44px;width:28px;padding:0;border:0;z-index:2;
   background:transparent;cursor:pointer;color:transparent}
 @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
+.qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
+.qmr-font-options :is(input,select):focus,.qmr-font-options button:focus-visible{outline:1px solid var(--qmr-muted);outline-offset:-1px;box-shadow:none}
 .qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
 .qmr-page-zone::after{font-size:26px;color:var(--qmr-muted);opacity:0;transition:opacity .12s}
 .qmr-page-zone-prev::after{content:'\u2039'}.qmr-page-zone-next::after{content:'\u203A'}
-.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
-.qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
-.qmr-page-zone::after{opacity:1}
+.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always .qmr-page-zone::after{opacity:1}
 .qmr-page-buttons-hidden .qmr-page-zone{display:none}
 .qmr-reader[data-qmr-eink=true],.qmr-reader[data-qmr-eink=true] .qmr-panel{--qmr-paper:#fff!important;--qmr-ink:#000!important;--qmr-muted:#444!important;--qmr-ui:#fff!important;--qmr-border:#000!important;--qmr-accent:#000!important;color:#000;background:#fff}
 .qmr-reader[data-qmr-eink=true]{color-scheme:light}.qmr-reader[data-qmr-eink=true] :is(.qmr-muted,.qmr-group-title,.qmr-panel-title,.qmr-field-label,.qmr-field-value){color:#444!important}.qmr-reader[data-qmr-eink=true] .qmr-panel :is(input,select,button){color:#000!important;background:#fff!important;border-color:#000!important}
-.qmr-reader[data-qmr-eink=true] *{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
+.qmr-reader[data-qmr-eink=true] *,.qmr-reader[data-qmr-eink=true] *::before,.qmr-reader[data-qmr-eink=true] *::after{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
 .qmr-reader[data-qmr-eink=true] .qmr-hl{background:transparent;text-decoration:underline;text-decoration-thickness:2px}
 .qmr-page-zone:hover{background:transparent}
 .qmr-page-zone:focus-visible{outline:1px solid var(--qmr-accent);outline-offset:-4px}
@@ -113982,11 +114175,10 @@ var UI_CSS = `
 .qmr-native-chat>[data-conversation-content]{flex:1;min-height:0}
 .qmr-native-chat [data-content-phase="hero"] [data-conversation-scroll]{justify-content:flex-end}
 .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){color:var(--qmr-ink)}
-/* \u4F34\u8BFB\u72EC\u7ACB\u5916\u89C2\uFF08\u5BF9\u7167\u539F\u7248 4.5.10/4.5.12\uFF09\uFF1A\u81EA\u5B9A\u4E49\u6A21\u5F0F\u4E0B\u4EC5\u4F1A\u8BDD\u6587\u5B57\u6362\u5B57\u4F53\u4E0E\u5B57\u53F7\uFF0C
-   \u4E3B\u9898\u6574\u5957\u53D8\u91CF\u968F data-qmr-ai-appearance \u6302\u5728\u4F34\u8BFB\u9762\u677F\u4E0A\uFF08inline style \u6CE8\u5165\uFF09\u3002 */
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-companion{font-family:var(--qmr-ai-font)}
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
+/* \u4F34\u8BFB\u59CB\u7EC8\u4F7F\u7528\u5DF2\u89E3\u6790\u7684\u5B57\u4F53/\u5B57\u53F7\u53D8\u91CF\uFF1A\u8DDF\u968F\u6B63\u6587\u4E0E\u72EC\u7ACB\u5916\u89C2\u5171\u7528\u540C\u4E00\u6E32\u67D3\u94FE\u8DEF\u3002 */
+.qmr-panel-companion .qmr-companion{font-family:var(--qmr-ai-font)}
+.qmr-panel-companion .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
+.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:var(--qmr-ai-font);font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
 .qmr-prompt-backdrop{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.35);padding:20px}
 .qmr-prompt-dialog{display:flex;flex-direction:column;width:min(620px,100%);max-height:min(820px,calc(100dvh - 40px));min-height:0;border:1px solid var(--qmr-border);border-radius:12px;background:var(--qmr-paper);color:var(--qmr-ink);box-shadow:0 18px 50px rgba(0,0,0,.2);overflow:hidden;font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 .qmr-prompt-dialog header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 16px;flex:none}
@@ -114472,7 +114664,7 @@ function createController(getProps, store) {
     merged.lineHeight = Math.min(2.2, Math.max(1.4, Number(merged.lineHeight) || base.lineHeight));
     merged.margin = clampInt(merged.margin || base.margin, 32, 120);
     if (!READER_THEMES2[merged.theme]) merged.theme = base.theme;
-    if (!["serif", "sans-serif", "mono"].includes(merged.fontFamily)) merged.fontFamily = "serif";
+    if (!isReaderFontKey(merged.fontFamily)) merged.fontFamily = "serif";
     if (merged.flow !== "scroll") merged.flow = "paginated";
     merged.justify = merged.justify !== false;
     merged.spread = merged.spread === true;
@@ -114482,7 +114674,7 @@ function createController(getProps, store) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
       const preservePosition = id === uiStore.get().bookId && ["fontSize", "fontFamily", "lineHeight", "margin", "flow", "spread", "justify", "pdfZoom", "textAlign", "maxLineCh", "vAlign"].some((key) => Object.hasOwn(patch || {}, key));
-      const anchor = preservePosition ? pager.capture?.() || state.locator : null;
+      const anchor = preservePosition ? uiStore.get().chapterBusy ? state.locator : pager.capture?.() || state.locator : null;
       const merged = { ...state.settings || {}, ...patch || {} };
       patchState(id, { settings: merged });
       if (anchor && Number.isFinite(anchor.textOffset)) {
@@ -116608,7 +116800,33 @@ function LibraryView({ ui }) {
 }
 
 // src/ui/reader.js
-var React21 = __toESM(require("react"), 1);
+var React23 = __toESM(require("react"), 1);
+
+// src/ui/use-reader-font.js
+var React10 = __toESM(require("react"), 1);
+function useReaderFont(ui, bookId, key, scope = "book") {
+  const retry = ui.useSel((state) => state.fontRetry || 0), host = ui.props().data?.getHost();
+  React10.useEffect(() => {
+    let active = true;
+    const status = (value) => ui.store.set({ fontStatuses: { ...ui.store.get().fontStatuses, [key]: value } });
+    status({ loading: key === "zhuque" || key?.startsWith("imported:"), error: null });
+    loadReaderFont(host, key).then((loaded) => {
+      const selected = scope === "book" ? ui.settingsOf(bookId).fontFamily : ui.store.get().companionAppearance?.fontFamily;
+      if (!active || ui.store.get().bookId !== bookId || selected !== key) return;
+      status({ loading: false, error: null });
+      const state = ui.store.get();
+      if (loaded) {
+        const anchor = ui.stateOr(bookId).locator;
+        ui.store.set({ fontVersion: (state.fontVersion || 0) + 1, ...scope === "book" ? { restoreAnchor: anchor, restoreScroll: anchor.scroll, jumpToken: (state.jumpToken || 0) + 1 } : {} });
+      }
+    }, (cause) => {
+      if (active) status({ loading: false, error: cause.message });
+    });
+    return () => {
+      active = false;
+    };
+  }, [ui, bookId, key, retry, host, scope]);
+}
 
 // src/core/reading-position.js
 var READING_LOCATION_SIZE = 1500;
@@ -116673,7 +116891,7 @@ function parseReadingPosition(raw, model, mode = model.kind) {
 }
 
 // src/ui/companion.js
-var React10 = __toESM(require("react"), 1);
+var React11 = __toESM(require("react"), 1);
 var import_react_dom2 = require("react-dom");
 
 // src/ui/quick-prompts.js
@@ -116709,37 +116927,37 @@ function resetQuickPrompts() {
 }
 
 // src/ui/companion.js
-var h8 = React10.createElement;
+var h8 = React11.createElement;
 function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) {
   const book = ui.bookOf(bookId);
   const selection = ui.useSel((state) => state.companionSelection);
-  const [workspaceId, setWorkspaceId] = React10.useState(() => chatApi?.defaultWorkspace?.());
-  const [chat, setChat] = React10.useState(null);
-  const [chatBookId, setChatBookId] = React10.useState(null);
-  const [error, setError] = React10.useState("");
-  const [busy, setBusy] = React10.useState(false);
-  const [pageText, setPageText] = React10.useState("");
-  const [pageReady, setPageReady] = React10.useState(false);
-  const [attached, setAttached] = React10.useState("");
+  const [workspaceId, setWorkspaceId] = React11.useState(() => chatApi?.defaultWorkspace?.());
+  const [chat, setChat] = React11.useState(null);
+  const [chatBookId, setChatBookId] = React11.useState(null);
+  const [error, setError] = React11.useState("");
+  const [busy, setBusy] = React11.useState(false);
+  const [pageText, setPageText] = React11.useState("");
+  const [pageReady, setPageReady] = React11.useState(false);
+  const [attached, setAttached] = React11.useState("");
   const promptLanguage = ui.t("prompts.language", "zh");
-  const [prompts, setPrompts] = React10.useState(() => readQuickPrompts(promptLanguage));
-  const [promptMount, setPromptMount] = React10.useState(null);
-  const [sendingPrompt, setSendingPrompt] = React10.useState(false);
-  const generation = React10.useRef(0);
-  const owned = React10.useRef(null);
-  const chatRoot = React10.useRef(null);
-  const sending = React10.useRef(false);
-  const insertedQuote = React10.useRef("");
-  const insertedQuoteText = React10.useRef("");
-  const contextQueue = React10.useRef(Promise.resolve());
-  const shownChat = React10.useRef(false);
+  const [prompts, setPrompts] = React11.useState(() => readQuickPrompts(promptLanguage));
+  const [promptMount, setPromptMount] = React11.useState(null);
+  const [sendingPrompt, setSendingPrompt] = React11.useState(false);
+  const generation = React11.useRef(0);
+  const owned = React11.useRef(null);
+  const chatRoot = React11.useRef(null);
+  const sending = React11.useRef(false);
+  const insertedQuote = React11.useRef("");
+  const insertedQuoteText = React11.useRef("");
+  const contextQueue = React11.useRef(Promise.resolve());
+  const shownChat = React11.useRef(false);
   const chapter = engine?.book?.chapters?.[chapterIndex]?.label || `\u7B2C ${chapterIndex + 1} \u7AE0`;
   const sourceLabel = `${[book?.title || "\u672A\u547D\u540D", chapter !== book?.title ? chapter : ""].filter(Boolean).join(" \xB7 ")}${selection?.text ? " \xB7 \u9009\u6BB5\u5DF2\u5173\u8054" : ""}`;
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     if (workspaceId || !chatApi) return void 0;
     return chatApi.watchWorkspaces?.(() => setWorkspaceId(chatApi.defaultWorkspace?.()));
   }, [workspaceId, chatApi]);
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     let cancelled = false;
     setPageText("");
     setPageReady(false);
@@ -116755,18 +116973,18 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
       cancelled = true;
     };
   }, [engine, chapterIndex]);
-  React10.useEffect(() => () => {
+  React11.useEffect(() => () => {
     generation.current += 1;
     owned.current?.release();
     owned.current = null;
   }, []);
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     const reload = () => setPrompts(readQuickPrompts(promptLanguage));
     reload();
     window.addEventListener("qmr-prompts-changed", reload);
     return () => window.removeEventListener("qmr-prompts-changed", reload);
   }, [promptLanguage]);
-  const start = React10.useCallback(async (fresh = false) => {
+  const start = React11.useCallback(async (fresh = false) => {
     if (!workspaceId || !chatApi) return;
     const token = ++generation.current;
     setBusy(true);
@@ -116803,12 +117021,12 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
       if (token === generation.current) setBusy(false);
     }
   }, [bookId, chatApi, workspaceId]);
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     if (workspaceId) void start();
   }, [workspaceId, bookId, start]);
   const contextKey = `${bookId}|${chapterIndex}|${selection?.text || ""}|${pageText}`;
   const chatVisible = !!chat && chatBookId === bookId && (shownChat.current || attached === contextKey);
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     if (!chat || chatBookId !== bookId || !pageReady) return void 0;
     let cancelled = false;
     setAttached("");
@@ -116835,7 +117053,7 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
       cancelled = true;
     };
   }, [chat, chatApi, chatBookId, contextKey, pageReady]);
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     if (!chatVisible || attached !== contextKey || !selection?.text || !selection.id) return;
     const id = `${chat.sessionId}:${selection.id}`;
     if (insertedQuote.current === id) return;
@@ -116850,7 +117068,7 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
       setError(`\u9009\u6587\u672A\u52A0\u5165\u8F93\u5165\u6846\uFF1A${cause?.message || String(cause)}`);
     }
   }, [chat, chatVisible, selection, attached, contextKey]);
-  React10.useEffect(() => {
+  React11.useEffect(() => {
     if (!chat || !SessionProvider) return void 0;
     const root = chatRoot.current;
     if (!root) return void 0;
@@ -116927,8 +117145,8 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
 }
 
 // src/ui/selection-menu.js
-var React11 = __toESM(require("react"), 1);
-var h9 = React11.createElement;
+var React12 = __toESM(require("react"), 1);
+var h9 = React12.createElement;
 function computeMenuPosition(anchor, size) {
   const width = Math.max(80, size && size.width || 250);
   const height = Math.max(28, size && size.height || 42);
@@ -116943,10 +117161,10 @@ function computeMenuPosition(anchor, size) {
   return { left, top };
 }
 function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk, onLookup, onSpeak }) {
-  const elementRef = React11.useRef(null);
-  const [position, setPosition] = React11.useState(() => computeMenuPosition(selection.anchor));
+  const elementRef = React12.useRef(null);
+  const [position, setPosition] = React12.useState(() => computeMenuPosition(selection.anchor));
   const themeId = ui.settingsOf(ui.useSel((state) => state.bookId)).theme;
-  React11.useLayoutEffect(() => {
+  React12.useLayoutEffect(() => {
     const element = elementRef.current;
     const size = element ? { width: element.offsetWidth, height: element.offsetHeight } : void 0;
     setPosition(computeMenuPosition(selection.anchor, size));
@@ -117002,7 +117220,7 @@ function SelectionMenu({ ui, selection, onHighlight, onNote, onAsk, onLookup, on
 }
 
 // src/ui/panel-speech.js
-var React12 = __toESM(require("react"), 1);
+var React13 = __toESM(require("react"), 1);
 
 // src/client/tts.js
 function speechSegments(text, max = 220) {
@@ -119514,14 +119732,14 @@ function speechServiceLinks(profile) {
 }
 
 // src/ui/panel-speech.js
-var h10 = React12.createElement;
+var h10 = React13.createElement;
 function useSpeech(ui, bookId, engine) {
-  const [snapshot, setSnapshot] = React12.useState({ status: "idle" }), [voices, setVoices] = React12.useState([]), [macVoices, setMacVoices] = React12.useState([]);
-  const [config, setConfig] = React12.useState({ providers: [], profiles: {}, localModels: [] }), [catalog, setCatalog] = React12.useState({}), [preview, setPreview] = React12.useState({ status: "idle" });
-  const [options, setOptions] = React12.useState({ provider: "browser", rate: 1, voice: "", follow: true });
-  const optionsRef = React12.useRef(options);
+  const [snapshot, setSnapshot] = React13.useState({ status: "idle" }), [voices, setVoices] = React13.useState([]), [macVoices, setMacVoices] = React13.useState([]);
+  const [config, setConfig] = React13.useState({ providers: [], profiles: {}, localModels: [] }), [catalog, setCatalog] = React13.useState({}), [preview, setPreview] = React13.useState({ status: "idle" });
+  const [options, setOptions] = React13.useState({ provider: "browser", rate: 1, voice: "", follow: true });
+  const optionsRef = React13.useRef(options);
   optionsRef.current = options;
-  const controller = React12.useRef(null), audition = React12.useRef(null), generation = React12.useRef(0), previewGeneration = React12.useRef(0), focus = React12.useRef(null), ownChapter = React12.useRef(null), saved = React12.useRef(false);
+  const controller = React13.useRef(null), audition = React13.useRef(null), generation = React13.useRef(0), previewGeneration = React13.useRef(0), focus = React13.useRef(null), ownChapter = React13.useRef(null), saved = React13.useRef(false);
   const t = (key, fallback) => ui.t(`speech.${key}`, fallback);
   const errorText = (error) => {
     if (error?.status === 429 && error.retryAt > Date.now()) return t("rateLimitUntil", "\u8BED\u97F3\u670D\u52A1\u6682\u65F6\u9650\u6D41\uFF0C{0} \u540E\u53EF\u91CD\u8BD5").replace("{0}", new Date(error.retryAt).toLocaleTimeString());
@@ -119561,7 +119779,7 @@ function useSpeech(ui, bookId, engine) {
       ui.patchState(bookId, { speechSettings: next });
     }
   };
-  React12.useEffect(() => {
+  React13.useEffect(() => {
     let cancelled = false;
     const refresh = () => setVoices(globalThis.speechSynthesis?.getVoices() || []);
     refresh();
@@ -119583,7 +119801,7 @@ function useSpeech(ui, bookId, engine) {
       globalThis.speechSynthesis?.removeEventListener("voiceschanged", refresh);
     };
   }, [ui, bookId]);
-  React12.useEffect(() => {
+  React13.useEffect(() => {
     if (!engine) return;
     const ticket = ++generation.current;
     ui.loadState(bookId).then((state) => {
@@ -119721,10 +119939,10 @@ function useSpeech(ui, bookId, engine) {
 }
 function SpeechConfiguration({ speech }) {
   const { t, options, config } = speech, id = options.provider;
-  const providerRef = React12.useRef(id);
+  const providerRef = React13.useRef(id);
   providerRef.current = id;
-  const [draft, setDraft] = React12.useState(config.profiles[id] || { id }), [key, setKey] = React12.useState(""), [busy, setBusy] = React12.useState(false), [message, setMessage] = React12.useState(""), [sample, setSample] = React12.useState(t("sample", "\u4F60\u597D\uFF0C\u8FD9\u662F\u4E54\u6728\u9605\u8BFB\u5668\u7684\u8BED\u97F3\u6717\u8BFB\u6D4B\u8BD5\u3002"));
-  React12.useEffect(() => {
+  const [draft, setDraft] = React13.useState(config.profiles[id] || { id }), [key, setKey] = React13.useState(""), [busy, setBusy] = React13.useState(false), [message, setMessage] = React13.useState(""), [sample, setSample] = React13.useState(t("sample", "\u4F60\u597D\uFF0C\u8FD9\u662F\u4E54\u6728\u9605\u8BFB\u5668\u7684\u8BED\u97F3\u6717\u8BFB\u6D4B\u8BD5\u3002"));
+  React13.useEffect(() => {
     setDraft(config.profiles[id] || { id });
     setKey("");
     setMessage("");
@@ -119779,8 +119997,8 @@ function SpeechConfiguration({ speech }) {
 }
 function LocalModelSetup({ speech }) {
   const { config, t, options } = speech, profile = config.profiles.localModel || { id: "localModel", model: "kokoro", voice: "zf_001" };
-  const [state, setState] = React12.useState({ phase: "unknown" }), [message, setMessage] = React12.useState(""), [checkToken, setCheckToken] = React12.useState(0);
-  React12.useEffect(() => {
+  const [state, setState] = React13.useState({ phase: "unknown" }), [message, setMessage] = React13.useState(""), [checkToken, setCheckToken] = React13.useState(0);
+  React13.useEffect(() => {
     let closed = false, timer;
     const poll = async () => {
       try {
@@ -119826,7 +120044,7 @@ function LocalModelSetup({ speech }) {
 }
 function SpeechPanel({ ui, speech }) {
   const { snapshot, options, config, t } = speech, active = ["playing", "loading"].includes(snapshot.status);
-  const [voiceFilter, setVoiceFilter] = React12.useState("");
+  const [voiceFilter, setVoiceFilter] = React13.useState("");
   const selected = ui.useSel((state) => state.selection?.text || "");
   const profile = { ...config.profiles[options.provider] || {}, id: options.provider, voice: options.voice };
   const allVoices = options.provider === "macos" ? macVoiceChoices(speech.macVoices, t, ui.t("prompts.language", "zh") === "zh") : options.provider === "browser" ? speech.voices.map((v2) => ({ id: v2.voiceURI, label: `${v2.name} \xB7 ${v2.lang}` })) : options.provider === "localModel" ? localVoiceChoices(profile.model) : voiceChoices(profile, speech.catalog[options.provider]);
@@ -119867,7 +120085,7 @@ function SpeechPanel({ ui, speech }) {
 }
 
 // src/ui/panel-vocabulary.js
-var React13 = __toESM(require("react"), 1);
+var React14 = __toESM(require("react"), 1);
 
 // src/core/lookup.js
 var LANGUAGE_NAMES = Object.freeze({
@@ -119953,36 +120171,36 @@ function setSessionLookupTarget(bookId, target) {
 }
 
 // src/ui/panel-vocabulary.js
-var h11 = React13.createElement;
+var h11 = React14.createElement;
 function LookupCard({ ui, selection, bookId, engine, chatApi, SessionProvider, renderSlot }) {
-  const [chat, setChat] = React13.useState(null);
-  const [meaning, setMeaning] = React13.useState("");
-  const [context, setContext] = React13.useState(selection.text);
-  const [error, setError] = React13.useState("");
-  const [busy, setBusy] = React13.useState(false);
-  const [saved, setSaved] = React13.useState(false);
-  const [saving, setSaving] = React13.useState(false);
-  const [preferences, setPreferences] = React13.useState(readLookupPreferences);
-  const [target, setTarget] = React13.useState(() => sessionLookupTarget(bookId, readLookupPreferences().target));
-  const [revision, setRevision] = React13.useState(0);
-  const [notice, setNotice] = React13.useState("");
-  const [usedTarget, setUsedTarget] = React13.useState("");
-  const [settingsError, setSettingsError] = React13.useState("");
-  const [viewport, setViewport] = React13.useState(() => ({ width: globalThis.innerWidth || 1e3, height: globalThis.innerHeight || 800 }));
-  const dirty = React13.useRef(false);
-  const prompt = React13.useRef("");
-  const root = React13.useRef(null);
-  const restoreFocus = React13.useRef(true);
-  const generation = React13.useRef(0);
+  const [chat, setChat] = React14.useState(null);
+  const [meaning, setMeaning] = React14.useState("");
+  const [context, setContext] = React14.useState(selection.text);
+  const [error, setError] = React14.useState("");
+  const [busy, setBusy] = React14.useState(false);
+  const [saved, setSaved] = React14.useState(false);
+  const [saving, setSaving] = React14.useState(false);
+  const [preferences, setPreferences] = React14.useState(readLookupPreferences);
+  const [target, setTarget] = React14.useState(() => sessionLookupTarget(bookId, readLookupPreferences().target));
+  const [revision, setRevision] = React14.useState(0);
+  const [notice, setNotice] = React14.useState("");
+  const [usedTarget, setUsedTarget] = React14.useState("");
+  const [settingsError, setSettingsError] = React14.useState("");
+  const [viewport, setViewport] = React14.useState(() => ({ width: globalThis.innerWidth || 1e3, height: globalThis.innerHeight || 800 }));
+  const dirty = React14.useRef(false);
+  const prompt = React14.useRef("");
+  const root = React14.useRef(null);
+  const restoreFocus = React14.useRef(true);
+  const generation = React14.useRef(0);
   const t = (key, fallback) => ui.t(`lookup.${key}`, fallback);
   const label = (key) => lookupText(ui, key);
-  const close = React13.useCallback(() => ui.store.set({ lookupSelection: null }), [ui]);
-  React13.useEffect(() => {
+  const close = React14.useCallback(() => ui.store.set({ lookupSelection: null }), [ui]);
+  React14.useEffect(() => {
     const resize = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
-  React13.useEffect(() => {
+  React14.useEffect(() => {
     const previous = document.activeElement;
     root.current?.querySelector("button")?.focus();
     const dismiss = (event) => {
@@ -120004,7 +120222,7 @@ function LookupCard({ ui, selection, bookId, engine, chatApi, SessionProvider, r
       if (restoreFocus.current && previous?.isConnected) previous.focus?.({ preventScroll: true });
     };
   }, [close]);
-  React13.useEffect(() => {
+  React14.useEffect(() => {
     const token = ++generation.current;
     let cancelled = false, owned, unsubscribe;
     setChat(null);
@@ -120234,17 +120452,17 @@ function VocabularyPanel({ ui, bookId }) {
 }
 
 // src/ui/toc.js
-var React15 = __toESM(require("react"), 1);
+var React16 = __toESM(require("react"), 1);
 
 // src/ui/navigation-panel.js
-var React14 = __toESM(require("react"), 1);
-var h12 = React14.createElement;
+var React15 = __toESM(require("react"), 1);
+var h12 = React15.createElement;
 function BookmarkList({ ui, bookId }) {
   const state = ui.useSel((value) => value.states?.[bookId]);
   const chapterBusy = ui.useSel((value) => value.chapterBusy);
-  const [label, setLabel] = React14.useState(""), [createId, setCreateId] = React14.useState(null), [editing, setEditing] = React14.useState(null), [editLabel, setEditLabel] = React14.useState(""), [busy, setBusy] = React14.useState(false), [error, setError] = React14.useState(""), [status, setStatus] = React14.useState("");
-  const alive = React14.useRef(true);
-  React14.useEffect(() => {
+  const [label, setLabel] = React15.useState(""), [createId, setCreateId] = React15.useState(null), [editing, setEditing] = React15.useState(null), [editLabel, setEditLabel] = React15.useState(""), [busy, setBusy] = React15.useState(false), [error, setError] = React15.useState(""), [status, setStatus] = React15.useState("");
+  const alive = React15.useRef(true);
+  React15.useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
@@ -120293,7 +120511,7 @@ function BookmarkList({ ui, bookId }) {
         await ui.saveBookmark({ id: bookmark.id, label: editLabel });
         if (alive.current) setEditing(null);
       });
-    } }, h12("input", { "aria-label": t("newName", "\u4E66\u7B7E\u65B0\u540D\u79F0"), maxLength: 120, value: editLabel, disabled: busy, onChange: (event) => setEditLabel(event.target.value) }), h12("div", { className: "qmr-feature-actions" }, h12("button", { className: "qmr-btn", disabled: busy || !editLabel.trim() }, t("save", "\u4FDD\u5B58")), h12("button", { type: "button", className: "qmr-btn", disabled: busy, onClick: () => setEditing(null) }, t("cancel", "\u53D6\u6D88")))) : h12(React14.Fragment, null, h12("button", { className: "qmr-bookmark-jump", type: "button", onClick: () => ui.openBookmark(bookmark) }, h12("strong", null, bookmark.label), h12("span", { className: "qmr-muted" }, `${Math.round((bookmark.percent || 0) * 100)}%`)), h12("button", { className: "qmr-icon-btn", type: "button", "aria-label": t("rename", "\u91CD\u547D\u540D\u4E66\u7B7E") + " \xB7 " + bookmark.label, disabled: busy, onClick: () => {
+    } }, h12("input", { "aria-label": t("newName", "\u4E66\u7B7E\u65B0\u540D\u79F0"), maxLength: 120, value: editLabel, disabled: busy, onChange: (event) => setEditLabel(event.target.value) }), h12("div", { className: "qmr-feature-actions" }, h12("button", { className: "qmr-btn", disabled: busy || !editLabel.trim() }, t("save", "\u4FDD\u5B58")), h12("button", { type: "button", className: "qmr-btn", disabled: busy, onClick: () => setEditing(null) }, t("cancel", "\u53D6\u6D88")))) : h12(React15.Fragment, null, h12("button", { className: "qmr-bookmark-jump", type: "button", onClick: () => ui.openBookmark(bookmark) }, h12("strong", null, bookmark.label), h12("span", { className: "qmr-muted" }, `${Math.round((bookmark.percent || 0) * 100)}%`)), h12("button", { className: "qmr-icon-btn", type: "button", "aria-label": t("rename", "\u91CD\u547D\u540D\u4E66\u7B7E") + " \xB7 " + bookmark.label, disabled: busy, onClick: () => {
       setEditing(bookmark.id);
       setEditLabel(bookmark.label);
       setError("");
@@ -120301,11 +120519,11 @@ function BookmarkList({ ui, bookId }) {
   );
 }
 function PositionInput({ ui, engine, bookId }) {
-  const [model, setModel] = React14.useState(null), [mode, setMode] = React14.useState("location"), [value, setValue] = React14.useState(""), [error, setError] = React14.useState("");
+  const [model, setModel] = React15.useState(null), [mode, setMode] = React15.useState("location"), [value, setValue] = React15.useState(""), [error, setError] = React15.useState("");
   const locator = ui.useSel((state) => state.states?.[bookId]?.locator);
   const pdfZoom = ui.useSel((state) => state.states?.[bookId]?.settings?.pdfZoom) || 1;
   const t = (key, fallback) => ui.t(`nav.${key}`, fallback);
-  React14.useEffect(() => {
+  React15.useEffect(() => {
     let active = true;
     setModel(null);
     setError("");
@@ -120353,7 +120571,7 @@ function PositionInput({ ui, engine, bookId }) {
 var NAVIGATION_CSS = `.qmr-navigation-tabs{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--qmr-border)}.qmr-navigation-tabs button{flex:1;padding:7px;border:0;border-radius:5px;background:transparent;color:var(--qmr-muted);font:inherit;cursor:pointer}.qmr-navigation-tabs button[aria-selected=true]{color:var(--qmr-ink);background:var(--qmr-ui);font-weight:600}.qmr-navigation-body,.qmr-position-form{display:flex;flex-direction:column;gap:14px}.qmr-navigation-body form,.qmr-position-form label{display:flex;flex-direction:column;gap:8px}.qmr-navigation-body label{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-navigation-body input,.qmr-position-form input,.qmr-position-form select{width:100%;min-width:0;height:40px;padding:8px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}.qmr-bookmark-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}.qmr-bookmark-list li{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--qmr-border)}.qmr-bookmark-list li form{width:100%}.qmr-bookmark-jump{display:flex;flex:1;min-width:0;text-align:left;flex-direction:column;gap:3px;padding:0;border:0;color:var(--qmr-ink);background:none;cursor:pointer}.qmr-bookmark-jump strong{overflow-wrap:anywhere;font-size:13px}.qmr-bookmark-jump span{font-size:12px}`;
 
 // src/ui/toc.js
-var h13 = React15.createElement;
+var h13 = React16.createElement;
 function TocPanel({ ui }) {
   const bookId = ui.useSel((state) => state.bookId);
   const tab = ui.useSel((state) => state.navigationTab || "toc");
@@ -120361,14 +120579,14 @@ function TocPanel({ ui }) {
   const chapterIndex = ui.useSel((state) => state.chapterIndex);
   const chapterCount = ui.useSel((state) => state.chapterCount);
   ui.useSel((state) => state.engineVersion);
-  const [collapsed, setCollapsed] = React15.useState({});
+  const [collapsed, setCollapsed] = React16.useState({});
   const engine = ui.engineOf(bookId);
-  const labels = React15.useMemo(() => chapterLabelMap(engine), [engine]);
-  const entries2 = React15.useMemo(() => {
+  const labels = React16.useMemo(() => chapterLabelMap(engine), [engine]);
+  const entries2 = React16.useMemo(() => {
     const toc = engine && engine.book && Array.isArray(engine.book.toc) ? engine.book.toc : [];
     return toc;
   }, [engine]);
-  const indexOfHref = React15.useCallback((href) => {
+  const indexOfHref = React16.useCallback((href) => {
     const direct = chapterIndexForHref(engine, href);
     if (direct >= 0) return direct;
     try {
@@ -120424,7 +120642,7 @@ function TocPanel({ ui }) {
   const chapterLabel2 = labels.get(chapterIndex) || `\u7B2C ${chapterIndex + 1} \u7AE0`;
   const tabs = [["toc", t("toc", "\u76EE\u5F55")], ["bookmarks", t("bookmarks", "\u4E66\u7B7E")], ["position", t("positionJump", "\u4F4D\u7F6E\u8DF3\u8F6C")]];
   return h13(
-    React15.Fragment,
+    React16.Fragment,
     null,
     h13("style", null, NAVIGATION_CSS),
     h13("div", { className: "qmr-panel-head" }, h13(IconToc, { width: 16, height: 16 }), h13("span", { className: "qmr-panel-title" }, t("navigation", "\u76EE\u5F55\u4E0E\u4E66\u7B7E")), h13("button", { type: "button", className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED\u5BFC\u822A"), onClick: () => ui.setPanel(null) }, h13(IconClose, { width: 16, height: 16 }))),
@@ -120443,7 +120661,7 @@ function TocPanel({ ui }) {
       "div",
       { className: "qmr-panel-body", id: "qmr-navigation-panel", role: "tabpanel", "aria-labelledby": "qmr-nav-tab-" + tab },
       tab === "bookmarks" ? h13(BookmarkList, { key: bookId, ui, bookId }) : tab === "position" ? h13(PositionInput, { key: bookId, ui, engine, bookId }) : h13(
-        React15.Fragment,
+        React16.Fragment,
         null,
         h13("div", { className: "qmr-group-title" }, t("chapterCount", "\u7B2C {current} / {total} \u7AE0").replace("{current}", chapterIndex + 1).replace("{total}", chapterCount || "?"), h13("span", { className: "qmr-muted" }, chapterLabel2)),
         entries2.length ? renderEntries(entries2, 0) : h13("div", { className: "qmr-empty" }, h13("div", { className: "qmr-empty-title" }, t("noToc", "\u8FD9\u672C\u4E66\u6CA1\u6709\u76EE\u5F55")), h13("p", null, t("noTocHint", "\u53EF\u4EE5\u7528\u5E95\u90E8\u8FDB\u5EA6\u6216\u4F4D\u7F6E\u8F93\u5165\u8DF3\u8F6C\u3002")))
@@ -120453,8 +120671,8 @@ function TocPanel({ ui }) {
 }
 
 // src/ui/panel-highlights.js
-var React16 = __toESM(require("react"), 1);
-var h14 = React16.createElement;
+var React17 = __toESM(require("react"), 1);
+var h14 = React17.createElement;
 function percentOfHighlight(highlight) {
   return formatPercent(highlight && highlight.percent);
 }
@@ -120473,8 +120691,8 @@ function groupByChapter(highlights, engine) {
   }));
 }
 function HighlightItem({ ui, highlight, bookId, editing }) {
-  const [draft, setDraft] = React16.useState(String(highlight.note || ""));
-  React16.useEffect(() => {
+  const [draft, setDraft] = React17.useState(String(highlight.note || ""));
+  React17.useEffect(() => {
     setDraft(String(highlight.note || ""));
   }, [highlight.id, highlight.note, editing]);
   const swatches = HIGHLIGHT_COLORS2.map((color) => h14("button", {
@@ -120569,17 +120787,17 @@ function HighlightsPanel({ ui }) {
   const engineVersion = ui.useSel((state) => state.engineVersion);
   const engine = ui.engineOf(bookId);
   const book = ui.bookOf(bookId);
-  React16.useEffect(() => {
+  React17.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
   }, [bookId, ui]);
   const highlights = bookState && bookState.highlights || [];
-  const highlightsRef = React16.useRef(highlights);
+  const highlightsRef = React17.useRef(highlights);
   highlightsRef.current = highlights;
-  const engineRef = React16.useRef(engine);
+  const engineRef = React17.useRef(engine);
   engineRef.current = engine;
-  const labels = React16.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
-  const groups = React16.useMemo(() => groupByChapter(highlights, engine), [highlights, engine]);
-  const markdown2 = React16.useMemo(
+  const labels = React17.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
+  const groups = React17.useMemo(() => groupByChapter(highlights, engine), [highlights, engine]);
+  const markdown2 = React17.useMemo(
     () => toMarkdown(bookState || {}, book, engine),
     [bookState, book, engine]
   );
@@ -120598,7 +120816,7 @@ function HighlightsPanel({ ui }) {
     }
   };
   return h14(
-    React16.Fragment,
+    React17.Fragment,
     null,
     h14(
       "div",
@@ -120638,7 +120856,7 @@ function HighlightsPanel({ ui }) {
       "div",
       { className: "qmr-panel-body" },
       mode === "notes" ? h14(
-        React16.Fragment,
+        React17.Fragment,
         null,
         h14(
           "div",
@@ -120676,7 +120894,7 @@ function HighlightsPanel({ ui }) {
           )) : h14("p", null, "\u6682\u65E0\u5212\u7EBF\u3002")
         )
       ) : highlights.length ? h14(
-        React16.Fragment,
+        React17.Fragment,
         null,
         h14(
           "div",
@@ -120710,8 +120928,8 @@ function HighlightsPanel({ ui }) {
 }
 
 // src/ui/panel-search.js
-var React17 = __toESM(require("react"), 1);
-var h15 = React17.createElement;
+var React18 = __toESM(require("react"), 1);
+var h15 = React18.createElement;
 function renderSnippet(snippet, query) {
   const text = String(snippet || "");
   const needle = String(query || "").trim();
@@ -120739,17 +120957,17 @@ function SearchPanel({ ui }) {
   const current = ui.useSel((state) => state.searchIndex);
   const busy = ui.useSel((state) => state.searchBusy);
   const error = ui.useSel((state) => state.searchError);
-  const [text, setText] = React17.useState(String(storeQuery || ""));
-  const inputRef = React17.useRef(null);
-  const listRef = React17.useRef(null);
+  const [text, setText] = React18.useState(String(storeQuery || ""));
+  const inputRef = React18.useRef(null);
+  const listRef = React18.useRef(null);
   const debouncedSearch = useDebounced((value) => ui.search(bookId, value), 250);
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     try {
       if (inputRef.current) inputRef.current.focus();
     } catch (_error) {
     }
   }, []);
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     const element = listRef.current;
     if (!element || current < 0) return;
     try {
@@ -120785,7 +121003,7 @@ function SearchPanel({ ui }) {
     }
   };
   return h15(
-    React17.Fragment,
+    React18.Fragment,
     null,
     h15(
       "div",
@@ -120862,29 +121080,121 @@ function SearchPanel({ ui }) {
 }
 
 // src/ui/panel-settings.js
+var React21 = __toESM(require("react"), 1);
+
+// src/ui/settings-fonts.js
 var React19 = __toESM(require("react"), 1);
+var h16 = React19.createElement;
+function ReaderFontOptions({ ui, bookId, settings, update, scope = "book" }) {
+  const host = ui.props().data?.getHost(), english = ui.t("prompts.language", "zh") === "en", tx = (zh, en) => english ? en : zh;
+  const [fonts, setFonts] = React19.useState([]), [families, setFamilies] = React19.useState([]), [family, setFamily] = React19.useState(""), [busy, setBusy] = React19.useState(false), [error, setError] = React19.useState("");
+  const fileRef = React19.useRef(null), alive = React19.useRef(true);
+  const status = ui.useSel((state) => state.fontStatuses?.[settings.fontFamily]);
+  const fontLabel = scope === "companion" ? tx("\u4F34\u8BFB\u5B57\u4F53", "Companion font") : tx("\u5B57\u4F53", "Font");
+  React19.useEffect(() => {
+    let active = true;
+    alive.current = true;
+    host?.fontAction({ kind: "list" }).then((result) => {
+      if (active) setFonts(result.fonts || []);
+    }, (cause) => {
+      if (active) setError(cause.message);
+    });
+    return () => {
+      active = false;
+      alive.current = false;
+    };
+  }, [host, bookId]);
+  const run = async (fn) => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await fn();
+    } catch (cause) {
+      if (alive.current) setError(cause.message);
+    } finally {
+      if (alive.current) setBusy(false);
+    }
+  };
+  const importFile = async (file) => {
+    if (!file) return;
+    await run(async () => {
+      if (!host?.fontAction) throw Error(tx("\u5B57\u4F53\u670D\u52A1\u5C1A\u672A\u5C31\u7EEA", "The font service is not ready"));
+      if (file.size > MAX_FONT_BYTES) throw Error(tx("\u5B57\u4F53\u4E0D\u80FD\u8D85\u8FC764MB", "Fonts must be within 64MB"));
+      const bytes = await validateFontFile(file), result = await host.fontAction({ kind: "import", filename: file.name, base64: fontBase64(bytes) });
+      if (!alive.current) return;
+      setFonts(result.fonts);
+      if (ui.store.get().bookId === bookId && (scope !== "companion" || ui.store.get().companionAppearance)) {
+        update({ fontFamily: "imported:" + result.font.id });
+        ui.store.set({ fontRetry: (ui.store.get().fontRetry || 0) + 1 });
+      }
+    });
+  };
+  const known = /* @__PURE__ */ new Set(["serif", "sans-serif", "mono", ...Object.keys(READER_FONTS), ...fonts.map((font) => "imported:" + font.id), ...families.map((name) => "system:" + name)]);
+  return h16(
+    "div",
+    { className: "qmr-font-options", "data-qmr-font-scope": scope, role: "group", "aria-label": fontLabel + tx("\u8BBE\u7F6E", " settings") },
+    h16("label", { className: "qmr-appearance-option" }, h16("span", null, fontLabel), h16(
+      "select",
+      { className: "qmr-select", "aria-label": fontLabel, value: settings.fontFamily, disabled: busy, onChange: (event) => update({ fontFamily: event.target.value }) },
+      [["serif", tx("\u886C\u7EBF", "Serif")], ["sans-serif", tx("\u65E0\u886C\u7EBF", "Sans serif")], ["mono", tx("\u7B49\u5BBD", "Monospace")]].map(([value, label]) => h16("option", { key: value, value }, label)),
+      Object.values(READER_FONTS).filter((font) => font.id !== "custom").map((font) => h16("option", { key: font.id, value: font.id }, font.labels[english ? "en" : "zh"] + (font.id === "zhuque" ? tx(" \xB7 \u79BB\u7EBF\u5185\u7F6E", " \xB7 bundled") : ""))),
+      fonts.map((font) => h16("option", { key: font.id, value: "imported:" + font.id }, font.name + " \xB7 " + font.format.toUpperCase() + tx(" \xB7 \u5DF2\u5BFC\u5165", " \xB7 imported"))),
+      families.map((name) => h16("option", { key: name, value: "system:" + name }, name)),
+      !known.has(settings.fontFamily) ? h16("option", { value: settings.fontFamily }, settings.fontFamily.startsWith("imported:") ? tx("\u5DF2\u4FDD\u5B58\u7684\u5BFC\u5165\u5B57\u4F53", "Saved imported font") : settings.fontFamily.replace(/^(system|custom):/, "")) : null
+    )),
+    status?.loading ? h16("p", { role: "status", className: "qmr-muted qmr-small" }, tx("\u6B63\u5728\u52A0\u8F7D\u5B57\u4F53\u2026", "Loading font\u2026")) : null,
+    status?.error ? h16("p", { role: "alert" }, status.error, h16("button", { type: "button", className: "qmr-btn qmr-btn-sm", onClick: () => ui.store.set({ fontRetry: (ui.store.get().fontRetry || 0) + 1 }) }, tx("\u91CD\u8BD5", "Retry"))) : null,
+    h16(
+      "details",
+      null,
+      h16("summary", null, tx("\u81EA\u5B9A\u4E49\u4E0E\u5BFC\u5165\u5B57\u4F53", "Custom and imported fonts")),
+      h16(
+        "div",
+        { className: "qmr-font-custom" },
+        h16("p", { className: "qmr-muted qmr-small" }, tx("\u6731\u96C0\u4EFF\u5B8B\u53EF\u79BB\u7EBF\u4F7F\u7528\uFF0C\u5176\u4F59\u547D\u540D\u5B57\u4F53\u9700\u5F53\u524D\u8BBE\u5907\u5DF2\u5B89\u88C5\u3002\u5BBF\u4E3B\u5B57\u4F53\u5217\u8868\u7528\u4E8E\u672C\u673A\u9605\u8BFB\uFF1B\u8FDC\u7A0B\u9605\u8BFB\u8BF7\u5BFC\u5165\u6587\u4EF6\u4EE5\u4FDD\u8BC1\u5404\u7AEF\u4E00\u81F4\u3002", "Zhuque is bundled. Other named fonts must be installed on this device. The Host list suits local reading; import a file for consistent remote reading.")),
+        h16("button", { type: "button", className: "qmr-btn", disabled: busy, onClick: () => void run(async () => {
+          if (!host?.fontAction) throw Error("\u5B57\u4F53\u670D\u52A1\u5C1A\u672A\u5C31\u7EEA");
+          const result = await host.fontAction({ kind: "system" });
+          if (alive.current) setFamilies(result.families);
+        }) }, busy ? tx("\u5904\u7406\u4E2D\u2026", "Working\u2026") : tx("\u8BFB\u53D6\u5BBF\u4E3B\u7CFB\u7EDF\u5B57\u4F53", "Read Host system fonts")),
+        families.length ? h16("p", { role: "status", className: "qmr-muted qmr-small" }, `${families.length} ` + tx("\u4E2A\u5B57\u4F53\u65CF\u5DF2\u52A0\u5165\u4E0A\u65B9\u5217\u8868", "font families added above")) : null,
+        h16("label", { className: "qmr-appearance-option" }, h16("span", null, tx("\u5F53\u524D\u8BBE\u5907\u5B57\u4F53\u540D\u79F0\u6216\u5B57\u4F53\u6808", "Font family or stack installed on this device")), h16("input", { className: "qmr-input", value: family, disabled: busy, maxLength: 512, onChange: (event) => setFamily(event.target.value) })),
+        h16("button", { type: "button", className: "qmr-btn", disabled: busy || !readerFontStack(family), onClick: () => update({ fontFamily: "custom:" + family.trim() }) }, tx("\u4F7F\u7528\u8FD9\u4E2A\u5B57\u4F53", "Use this font")),
+        h16("input", { ref: fileRef, type: "file", hidden: true, accept: FONT_FILE_ACCEPT, onChange: (event) => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          void importFile(file);
+        } }),
+        h16("button", { type: "button", className: "qmr-btn", disabled: busy, onClick: () => fileRef.current?.click() }, tx("\u5BFC\u5165\u5B57\u4F53\u6587\u4EF6", "Import font file")),
+        h16("p", { className: "qmr-muted qmr-small" }, "TTF \xB7 OTF \xB7 WOFF \xB7 WOFF2 \xB7 \u226464MB")
+      )
+    ),
+    error ? h16("p", { role: "alert" }, error) : null
+  );
+}
 
 // src/ui/settings-appearance.js
-var React18 = __toESM(require("react"), 1);
-var h16 = React18.createElement;
+var React20 = __toESM(require("react"), 1);
+var h17 = React20.createElement;
 function AppearanceOptions({ ui, settings, update }) {
   const en = ui.t("prompts.language", "zh") === "en", tx = (zh, enText) => en ? enText : zh;
-  const select = (key, label, options) => h16("label", { className: "qmr-appearance-option" }, h16("span", null, label), h16("select", { className: "qmr-select", value: settings[key], "aria-label": label, onChange: (event) => update({ [key]: event.target.value, ...key === "textAlign" ? { justify: event.target.value === "justify" } : {} }) }, options.map(([value, title]) => h16("option", { key: value, value }, title))));
-  const toggle = (key, label) => h16("label", { className: "qmr-switch" }, h16("input", { type: "checkbox", checked: settings[key], "aria-label": label, onChange: (event) => update({ [key]: event.target.checked }) }), label);
-  return h16(
+  const select = (key, label, options) => h17("label", { className: "qmr-appearance-option" }, h17("span", null, label), h17("select", { className: "qmr-select", value: settings[key], "aria-label": label, onChange: (event) => update({ [key]: event.target.value, ...key === "textAlign" ? { justify: event.target.value === "justify" } : {} }) }, options.map(([value, title]) => h17("option", { key: value, value }, title))));
+  const toggle = (key, label) => h17("label", { className: "qmr-switch" }, h17("input", { type: "checkbox", checked: settings[key], "aria-label": label, onChange: (event) => update({ [key]: event.target.checked }) }), label);
+  return h17(
     "details",
     { className: "qmr-appearance-advanced" },
-    h16("summary", null, tx("\u66F4\u591A\u5916\u89C2\u9009\u9879", "More appearance options")),
-    h16(
+    h17("summary", null, tx("\u66F4\u591A\u5916\u89C2\u9009\u9879", "More appearance options")),
+    h17(
       "div",
       { className: "qmr-appearance-options" },
       select("textAlign", tx("\u6587\u5B57\u5BF9\u9F50", "Text alignment"), [["left", tx("\u5DE6\u5BF9\u9F50", "Left")], ["justify", tx("\u4E24\u7AEF\u5BF9\u9F50", "Justified")], ["center", tx("\u5C45\u4E2D", "Center")], ["right", tx("\u53F3\u5BF9\u9F50", "Right")]]),
-      h16("label", { className: "qmr-appearance-option" }, h16("span", null, tx("\u6BCF\u884C\u5BBD\u5EA6", "Line width")), h16("input", { className: "qmr-range", type: "range", min: 0, max: 120, step: 4, value: settings.maxLineCh, "aria-label": tx("\u6BCF\u884C\u5BBD\u5EA6", "Line width"), onChange: (event) => update({ maxLineCh: Number(event.target.value) }) }), h16("span", null, settings.maxLineCh ? `${settings.maxLineCh} ch` : tx("\u81EA\u52A8", "Auto"))),
+      h17("label", { className: "qmr-appearance-option" }, h17("span", null, tx("\u6BCF\u884C\u5BBD\u5EA6", "Line width")), h17("input", { className: "qmr-range", type: "range", min: 0, max: 120, step: 4, value: settings.maxLineCh, "aria-label": tx("\u6BCF\u884C\u5BBD\u5EA6", "Line width"), onChange: (event) => update({ maxLineCh: Number(event.target.value) }) }), h17("span", null, settings.maxLineCh ? `${settings.maxLineCh} ch` : tx("\u81EA\u52A8", "Auto"))),
       select("vAlign", tx("\u77ED\u9875\u5782\u76F4\u5BF9\u9F50", "Short page alignment"), [["top", tx("\u9876\u90E8", "Top")], ["center", tx("\u5C45\u4E2D", "Center")], ["bottom", tx("\u5E95\u90E8", "Bottom")]]),
-      h16("p", { className: "qmr-muted qmr-small" }, tx("\u5782\u76F4\u5BF9\u9F50\u4EC5\u5E94\u7528\u4E8E\u5206\u9875\u6A21\u5F0F\u7684\u77ED\u9875\u3002", "Vertical alignment applies to short paginated pages.")),
+      h17("p", { className: "qmr-muted qmr-small" }, tx("\u5782\u76F4\u5BF9\u9F50\u4EC5\u5E94\u7528\u4E8E\u5206\u9875\u6A21\u5F0F\u7684\u77ED\u9875\u3002", "Vertical alignment applies to short paginated pages.")),
       toggle("immersive", tx("\u81EA\u52A8\u9690\u85CF\u9605\u8BFB\u5DE5\u5177\u680F", "Auto-hide reading controls")),
       toggle("einkMode", tx("\u7535\u5B50\u58A8\u6C34\u6A21\u5F0F", "E-ink mode")),
-      h16("p", { className: "qmr-muted qmr-small" }, tx("\u9ED1\u767D\u9AD8\u5BF9\u6BD4\u3001\u5173\u95ED\u52A8\u6548\u5E76\u4FDD\u6301\u5DE5\u5177\u680F\u53EF\u89C1\u3002", "Black and white, no animation, with reading controls kept visible.")),
+      h17("p", { className: "qmr-muted qmr-small" }, tx("\u9ED1\u767D\u9AD8\u5BF9\u6BD4\u3001\u5173\u95ED\u52A8\u6548\u5E76\u4FDD\u6301\u5DE5\u5177\u680F\u53EF\u89C1\u3002", "Black and white, no animation, with reading controls kept visible.")),
       select("navMode", tx("\u7FFB\u9875\u64CD\u4F5C", "Page navigation"), [["buttons", tx("\u6309\u94AE\u4E0E\u952E\u76D8", "Buttons and keyboard")], ["click", tx("\u70B9\u51FB\u4E66\u9875\u5DE6\u53F3\u4FA7", "Click the left or right side")]]),
       select("pageButtonsVisibility", tx("\u9875\u4FA7\u7FFB\u9875\u6309\u94AE", "Page side buttons"), [["hover", tx("\u60AC\u505C\u65F6\u663E\u793A", "On hover")], ["always", tx("\u59CB\u7EC8\u663E\u793A", "Always")], ["hidden", tx("\u9690\u85CF", "Hidden")]]),
       toggle("pageTurnAnimation", tx("\u7FFB\u9875\u52A8\u753B", "Page turn animation"))
@@ -120893,23 +121203,23 @@ function AppearanceOptions({ ui, settings, update }) {
 }
 
 // src/ui/panel-settings.js
-var h17 = React19.createElement;
+var h18 = React21.createElement;
 function SettingsPanel({ ui }) {
   const bookId = ui.useSel((state) => state.bookId);
   ui.useSel((state) => (state.states || {})[bookId] || null);
   const isLoaded = !!ui.useSel((state) => (state.states || {})[bookId] ? 1 : 0);
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
-  React19.useEffect(() => {
+  React21.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
   }, [bookId, ui]);
   const settings = ui.settingsOf(bookId);
   const update = (patch) => ui.updateSettings(bookId, patch);
-  const themeCardGrid = (activeId, onSelect) => h17(
+  const themeCardGrid = (activeId, onSelect) => h18(
     "div",
     { className: "qmr-theme-grid" },
     READER_THEME_IDS.map((id) => {
       const theme = READER_THEMES2[id];
-      return h17(
+      return h18(
         "button",
         {
           key: id,
@@ -120918,45 +121228,45 @@ function SettingsPanel({ ui }) {
           "aria-pressed": activeId === id,
           onClick: () => onSelect(id)
         },
-        h17("span", {
+        h18("span", {
           className: "qmr-theme-swatch",
           style: { background: theme.bg, color: theme.text },
           "aria-hidden": "true"
         }, "\u6587"),
-        h17("span", null, readerThemeLabel(id, ui.t("prompts.language", "zh") === "en"))
+        h18("span", null, readerThemeLabel(id, ui.t("prompts.language", "zh") === "en"))
       );
     })
   );
-  return h17(
-    React19.Fragment,
+  return h18(
+    React21.Fragment,
     null,
-    h17(
+    h18(
       "div",
       { className: "qmr-panel-head" },
-      h17(IconSettings, { width: 16, height: 16 }),
-      h17("span", { className: "qmr-panel-title" }, "\u9605\u8BFB\u8BBE\u7F6E"),
-      h17("button", {
+      h18(IconSettings, { width: 16, height: 16 }),
+      h18("span", { className: "qmr-panel-title" }, "\u9605\u8BFB\u8BBE\u7F6E"),
+      h18("button", {
         type: "button",
         className: "qmr-icon-btn",
         "aria-label": "\u5173\u95ED\u8BBE\u7F6E",
         onClick: () => ui.setPanel(null)
-      }, h17(IconClose, { width: 16, height: 16 }))
+      }, h18(IconClose, { width: 16, height: 16 }))
     ),
-    h17(
+    h18(
       "div",
       { className: "qmr-panel-body" },
-      !isLoaded ? h17("div", { className: "qmr-muted qmr-small", style: { marginBottom: 8 } }, "\u6B63\u5728\u8BFB\u53D6\u5DF2\u4FDD\u5B58\u7684\u8BBE\u7F6E\u2026") : null,
-      h17("div", { className: "qmr-group-title" }, "\u4E3B\u9898"),
+      !isLoaded ? h18("div", { className: "qmr-muted qmr-small", style: { marginBottom: 8 } }, "\u6B63\u5728\u8BFB\u53D6\u5DF2\u4FDD\u5B58\u7684\u8BBE\u7F6E\u2026") : null,
+      h18("div", { className: "qmr-group-title" }, "\u4E3B\u9898"),
       themeCardGrid(settings.theme, (id) => update({ theme: id })),
-      h17("div", { className: "qmr-group-title" }, "\u6392\u7248"),
-      h17(
+      h18("div", { className: "qmr-group-title" }, "\u6392\u7248"),
+      h18(
         "div",
         { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
-        h17(
+        h18("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
+        h18(
           "span",
           { className: "qmr-field-ctl" },
-          h17("input", {
+          h18("input", {
             className: "qmr-range",
             type: "range",
             min: 12,
@@ -120967,16 +121277,16 @@ function SettingsPanel({ ui }) {
             onChange: (event) => update({ fontSize: Number(event.target.value) })
           })
         ),
-        h17("span", { className: "qmr-field-value" }, `${settings.fontSize}px`)
+        h18("span", { className: "qmr-field-value" }, `${settings.fontSize}px`)
       ),
-      h17(
+      h18(
         "div",
         { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
-        h17(
+        h18("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
+        h18(
           "span",
           { className: "qmr-field-ctl" },
-          h17("input", {
+          h18("input", {
             className: "qmr-range",
             type: "range",
             min: 1.4,
@@ -120987,32 +121297,17 @@ function SettingsPanel({ ui }) {
             onChange: (event) => update({ lineHeight: Number(event.target.value) })
           })
         ),
-        h17("span", { className: "qmr-field-value" }, Number(settings.lineHeight).toFixed(2))
+        h18("span", { className: "qmr-field-value" }, Number(settings.lineHeight).toFixed(2))
       ),
-      h17(
+      h18(ReaderFontOptions, { ui, bookId, settings, update }),
+      h18(
         "div",
         { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u5B57\u4F53"),
-        h17(
+        h18("span", { className: "qmr-field-label" }, "\u9875\u8FB9\u8DDD"),
+        h18(
           "span",
           { className: "qmr-field-ctl" },
-          h17("select", {
-            className: "qmr-select",
-            style: { flex: "1 1 auto" },
-            value: settings.fontFamily,
-            "aria-label": "\u5B57\u4F53",
-            onChange: (event) => update({ fontFamily: event.target.value })
-          }, Object.keys(READER_FONT_LABELS).map((key) => h17("option", { key, value: key }, READER_FONT_LABELS[key])))
-        )
-      ),
-      h17(
-        "div",
-        { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u9875\u8FB9\u8DDD"),
-        h17(
-          "span",
-          { className: "qmr-field-ctl" },
-          h17("input", {
+          h18("input", {
             className: "qmr-range",
             type: "range",
             min: 32,
@@ -121023,26 +121318,26 @@ function SettingsPanel({ ui }) {
             onChange: (event) => update({ margin: Number(event.target.value) })
           })
         ),
-        h17("span", { className: "qmr-field-value" }, `${settings.margin}px`)
+        h18("span", { className: "qmr-field-value" }, `${settings.margin}px`)
       ),
-      h17("div", { className: "qmr-group-title" }, "\u7FFB\u9875"),
-      h17(
+      h18("div", { className: "qmr-group-title" }, "\u7FFB\u9875"),
+      h18(
         "div",
         { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u65B9\u5F0F"),
-        h17(
+        h18("span", { className: "qmr-field-label" }, "\u65B9\u5F0F"),
+        h18(
           "span",
           { className: "qmr-field-ctl" },
-          h17(
+          h18(
             "span",
             { className: "qmr-seg", role: "group", "aria-label": "\u7FFB\u9875\u65B9\u5F0F" },
-            h17("button", {
+            h18("button", {
               type: "button",
               className: settings.flow === "paginated" ? "is-active" : "",
               "aria-pressed": settings.flow === "paginated",
               onClick: () => update({ flow: "paginated" })
             }, "\u5206\u9875"),
-            h17("button", {
+            h18("button", {
               type: "button",
               className: settings.flow === "scroll" ? "is-active" : "",
               "aria-pressed": settings.flow === "scroll",
@@ -121051,17 +121346,17 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      h17(
+      h18(
         "div",
         { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u7248\u5F0F"),
-        h17(
+        h18("span", { className: "qmr-field-label" }, "\u7248\u5F0F"),
+        h18(
           "span",
           { className: "qmr-field-ctl" },
-          h17(
+          h18(
             "label",
             { className: "qmr-switch" },
-            h17("input", {
+            h18("input", {
               type: "checkbox",
               checked: settings.spread,
               disabled: settings.flow !== "paginated",
@@ -121072,19 +121367,19 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      h17(AppearanceOptions, { ui, settings, update }),
-      h17("div", { className: "qmr-group-title" }, "AI \u4F34\u8BFB\u5916\u89C2"),
-      h17(
+      h18(AppearanceOptions, { ui, settings, update }),
+      h18("div", { className: "qmr-group-title" }, "AI \u4F34\u8BFB\u5916\u89C2"),
+      h18(
         "div",
         { className: "qmr-field" },
-        h17("span", { className: "qmr-field-label" }, "\u8DDF\u968F"),
-        h17(
+        h18("span", { className: "qmr-field-label" }, "\u8DDF\u968F"),
+        h18(
           "span",
           { className: "qmr-field-ctl" },
-          h17(
+          h18(
             "label",
             { className: "qmr-switch" },
-            h17("input", {
+            h18("input", {
               type: "checkbox",
               checked: !companionAppearance,
               "aria-label": "\u4F34\u8BFB\u8DDF\u968F\u6B63\u6587\u5916\u89C2",
@@ -121105,18 +121400,18 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      companionAppearance ? h17(
-        React19.Fragment,
+      companionAppearance ? h18(
+        React21.Fragment,
         null,
         themeCardGrid(companionAppearance.theme, (id) => ui.setCompanionAppearance({ ...companionAppearance, theme: id })),
-        h17(
+        h18(
           "div",
           { className: "qmr-field", style: { marginTop: 10 } },
-          h17("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
-          h17(
+          h18("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
+          h18(
             "span",
             { className: "qmr-field-ctl" },
-            h17("input", {
+            h18("input", {
               className: "qmr-range",
               type: "range",
               min: 12,
@@ -121127,16 +121422,16 @@ function SettingsPanel({ ui }) {
               onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontSize: Number(event.target.value) })
             })
           ),
-          h17("span", { className: "qmr-field-value" }, `${companionAppearance.fontSize}px`)
+          h18("span", { className: "qmr-field-value" }, `${companionAppearance.fontSize}px`)
         ),
-        h17(
+        h18(
           "div",
           { className: "qmr-field" },
-          h17("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
-          h17(
+          h18("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
+          h18(
             "span",
             { className: "qmr-field-ctl" },
-            h17("input", {
+            h18("input", {
               className: "qmr-range",
               type: "range",
               min: 1.4,
@@ -121147,41 +121442,26 @@ function SettingsPanel({ ui }) {
               onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, lineHeight: Number(event.target.value) })
             })
           ),
-          h17("span", { className: "qmr-field-value" }, Number(companionAppearance.lineHeight).toFixed(2))
+          h18("span", { className: "qmr-field-value" }, Number(companionAppearance.lineHeight).toFixed(2))
         ),
-        h17(
-          "div",
-          { className: "qmr-field" },
-          h17("span", { className: "qmr-field-label" }, "\u5B57\u4F53"),
-          h17(
-            "span",
-            { className: "qmr-field-ctl" },
-            h17("select", {
-              className: "qmr-select",
-              style: { flex: "1 1 auto" },
-              value: companionAppearance.fontFamily,
-              "aria-label": "\u4F34\u8BFB\u5B57\u4F53",
-              onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontFamily: event.target.value })
-            }, Object.keys(READER_FONT_LABELS).map((key) => h17("option", { key, value: key }, READER_FONT_LABELS[key])))
-          )
-        ),
-        h17(
+        h18(ReaderFontOptions, { ui, bookId, scope: "companion", settings: companionAppearance, update: (patch) => ui.setCompanionAppearance({ ...companionAppearance, ...patch }) }),
+        h18(
           "p",
           { className: "qmr-muted qmr-small", style: { marginTop: 8 } },
           "\u72EC\u7ACB\u5916\u89C2\u53EA\u5F71\u54CD AI \u4F34\u8BFB\u9762\u677F\uFF0C\u5168\u5C40\u751F\u6548\uFF1B\u91CD\u65B0\u6253\u5F00\u300C\u8DDF\u968F\u6B63\u6587\u300D\u6062\u590D\u4E0E\u4E66\u7C4D\u8BBE\u7F6E\u4E00\u81F4\u3002"
         )
       ) : null,
-      h17("div", { className: "qmr-divider" }),
-      h17(
+      h18("div", { className: "qmr-divider" }),
+      h18(
         "div",
         { className: "qmr-hl-tools" },
-        h17("button", {
+        h18("button", {
           type: "button",
           className: "qmr-btn qmr-btn-sm",
           onClick: () => update({ ...UI_SETTING_DEFAULTS })
         }, "\u6062\u590D\u9ED8\u8BA4")
       ),
-      h17(
+      h18(
         "p",
         { className: "qmr-muted qmr-small", style: { marginTop: 10 } },
         `\u4E3B\u9898\u5E94\u7528\u4E8E\u4E66\u9875\u3001\u9605\u8BFB\u5DE5\u5177\u680F\u4E0E AI \u4F34\u8BFB\uFF1B\u8BBE\u7F6E\u968F\u8FD9\u672C\u4E66\u4FDD\u5B58\u3002\u4F34\u8BFB\u9ED8\u8BA4\u8DDF\u968F\u8FD9\u91CC\u7684\u4E3B\u9898\u3002`
@@ -121191,20 +121471,20 @@ function SettingsPanel({ ui }) {
 }
 
 // src/ui/prompt-manager.js
-var React20 = __toESM(require("react"), 1);
-var h18 = React20.createElement;
+var React22 = __toESM(require("react"), 1);
+var h19 = React22.createElement;
 function PromptManager({ ui, onClose }) {
   const t = (key, fallback) => ui.t(`prompts.${key}`, fallback);
   const language = t("language", "zh");
-  const [items, setItems] = React20.useState(() => readQuickPrompts(language));
-  const [error, setError] = React20.useState("");
-  const [restored, setRestored] = React20.useState(false);
-  const dirty = React20.useRef(false), dialog = React20.useRef(null), pendingFocus = React20.useRef(null);
+  const [items, setItems] = React22.useState(() => readQuickPrompts(language));
+  const [error, setError] = React22.useState("");
+  const [restored, setRestored] = React22.useState(false);
+  const dirty = React22.useRef(false), dialog = React22.useRef(null), pendingFocus = React22.useRef(null);
   const keyDown = useDialogFocus(dialog, onClose);
-  React20.useEffect(() => {
+  React22.useEffect(() => {
     if (!dirty.current) setItems(readQuickPrompts(language));
   }, [language]);
-  React20.useLayoutEffect(() => {
+  React22.useLayoutEffect(() => {
     if (!pendingFocus.current) return;
     dialog.current?.querySelector(`[data-prompt-id="${pendingFocus.current}"] input`)?.focus();
     pendingFocus.current = null;
@@ -121236,46 +121516,46 @@ function PromptManager({ ui, onClose }) {
       setError(t("failed", "\u4FDD\u5B58\u5931\u8D25\uFF0C\u4FEE\u6539\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u91CD\u8BD5"));
     }
   };
-  return h18(
+  return h19(
     "div",
     { className: "qmr-prompt-backdrop", onClick: (event) => {
       if (event.target === event.currentTarget) onClose();
     } },
-    h18(
+    h19(
       "section",
       { className: "qmr-prompt-dialog", ref: dialog, role: "dialog", "aria-modal": "true", "aria-label": t("manage", "\u7BA1\u7406\u5FEB\u6377\u63D0\u793A\u8BCD"), onKeyDown: keyDown },
-      h18("header", null, h18("div", null, h18("h2", null, t("manage", "\u7BA1\u7406\u5FEB\u6377\u63D0\u793A\u8BCD")), h18("p", null, t("editorHint", "\u540D\u79F0\u663E\u793A\u5728\u6309\u94AE\u4E0A\uFF0C\u5B8C\u6574\u63D0\u793A\u8BCD\u53D1\u9001\u7ED9 AI\u3002"))), h18("button", { type: "button", className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED"), onClick: onClose }, h18(IconClose, { width: 18, height: 18 }))),
-      h18(
+      h19("header", null, h19("div", null, h19("h2", null, t("manage", "\u7BA1\u7406\u5FEB\u6377\u63D0\u793A\u8BCD")), h19("p", null, t("editorHint", "\u540D\u79F0\u663E\u793A\u5728\u6309\u94AE\u4E0A\uFF0C\u5B8C\u6574\u63D0\u793A\u8BCD\u53D1\u9001\u7ED9 AI\u3002"))), h19("button", { type: "button", className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED"), onClick: onClose }, h19(IconClose, { width: 18, height: 18 }))),
+      h19(
         "form",
         { className: "qmr-prompt-editor", onSubmit: save },
-        h18(
+        h19(
           "div",
           { className: "qmr-prompt-list" },
-          !items.length ? h18("div", { className: "qmr-prompt-empty" }, h18("p", null, t("empty", "\u8FD8\u6CA1\u6709\u5FEB\u6377\u63D0\u793A\u8BCD\u3002\u6DFB\u52A0\u4E00\u6761\uFF0C\u6216\u6062\u590D\u5185\u7F6E\u63D0\u793A\u8BCD\u3002"))) : null,
-          items.map((item, index) => h18(
+          !items.length ? h19("div", { className: "qmr-prompt-empty" }, h19("p", null, t("empty", "\u8FD8\u6CA1\u6709\u5FEB\u6377\u63D0\u793A\u8BCD\u3002\u6DFB\u52A0\u4E00\u6761\uFF0C\u6216\u6062\u590D\u5185\u7F6E\u63D0\u793A\u8BCD\u3002"))) : null,
+          items.map((item, index) => h19(
             "div",
             { className: "qmr-prompt-item", key: item.id, "data-prompt-id": item.id },
-            h18("label", null, h18("span", null, t("name", "\u540D\u79F0")), h18("input", { "data-autofocus": index === 0 ? true : void 0, maxLength: 60, value: item.title, onChange: (event) => change(item.id, "title", event.target.value) })),
-            h18("label", null, h18("span", null, t("body", "\u63D0\u793A\u8BCD")), h18("textarea", { rows: 3, maxLength: 5e3, value: item.body, onChange: (event) => change(item.id, "body", event.target.value) })),
-            h18("button", { type: "button", className: "qmr-prompt-delete", "aria-label": `${t("delete", "\u5220\u9664")} ${item.title || index + 1}`, onClick: () => {
+            h19("label", null, h19("span", null, t("name", "\u540D\u79F0")), h19("input", { "data-autofocus": index === 0 ? true : void 0, maxLength: 60, value: item.title, onChange: (event) => change(item.id, "title", event.target.value) })),
+            h19("label", null, h19("span", null, t("body", "\u63D0\u793A\u8BCD")), h19("textarea", { rows: 3, maxLength: 5e3, value: item.body, onChange: (event) => change(item.id, "body", event.target.value) })),
+            h19("button", { type: "button", className: "qmr-prompt-delete", "aria-label": `${t("delete", "\u5220\u9664")} ${item.title || index + 1}`, onClick: () => {
               dirty.current = true;
               setRestored(false);
               setItems((previous) => previous.filter((prompt) => prompt.id !== item.id));
-            } }, h18(IconTrash, { width: 14, height: 14 }), t("delete", "\u5220\u9664"))
+            } }, h19(IconTrash, { width: 14, height: 14 }), t("delete", "\u5220\u9664"))
           ))
         ),
-        error ? h18("div", { className: "qmr-prompt-error", role: "alert" }, error) : null,
-        h18(
+        error ? h19("div", { className: "qmr-prompt-error", role: "alert" }, error) : null,
+        h19(
           "footer",
           { className: "qmr-prompt-actions" },
-          h18("button", { type: "button", disabled: items.length >= 20, onClick: add }, h18(IconPlus, { width: 14, height: 14 }), t("add", "\u65B0\u589E\u63D0\u793A\u8BCD")),
-          h18("button", { type: "button", onClick: () => {
+          h19("button", { type: "button", disabled: items.length >= 20, onClick: add }, h19(IconPlus, { width: 14, height: 14 }), t("add", "\u65B0\u589E\u63D0\u793A\u8BCD")),
+          h19("button", { type: "button", onClick: () => {
             dirty.current = true;
             setItems(defaultQuickPrompts(language));
             setRestored(true);
             setError("");
           } }, t("reset", "\u6062\u590D\u5185\u7F6E")),
-          h18("div", { className: "qmr-prompt-submit" }, h18("button", { type: "button", onClick: onClose }, t("cancel", "\u53D6\u6D88")), h18("button", { type: "submit", className: "is-primary" }, t("save", "\u4FDD\u5B58")))
+          h19("div", { className: "qmr-prompt-submit" }, h19("button", { type: "button", onClick: onClose }, t("cancel", "\u53D6\u6D88")), h19("button", { type: "submit", className: "is-primary" }, t("save", "\u4FDD\u5B58")))
         )
       )
     )
@@ -121283,7 +121563,7 @@ function PromptManager({ ui, onClose }) {
 }
 
 // src/ui/reader.js
-var h19 = React21.createElement;
+var h20 = React23.createElement;
 var COLUMN_GAP = 56;
 function readerPageDirection(event) {
   if (event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.metaKey || event.ctrlKey || event.altKey) return null;
@@ -121429,7 +121709,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const promptManagerOpen = ui.useSel((state) => !!state.promptManagerOpen);
   const selection = ui.useSel((state) => state.selection);
   const lookupSelection = ui.useSel((state) => state.lookupSelection);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     ui.store.set({ lookupSelection: null });
   }, [bookId]);
   const searchQuery = ui.useSel((state) => state.searchQuery);
@@ -121439,7 +121719,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const jumpToken = ui.useSel((state) => state.jumpToken);
   const restoreAnchor = ui.useSel((state) => state.restoreAnchor);
   const jumpReturn = ui.useSel((state) => state.jumpReturn);
-  const lastRestoreRef = React21.useRef("");
+  const lastRestoreRef = React23.useRef("");
   const focusHighlightId = ui.useSel((state) => state.focusHighlightId);
   const focusToken = ui.useSel((state) => state.focusToken);
   const searchFocusToken = ui.useSel((state) => state.searchFocusToken);
@@ -121448,33 +121728,33 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const chapterBusy = ui.useSel((state) => state.chapterBusy);
   const bookState = ui.useSel((state) => (state.states || {})[bookId] || null);
   const narrow = useMediaQuery("(max-width: 900px)");
-  const workareaRef = React21.useRef(null);
-  const companionDragging = React21.useRef(false);
-  const [companionWidth, setCompanionWidth] = React21.useState(() => {
+  const workareaRef = React23.useRef(null);
+  const companionDragging = React23.useRef(false);
+  const [companionWidth, setCompanionWidth] = React23.useState(() => {
     const saved = Number(localStorage.getItem("qmr.companionWidth"));
     return Number.isFinite(saved) && saved >= 25 && saved <= 75 ? saved : 44;
   });
-  const companionWidthRef = React21.useRef(companionWidth);
-  const [chromeVisible, setChromeVisible] = React21.useState(true);
-  const chromeTimerRef = React21.useRef(null);
-  const showChrome = React21.useCallback(() => {
+  const companionWidthRef = React23.useRef(companionWidth);
+  const [chromeVisible, setChromeVisible] = React23.useState(true);
+  const chromeTimerRef = React23.useRef(null);
+  const showChrome = React23.useCallback(() => {
     setChromeVisible(true);
     clearTimeout(chromeTimerRef.current);
     if (liveRef.current?.settings?.immersive !== false && !liveRef.current?.settings?.einkMode) chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
   }, []);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     showChrome();
     return () => clearTimeout(chromeTimerRef.current);
   }, [showChrome]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     ui.store.set({ companionSelection: null });
   }, [bookId, chapterIndex]);
   const book = ui.bookOf(bookId);
   const sectionUnit = book?.format === "pdf" ? "\u9875" : book?.format === "txt" ? "\u90E8\u5206" : "\u7AE0";
   const engine = ui.engineOf(bookId);
-  const [modelState, setModelState] = React21.useState(null);
+  const [modelState, setModelState] = React23.useState(null);
   const positionModel = modelState?.engine === engine ? modelState.model : null;
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     let active = true;
     if (engine) readingPositionModel(engine).then((model) => {
       if (active) setModelState({ engine, model });
@@ -121487,38 +121767,41 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const speech = useSpeech(ui, bookId, engine);
   const speechFocus = ui.useSel((state) => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
+  useReaderFont(ui, bookId, storedSettings.fontFamily);
+  const fontVersion = ui.useSel((state) => state.fontVersion || 0);
   const settings = book?.format === "pdf" ? { ...storedSettings, flow: "scroll" } : storedSettings;
   const themeVars = readerThemeVars(settings.einkMode ? "eink" : settings.theme);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     showChrome();
   }, [settings.immersive, settings.einkMode, showChrome]);
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
   const companionLook = companionAppearance || { theme: settings.theme, fontFamily: settings.fontFamily, fontSize: settings.fontSize, lineHeight: settings.lineHeight };
-  const labels = React21.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
-  const [html, setHtml] = React21.useState("");
-  const [renderError, setRenderError] = React21.useState(null);
-  const [page, setPageState] = React21.useState(0);
-  const [pageCount, setPageCount] = React21.useState(1);
-  const viewportRef = React21.useRef(null);
-  const flowRef = React21.useRef(null);
-  const textIndexRef = React21.useRef(null);
-  const anchorAppliedRef = React21.useRef("");
-  const measureRef = React21.useRef({ pages: 1, perPage: 1, columnWidth: 320, gap: COLUMN_GAP });
-  const lastHtmlRef = React21.useRef(null);
-  const pendingLandLastRef = React21.useRef(false);
-  const lastFocusRef = React21.useRef("");
-  const lastSearchFocusRef = React21.useRef(null);
-  const scrollTimerRef = React21.useRef(null);
-  const highlights = React21.useMemo(
+  useReaderFont(ui, bookId, companionAppearance?.fontFamily || "serif", "companion");
+  const labels = React23.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
+  const [html, setHtml] = React23.useState("");
+  const [renderError, setRenderError] = React23.useState(null);
+  const [page, setPageState] = React23.useState(0);
+  const [pageCount, setPageCount] = React23.useState(1);
+  const viewportRef = React23.useRef(null);
+  const flowRef = React23.useRef(null);
+  const textIndexRef = React23.useRef(null);
+  const anchorAppliedRef = React23.useRef("");
+  const measureRef = React23.useRef({ pages: 1, perPage: 1, columnWidth: 320, gap: COLUMN_GAP });
+  const lastHtmlRef = React23.useRef(null);
+  const pendingLandLastRef = React23.useRef(false);
+  const lastFocusRef = React23.useRef("");
+  const lastSearchFocusRef = React23.useRef(null);
+  const scrollTimerRef = React23.useRef(null);
+  const highlights = React23.useMemo(
     () => (bookState && bookState.highlights || []).filter(Boolean),
     [bookState]
   );
   const highlightSignature = highlights.map((item) => `${item.id}:${item.color}`).join("|");
-  const highlightsRef = React21.useRef(highlights);
+  const highlightsRef = React23.useRef(highlights);
   highlightsRef.current = highlights;
-  const searchResultsRef = React21.useRef(searchResults);
+  const searchResultsRef = React23.useRef(searchResults);
   searchResultsRef.current = searchResults;
-  const liveRef = React21.useRef({});
+  const liveRef = React23.useRef({});
   liveRef.current = {
     page,
     pageCount,
@@ -121536,10 +121819,10 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     restoreScroll,
     positionModel
   };
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
   }, [bookId, ui]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     let cancelled = false;
     if (!engine || bookId == null) {
       setHtml("");
@@ -121562,7 +121845,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       cancelled = true;
     };
   }, [engine, bookId, chapterIndex, engineVersion, imagesVersion, settings.pdfZoom, ui]);
-  const setPage = React21.useCallback((next) => {
+  const setPage = React23.useCallback((next) => {
     setPageState((previous) => {
       const max = Math.max(0, (measureRef.current.pages || 1) - 1);
       const raw = typeof next === "function" ? next(previous) : next;
@@ -121570,7 +121853,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       return value;
     });
   }, []);
-  const measure = React21.useCallback(() => {
+  const measure = React23.useCallback(() => {
     const viewport = viewportRef.current;
     const flow = flowRef.current;
     if (!viewport || !flow) return measureRef.current;
@@ -121613,7 +121896,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       return measureRef.current;
     }
   }, [settings.flow, settings.spread, settings.vAlign, setPage]);
-  const revealNode = React21.useCallback((node) => {
+  const revealNode = React23.useCallback((node) => {
     if (!node) return;
     if (settings.flow === "scroll") {
       node.scrollIntoView?.({ block: "center", inline: "nearest" });
@@ -121627,7 +121910,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const column = Math.floor((x + 1) / (meta.columnWidth + meta.gap));
     setPage(Math.floor(column / meta.perPage));
   }, [settings.flow, setPage]);
-  React21.useLayoutEffect(() => {
+  React23.useLayoutEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
     const isNewHtml = lastHtmlRef.current !== html;
@@ -121692,7 +121975,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     setPage,
     ui
   ]);
-  React21.useLayoutEffect(() => {
+  React23.useLayoutEffect(() => {
     const flow = flowRef.current;
     if (!flow || !html || chapterBusy || !restoreAnchor) return;
     const key = `${bookId}:${chapterIndex}:${jumpToken}`;
@@ -121727,7 +122010,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [html, chapterBusy, restoreAnchor, jumpToken, bookId, chapterIndex, settings.flow, engine, revealNode]);
-  React21.useLayoutEffect(() => {
+  React23.useLayoutEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
     try {
@@ -121794,7 +122077,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     chapterBusy,
     revealNode
   ]);
-  React21.useLayoutEffect(() => {
+  React23.useLayoutEffect(() => {
     if (!speechFocus?.text || speechFocus.chapterIndex !== chapterIndex || chapterBusy || !html) return;
     const flow = flowRef.current;
     if (!flow) return;
@@ -121811,7 +122094,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     if (settings.flow === "scroll") revealNode(node.parentElement);
     else revealNode(range);
   }, [speechFocus, chapterIndex, chapterBusy, html, revealNode, settings.flow]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
     if (settings.flow === "scroll") {
@@ -121822,7 +122105,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     flow.style.transform = pageTransform(flow, meta, page, settings.vAlign);
     flow.style.transition = settings.einkMode || settings.pageTurnAnimation === false || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "none" : "transform .18s ease";
   }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin, settings.pageTurnAnimation, settings.einkMode, settings.vAlign]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     const measureNow = () => {
       try {
         const live = liveRef.current, prior = measureRef.current, saved = { ...ui.stateOr(live.bookId).locator };
@@ -121857,10 +122140,11 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         }
       }
     };
-  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify, settings.textAlign, settings.maxLineCh, settings.vAlign]);
-  const reportPosition = React21.useCallback(() => {
+  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify, settings.textAlign, settings.maxLineCh, settings.vAlign, fontVersion]);
+  const reportPosition = React23.useCallback(() => {
     const live = liveRef.current;
     if (live.bookId == null) return;
+    if (ui.store.get().chapterBusy) return ui.stateOr(live.bookId).locator;
     let scroll = 0;
     if (live.settings && live.settings.flow === "scroll") {
       const viewport = viewportRef.current;
@@ -121912,7 +122196,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     ui.reportPosition(live.bookId, locator);
     return locator;
   }, [ui]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     ui.store.set({ page, pageCount });
     if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     scrollTimerRef.current = setTimeout(() => {
@@ -121922,8 +122206,8 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
-  React21.useEffect(() => {
+  }, [page, pageCount, chapterIndex, jumpToken, chapterBusy, ui, reportPosition]);
+  React23.useEffect(() => {
     const isScroll = () => {
       const live = liveRef.current;
       return !!(live.settings && live.settings.flow === "scroll");
@@ -121977,7 +122261,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       ui.registerPager({ next: () => ui.goChapter((ui.store.get().chapterIndex || 0) + 1), prev: () => ui.goChapter((ui.store.get().chapterIndex || 0) - 1), capture: () => null });
     };
   }, [ui, setPage, reportPosition]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     const onKeyDown = (event) => {
       const state = ui.store.get();
       if (!state.visible || state.view !== "reader") return;
@@ -121997,7 +122281,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [ui]);
-  React21.useEffect(() => {
+  React23.useEffect(() => {
     const onMouseUp = () => {
       try {
         const flow = flowRef.current;
@@ -122184,11 +122468,11 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     textAlign: settings.textAlign,
     color: "var(--qmr-ink)"
   };
-  const panelNode = panel === "toc" ? h19(TocPanel, { ui }) : panel === "vocabulary" ? h19(VocabularyPanel, { ui, bookId }) : panel === "speech" ? h19(SpeechPanel, { ui, speech }) : panel === "search" ? h19(SearchPanel, { ui }) : panel === "highlights" || panel === "notes" ? h19(HighlightsPanel, { ui }) : panel === "companion" ? h19(CompanionPanel, { ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) : panel === "settings" ? h19(SettingsPanel, { ui }) : null;
+  const panelNode = panel === "toc" ? h20(TocPanel, { ui }) : panel === "vocabulary" ? h20(VocabularyPanel, { ui, bookId }) : panel === "speech" ? h20(SpeechPanel, { ui, speech }) : panel === "search" ? h20(SearchPanel, { ui }) : panel === "highlights" || panel === "notes" ? h20(HighlightsPanel, { ui }) : panel === "companion" ? h20(CompanionPanel, { ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) : panel === "settings" ? h20(SettingsPanel, { ui }) : null;
   const title = book && book.title || "\u9605\u8BFB";
   const author = book && book.author || "";
   const chapterLabel2 = labels.get(chapterIndex) || `\u7B2C ${chapterIndex + 1} \u7AE0`;
-  const toolbarButton = (key, icon, label, onClick, active) => h19(
+  const toolbarButton = (key, icon, label, onClick, active) => h20(
     "button",
     {
       key,
@@ -122202,69 +122486,69 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     icon
   );
   const stablePosition = positionModel ? positionForLocator(positionModel, bookState?.locator?.chapterIndex === chapterIndex ? bookState.locator : { chapterIndex }) : null;
-  const topBar = h19(
+  const topBar = h20(
     "div",
     { className: `qmr-topbar${chromeVisible ? "" : " qmr-chrome-hidden"}` },
-    h19("button", {
+    h20("button", {
       type: "button",
       className: "qmr-btn qmr-btn-icon",
       "aria-label": "\u8FD4\u56DE\u4E66\u5E93",
       title: "\u8FD4\u56DE\u4E66\u5E93",
       onClick: () => ui.backToLibrary()
-    }, h19(IconBack, { width: 16, height: 16 })),
-    h19(
+    }, h20(IconBack, { width: 16, height: 16 })),
+    h20(
       "div",
       { className: "qmr-topbar-title", title: [title, author, chapterLabel2].filter(Boolean).join(" \xB7 ") },
-      h19("div", { className: "qmr-title" }, title),
-      h19(
+      h20("div", { className: "qmr-title" }, title),
+      h20(
         "div",
         { className: "qmr-subtitle" },
         [chapterLabel2 !== title ? chapterLabel2 : "", formatPercent(progress)].filter(Boolean).join(" \xB7 ")
       )
     ),
-    h19(
+    h20(
       "div",
       { className: "qmr-actions" },
-      toolbarButton("speech", h19(IconAudio, { width: 16, height: 16 }), ui.t("speech.title", "\u8FDE\u7EED\u6717\u8BFB"), () => ui.setPanel("speech"), panel === "speech"),
-      toolbarButton("vocabulary", h19(IconLanguages, { width: 16, height: 16 }), ui.t("lookup.vocabulary", "\u751F\u8BCD\u672C"), () => ui.setPanel("vocabulary"), panel === "vocabulary"),
-      toolbarButton("search", h19(IconSearch, { width: 16, height: 16 }), "\u641C\u7D22", () => ui.setPanel("search"), panel === "search"),
-      toolbarButton("hl", h19(IconHighlight, { width: 16, height: 16 }), "\u5212\u7EBF", () => ui.setPanel("highlights"), panel === "highlights" || panel === "notes"),
-      toolbarButton("ai", h19(IconSparkles, { width: 16, height: 16 }), "AI \u4F34\u8BFB", () => ui.setPanel("companion"), panel === "companion"),
-      toolbarButton("settings", h19(IconSettings, { width: 16, height: 16 }), "\u8BBE\u7F6E", () => ui.setPanel("settings"), panel === "settings"),
-      h19("button", {
+      toolbarButton("speech", h20(IconAudio, { width: 16, height: 16 }), ui.t("speech.title", "\u8FDE\u7EED\u6717\u8BFB"), () => ui.setPanel("speech"), panel === "speech"),
+      toolbarButton("vocabulary", h20(IconLanguages, { width: 16, height: 16 }), ui.t("lookup.vocabulary", "\u751F\u8BCD\u672C"), () => ui.setPanel("vocabulary"), panel === "vocabulary"),
+      toolbarButton("search", h20(IconSearch, { width: 16, height: 16 }), "\u641C\u7D22", () => ui.setPanel("search"), panel === "search"),
+      toolbarButton("hl", h20(IconHighlight, { width: 16, height: 16 }), "\u5212\u7EBF", () => ui.setPanel("highlights"), panel === "highlights" || panel === "notes"),
+      toolbarButton("ai", h20(IconSparkles, { width: 16, height: 16 }), "AI \u4F34\u8BFB", () => ui.setPanel("companion"), panel === "companion"),
+      toolbarButton("settings", h20(IconSettings, { width: 16, height: 16 }), "\u8BBE\u7F6E", () => ui.setPanel("settings"), panel === "settings"),
+      h20("button", {
         type: "button",
         className: "qmr-btn qmr-btn-icon",
         "aria-label": "\u5168\u5C4F",
         title: "\u5168\u5C4F",
         onClick: () => ui.toggleFullscreen()
-      }, h19(IconFullscreen, { width: 16, height: 16 })),
-      h19("button", {
+      }, h20(IconFullscreen, { width: 16, height: 16 })),
+      h20("button", {
         type: "button",
         className: "qmr-btn qmr-btn-icon",
         "aria-label": "\u5173\u95ED\u9605\u8BFB\u5668",
         title: "\u5173\u95ED\u9605\u8BFB\u5668",
         onClick: () => ui.closeOverlay()
-      }, h19(IconClose, { width: 16, height: 16 }))
+      }, h20(IconClose, { width: 16, height: 16 }))
     )
   );
-  const bottomBar = h19(
+  const bottomBar = h20(
     "div",
     { className: `qmr-bottombar${chromeVisible ? "" : " qmr-chrome-hidden"}` },
-    h19("button", {
+    h20("button", {
       type: "button",
       className: `qmr-icon-btn${panel === "toc" ? " is-active" : ""}`,
       "aria-label": "\u76EE\u5F55",
       "aria-pressed": panel === "toc",
       title: "\u76EE\u5F55",
       onClick: () => ui.setPanel("toc")
-    }, h19(IconToc, { width: 16, height: 16 })),
-    h19("button", {
+    }, h20(IconToc, { width: 16, height: 16 })),
+    h20("button", {
       type: "button",
       className: "qmr-icon-btn",
       "aria-label": "\u4E0A\u4E00\u9875",
       onClick: () => ui.turnPage(-1)
-    }, h19(IconPrev, { width: 16, height: 16 })),
-    h19(
+    }, h20(IconPrev, { width: 16, height: 16 })),
+    h20(
       "div",
       {
         className: "qmr-track",
@@ -122288,30 +122572,30 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           }
         }
       },
-      h19("div", { className: "qmr-track-rail" }),
-      h19("div", { className: "qmr-track-fill", style: { width: `${Math.round(progress * 100)}%` } }),
-      h19("div", { className: "qmr-track-knob", style: { left: `${Math.round(progress * 100)}%` } })
+      h20("div", { className: "qmr-track-rail" }),
+      h20("div", { className: "qmr-track-fill", style: { width: `${Math.round(progress * 100)}%` } }),
+      h20("div", { className: "qmr-track-knob", style: { left: `${Math.round(progress * 100)}%` } })
     ),
-    h19("button", { className: "qmr-bottom-text qmr-position-trigger", type: "button", "aria-label": ui.t("nav.positionJump", "\u4F4D\u7F6E\u8DF3\u8F6C"), onClick: () => {
+    h20("button", { className: "qmr-bottom-text qmr-position-trigger", type: "button", "aria-label": ui.t("nav.positionJump", "\u4F4D\u7F6E\u8DF3\u8F6C"), onClick: () => {
       if (panel !== "toc") ui.setPanel("toc");
       ui.store.set({ navigationTab: "position" });
     } }, positionModel ? `${ui.t(positionModel.kind === "location" ? "nav.location" : positionModel.kind === "original" ? "nav.originalPage" : "nav.pdfPage", positionModel.kind === "location" ? "\u4F4D\u7F6E" : "\u9875\u7801")} ${stablePosition.current || "\u2014"} / ${positionModel.total}` : `\u7B2C ${chapterIndex + 1} / ${chapterCount || "?"} ${sectionUnit}`),
-    h19("span", { className: "qmr-bottom-text" }, formatPercent(progress)),
-    jumpReturn ? h19("button", { className: "qmr-icon-btn", "aria-label": ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), title: ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), onClick: () => ui.returnFromJump() }, h19(IconBack, { width: 16, height: 16 })) : null,
-    h19("button", {
+    h20("span", { className: "qmr-bottom-text" }, formatPercent(progress)),
+    jumpReturn ? h20("button", { className: "qmr-icon-btn", "aria-label": ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), title: ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), onClick: () => ui.returnFromJump() }, h20(IconBack, { width: 16, height: 16 })) : null,
+    h20("button", {
       type: "button",
       className: "qmr-icon-btn",
       "aria-label": "\u4E0B\u4E00\u9875",
       onClick: () => ui.turnPage(1)
-    }, h19(IconNext, { width: 16, height: 16 }))
+    }, h20(IconNext, { width: 16, height: 16 }))
   );
-  return h19(
+  return h20(
     "div",
     { className: `qmr-reader qmr-page-buttons-${settings.pageButtonsVisibility}`, "data-qmr-theme": settings.einkMode ? "eink" : settings.theme, "data-qmr-eink": settings.einkMode ? "true" : void 0, style: themeVars },
-    h19(
+    h20(
       "div",
       { className: `qmr-reader-main${panel === "companion" ? " qmr-has-companion" : ""}`, ref: workareaRef, style: { "--qmr-companion-width": `${companionWidth}%` } },
-      h19(
+      h20(
         "div",
         {
           className: `qmr-reader-content${settings.flow === "scroll" ? " qmr-flow-scroll" : ""}${book?.format === "pdf" ? " qmr-format-pdf" : ""}`,
@@ -122325,16 +122609,16 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           onKeyDownCapture: showChrome
         },
         topBar,
-        settings.flow !== "scroll" ? h19("button", {
+        settings.flow !== "scroll" ? h20("button", {
           type: "button",
           className: "qmr-page-zone qmr-page-zone-prev",
           "aria-label": "\u4E0A\u4E00\u9875",
           onClick: () => ui.turnPage(-1)
         }) : null,
-        h19(
+        h20(
           "div",
           { className: "qmr-page-frame", style: contentStyle },
-          h19("div", { className: viewportClass, ref: viewportRef }, h19("div", {
+          h20("div", { className: viewportClass, ref: viewportRef }, h20("div", {
             className: "qmr-page-flow qmr-paper-body",
             ref: flowRef,
             style: flowStyle,
@@ -122342,26 +122626,26 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
             onScroll: void 0
           }))
         ),
-        settings.flow !== "scroll" ? h19("button", {
+        settings.flow !== "scroll" ? h20("button", {
           type: "button",
           className: "qmr-page-zone qmr-page-zone-next",
           "aria-label": "\u4E0B\u4E00\u9875",
           onClick: () => ui.turnPage(1)
         }) : null,
-        settings.flow !== "scroll" ? h19("div", { className: "qmr-page-count" }, `\u7B2C ${page + 1} / ${pageCount} \u9875`) : null,
-        chapterBusy ? h19("div", { className: "qmr-chapter-loading" }, "\u6B63\u5728\u6392\u7248\u2026") : null,
-        renderError ? h19(
+        settings.flow !== "scroll" ? h20("div", { className: "qmr-page-count" }, `\u7B2C ${page + 1} / ${pageCount} \u9875`) : null,
+        chapterBusy ? h20("div", { className: "qmr-chapter-loading" }, "\u6B63\u5728\u6392\u7248\u2026") : null,
+        renderError ? h20(
           "div",
           { className: "qmr-errorbox" },
-          h19("div", { className: "qmr-errorbox-title" }, `\u8FD9\u4E00${sectionUnit}\u6E32\u67D3\u5931\u8D25`),
-          h19("div", { className: "qmr-errorbox-text" }, renderError),
-          h19("button", {
+          h20("div", { className: "qmr-errorbox-title" }, `\u8FD9\u4E00${sectionUnit}\u6E32\u67D3\u5931\u8D25`),
+          h20("div", { className: "qmr-errorbox-text" }, renderError),
+          h20("button", {
             type: "button",
             className: "qmr-btn qmr-btn-sm",
             onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 })
           }, "\u91CD\u8BD5")
         ) : null,
-        selection ? h19(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onSpeak: () => {
+        selection ? h20(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onSpeak: () => {
           const text = selection.text;
           if (panel !== "speech") ui.setPanel("speech");
           void speech.test(text, true);
@@ -122369,10 +122653,10 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           ui.store.set({ lookupSelection: { ...selection } });
           ui.clearSelection();
         } }) : null,
-        lookupSelection ? h19(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
+        lookupSelection ? h20(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
         bottomBar
       ),
-      panel === "companion" ? h19("div", {
+      panel === "companion" ? h20("div", {
         className: "qmr-companion-divider",
         role: "separator",
         tabIndex: 0,
@@ -122423,7 +122707,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           localStorage.setItem("qmr.companionWidth", "44");
         }
       }) : null,
-      panelNode ? h19("div", {
+      panelNode ? h20("div", {
         className: `qmr-panel${panel === "companion" ? " qmr-panel-companion" : ""}${narrow && panel !== "companion" ? " qmr-panel-overlay" : ""}`,
         style: panel === "companion" ? {
           ...readerThemeVars(companionLook.theme),
@@ -122434,12 +122718,12 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         "data-qmr-ai-appearance": panel === "companion" && companionAppearance ? "custom" : void 0
       }, panelNode) : null
     ),
-    promptManagerOpen ? h19(PromptManager, { ui, onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null
+    promptManagerOpen ? h20(PromptManager, { ui, onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null
   );
 }
 
 // src/ui/shell.js
-var h20 = React22.createElement;
+var h21 = React24.createElement;
 var INITIAL_STATE = Object.freeze({
   visible: false,
   view: "library",
@@ -122447,7 +122731,7 @@ var INITIAL_STATE = Object.freeze({
   panel: null,
   states: {}
 });
-var ReaderErrorBoundary = class extends React22.Component {
+var ReaderErrorBoundary = class extends React24.Component {
   constructor(props) {
     super(props);
     this.state = { error: null };
@@ -122469,23 +122753,23 @@ var ReaderErrorBoundary = class extends React22.Component {
     const error = this.state.error;
     if (error) {
       const text = String(error && error.message || error || "\u672A\u77E5\u9519\u8BEF");
-      return h20(
+      return h21(
         "div",
         { className: "qmr-root" },
-        h20(
+        h21(
           "div",
           { className: "qmr-errorbox", role: "alert" },
-          h20("div", { className: "qmr-errorbox-title" }, "\u9605\u8BFB\u5668\u754C\u9762\u51FA\u9519"),
-          h20("div", { className: "qmr-errorbox-text" }, text),
-          h20(
+          h21("div", { className: "qmr-errorbox-title" }, "\u9605\u8BFB\u5668\u754C\u9762\u51FA\u9519"),
+          h21("div", { className: "qmr-errorbox-text" }, text),
+          h21(
             "div",
             { className: "qmr-hl-tools" },
-            h20("button", {
+            h21("button", {
               type: "button",
               className: "qmr-btn qmr-btn-primary qmr-btn-sm",
               onClick: this.reset
-            }, h20(IconRetry, { width: 14, height: 14 }), "\u91CD\u8BD5"),
-            typeof this.props.onClose === "function" ? h20("button", {
+            }, h21(IconRetry, { width: 14, height: 14 }), "\u91CD\u8BD5"),
+            typeof this.props.onClose === "function" ? h21("button", {
               type: "button",
               className: "qmr-btn qmr-btn-sm",
               onClick: this.props.onClose
@@ -122502,13 +122786,13 @@ function looksLikeStore2(value) {
 }
 function ReaderOverlay(props) {
   const injectedStore = props && looksLikeStore2(props.store) ? props.store : null;
-  const fallbackStore = React22.useMemo(() => createUiStore({ ...INITIAL_STATE }), []);
+  const fallbackStore = React24.useMemo(() => createUiStore({ ...INITIAL_STATE }), []);
   const store = injectedStore || fallbackStore;
-  const propsRef = React22.useRef(props);
+  const propsRef = React24.useRef(props);
   propsRef.current = props;
-  const ui = React22.useMemo(() => createController(() => propsRef.current, store), [store]);
+  const ui = React24.useMemo(() => createController(() => propsRef.current, store), [store]);
   const injectedUseStore = props && typeof props.useStore === "function" ? props.useStore : null;
-  const useSel = React22.useCallback(
+  const useSel = React24.useCallback(
     (selector) => injectedUseStore ? injectedUseStore(selector) : useUiStore(store, selector),
     [injectedUseStore, store]
   );
@@ -122521,11 +122805,11 @@ function ReaderOverlay(props) {
   const lastError = useSel((state) => state.lastError);
   const openSignal = useSel((state) => state.openSignal);
   const jumpTarget = useSel((state) => state.jumpTarget);
-  const overlayRef = React22.useRef(null);
-  const lastSignalRef = React22.useRef(openSignal);
-  const handledBookRef = React22.useRef(null);
-  const initialHandledRef = React22.useRef(false);
-  const setOverlayNode = React22.useCallback((element) => {
+  const overlayRef = React24.useRef(null);
+  const lastSignalRef = React24.useRef(openSignal);
+  const handledBookRef = React24.useRef(null);
+  const initialHandledRef = React24.useRef(false);
+  const setOverlayNode = React24.useCallback((element) => {
     overlayRef.current = element;
     try {
       ui.attachOverlay(element);
@@ -122533,7 +122817,7 @@ function ReaderOverlay(props) {
     } catch (_error) {
     }
   }, [ui]);
-  React22.useEffect(() => {
+  React24.useEffect(() => {
     if (openSignal === void 0 || openSignal === null) return;
     if (lastSignalRef.current === openSignal) return;
     lastSignalRef.current = openSignal;
@@ -122546,7 +122830,7 @@ function ReaderOverlay(props) {
     handledBookRef.current = null;
     ui.openLibrary();
   }, [openSignal, store, ui]);
-  React22.useEffect(() => {
+  React24.useEffect(() => {
     if (initialHandledRef.current) return;
     const initialBookId = propsRef.current && propsRef.current.initialBookId;
     if (!initialBookId) {
@@ -122557,7 +122841,7 @@ function ReaderOverlay(props) {
     handledBookRef.current = String(initialBookId);
     ui.openBook(initialBookId);
   }, [ui]);
-  React22.useEffect(() => {
+  React24.useEffect(() => {
     if (!jumpTarget) return void 0;
     let cancelled = false;
     (async () => {
@@ -122569,7 +122853,7 @@ function ReaderOverlay(props) {
       cancelled = true;
     };
   }, [jumpTarget, store, ui]);
-  React22.useEffect(() => {
+  React24.useEffect(() => {
     const onKeyDown = (event) => {
       if (event.key !== "Escape") return;
       const state = store.get();
@@ -122601,19 +122885,19 @@ function ReaderOverlay(props) {
     return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [store, ui]);
   if (!visible && !props.embedded) return null;
-  const errorBar = lastError ? h20(
+  const errorBar = lastError ? h21(
     "div",
     { className: "qmr-errorbar", role: "alert" },
-    h20("span", null, String(lastError)),
-    h20("button", {
+    h21("span", null, String(lastError)),
+    h21("button", {
       type: "button",
       className: "qmr-icon-btn",
       "aria-label": "\u5173\u95ED\u9519\u8BEF\u63D0\u793A",
       onClick: () => ui.clearError()
-    }, h20(IconClose, { width: 14, height: 14 }))
+    }, h21(IconClose, { width: 14, height: 14 }))
   ) : null;
-  const content2 = view === "reader" && bookId != null ? h20(ReaderView, { ui, chatApi: props.chatApi, SessionProvider: props.SessionProvider, renderSlot: props.renderSlot }) : h20(LibraryView, { ui });
-  return h20(
+  const content2 = view === "reader" && bookId != null ? h21(ReaderView, { ui, chatApi: props.chatApi, SessionProvider: props.SessionProvider, renderSlot: props.renderSlot }) : h21(LibraryView, { ui });
+  return h21(
     "div",
     {
       className: props.embedded ? "qmr-overlay qmr-embedded" : "qmr-overlay",
@@ -122623,16 +122907,16 @@ function ReaderOverlay(props) {
       "aria-label": "\u4E54\u6728\u9605\u8BFB",
       "data-qmr-view": view
     },
-    h20(StyleSheet, null),
+    h21(StyleSheet, null),
     errorBar,
-    h20(
+    h21(
       ReaderErrorBoundary,
       { onError: (error) => ui.reportError(error, true), onClose: () => ui.closeOverlay() },
-      h20(
+      h21(
         "div",
         { className: "qmr-root" },
         content2,
-        notice ? h20("div", { className: `qmr-toast is-${noticeKind || "info"}` }, String(notice)) : null
+        notice ? h21("div", { className: `qmr-toast is-${noticeKind || "info"}` }, String(notice)) : null
       )
     )
   );
@@ -122763,7 +123047,7 @@ var remoteCodec = () => ({
 });
 var REMOTE = {
   package: "qiaomu-reader-dsh",
-  descriptors: ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "speechAction", "sendToAnki", "searchBooks", "downloadBook", "ebookAction", "translateSelection", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "bookCover", "highlights", "exportNotes", "setReadingContext"].map((method) => ({
+  descriptors: ["info", "library", "importBook", "removeBook", "restoreBook", "fontAction", "speechVoices", "speechAudio", "speechAction", "sendToAnki", "searchBooks", "downloadBook", "ebookAction", "translateSelection", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "bookCover", "highlights", "exportNotes", "setReadingContext"].map((method) => ({
     id: `qiaomu-reader-dsh#qiaomuReader/${method}`,
     service: "qiaomuReader",
     namespace: "qiaomuReader",
@@ -122779,7 +123063,7 @@ function pickComponent(module2, names, label) {
   for (const name of names) {
     if (typeof module2?.[name] === "function") return module2[name];
   }
-  const Missing = () => React23.createElement(
+  const Missing = () => React25.createElement(
     "div",
     { style: { padding: "16px", fontSize: "13px", color: "var(--dsw-alias-state-error-primary, #d33)" } },
     `\u4E54\u6728\u9605\u8BFB\uFF1A${label} \u6CA1\u6709\u5BFC\u51FA\u9884\u671F\u7684\u7EC4\u4EF6\uFF08\u627E\u8FC7 ${names.join(" / ")}\uFF09\u3002\u8BF7\u68C0\u67E5\u6784\u5EFA\u4EA7\u7269\u3002`
@@ -122789,6 +123073,7 @@ function pickComponent(module2, names, label) {
 }
 function apply(ctx) {
   const data = createDataLayer();
+  ctx.effect(() => () => disposeReaderFonts());
   const chatApi = nativeChatBridge(ctx);
   const store = createUiStore({
     visible: false,
@@ -122937,11 +123222,11 @@ function apply(ctx) {
     return data.getEngine(bookId);
   }
   function ReaderPanel(props) {
-    React23.useEffect(() => {
+    React25.useEffect(() => {
       store.set({ visible: true });
       return () => store.set({ visible: false, panel: null, selection: null });
     }, []);
-    return React23.createElement(Overlay, { ...props, embedded: true });
+    return React25.createElement(Overlay, { ...props, embedded: true });
   }
   ctx.effect(
     () => ctx.slots.inject(
@@ -123066,16 +123351,16 @@ function apply(ctx) {
   }, "qiaomu-reader: \u9884\u8F7D\u4E66\u5E93");
 }
 function BookIcon({ size = 18 }) {
-  return React23.createElement(
+  return React25.createElement(
     "svg",
     { width: size, height: size, viewBox: "0 0 24 24", fill: "none", "aria-hidden": true, focusable: false, style: { display: "block", flexShrink: 0 } },
-    React23.createElement("path", {
+    React25.createElement("path", {
       d: "M12 6.5C10.2 5 7.6 4.4 4.6 4.7v13.6c3-.3 5.6.3 7.4 1.8 1.8-1.5 4.4-2.1 7.4-1.8V4.7c-3-.3-5.6.3-7.4 1.8Z",
       stroke: "currentColor",
       strokeWidth: 1.6,
       strokeLinejoin: "round"
     }),
-    React23.createElement("path", { d: "M12 6.5v13.6", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" })
+    React25.createElement("path", { d: "M12 6.5v13.6", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" })
   );
 }
 

@@ -87,7 +87,7 @@ async function buildHost() {
     bundle: true,
     format: 'esm',
     platform: 'node',
-    loader: { '.py': 'text' },
+    loader: { '.py': 'text', '.woff2':'base64' },
     target: 'node20',
     external: HOST_EXTERNAL,
     legalComments: 'none',

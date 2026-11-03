@@ -17,6 +17,7 @@ check(p.exports);
 check(p.dsh.bundle.patch);
 check(p.icon || (p.name === 'qiaomu-rss-dsh' ? './lib/client.js' : './icon.svg'));
 assert(files.has('README.md') && files.has('LICENSE'));
+assert(files.has('licenses/zhuque-OFL.txt'), 'Missing bundled font license');
 const screenshots = JSON.parse(readFileSync('screenshots.json','utf8'));
 assert(Array.isArray(screenshots) && screenshots.length >= 1 && screenshots.length <= 8);
 for (const file of screenshots) assert(!file.includes('..') && !file.startsWith('/') && existsSync(file), `Invalid screenshot: ${file}`);

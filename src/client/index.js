@@ -1,3 +1,4 @@
+import { disposeReaderFonts } from './reader-fonts.js';
 import { LIBRARY_MESSAGES, flatMessages } from '../ui/library-locale.js';
 /**
  * 乔木阅读 · 客户端半入口（bootstrap）
@@ -28,7 +29,7 @@ const remoteCodec = () => ({
 });
 const REMOTE = {
   package: 'qiaomu-reader-dsh',
-  descriptors: ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'speechAction', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'translateSelection', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
+  descriptors: ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'fontAction', 'speechVoices', 'speechAudio', 'speechAction', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'translateSelection', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
     id: `qiaomu-reader-dsh#qiaomuReader/${method}`,
     service: 'qiaomuReader', namespace: 'qiaomuReader', method,
     invocation: { kind: 'direct' },
@@ -69,6 +70,7 @@ function pickComponent(module, names, label) {
 export function apply(ctx) {
   // 数据面：宿主半能连上就连，连不上退化为「内置书 + 浏览器缓存」。
   const data = createDataLayer();
+  ctx.effect(()=>()=>disposeReaderFonts());
   const chatApi = nativeChatBridge(ctx);
 
   // UI 状态容器：全屏浮层的可见性、当前书、当前面板都住在这里。

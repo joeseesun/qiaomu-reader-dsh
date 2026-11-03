@@ -46,3 +46,7 @@ test('position reports clear one-time fragment targets before creating bookmarks
  h.ui.reportPosition('b',{chapterIndex:1,scroll:0.3,textOffset:500,textQuote:'Remember this'});
  assert.equal(h.store.get().states.b.locator.fragment,'');await h.ui.flushState('b');
 });
+
+test('appearance changes during chapter loading retain saved locator instead of stale DOM capture',async()=>{
+ const h=harness();h.store.set({chapterBusy:true,states:{b:{...h.store.get().states.b,locator:{chapterIndex:0,scroll:0.3,textOffset:180,textQuote:'Saved book sentence'}}}});h.ui.updateSettings('b',{fontSize:32});assert.equal(h.store.get().restoreAnchor.textOffset,180);assert.equal(h.store.get().restoreAnchor.textQuote,'Saved book sentence');await h.ui.flushState('b');
+});
