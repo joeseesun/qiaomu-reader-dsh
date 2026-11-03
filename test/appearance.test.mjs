@@ -20,3 +20,11 @@ test('short page alignment does not shift full or empty pages',()=>{
  assert.equal(verticalPageOffset(600,200,'center'),200);assert.equal(verticalPageOffset(600,200,'bottom'),400);
  assert.equal(verticalPageOffset(600,590,'bottom'),0);assert.equal(verticalPageOffset(600,0,'center'),0);assert.equal(verticalPageOffset(600,200,'top'),0);
 });
+
+test('Reader stylesheet parses without invalid selector or at-rule warnings',async()=>{
+ const {build,transform}=await import('esbuild'),vm=await import('node:vm');
+ const result=await build({entryPoints:['src/ui/theme.js'],bundle:true,write:false,format:'cjs',platform:'node',external:['react']});
+ const module={exports:{}};vm.runInNewContext(result.outputFiles[0].text,{module,exports:module.exports,require:()=>({})});
+ const parsed=await transform(module.exports.UI_CSS,{loader:'css',target:'chrome120',logLevel:'silent'});
+ assert.deepEqual(parsed.warnings.map(warning=>warning.text),[]);
+});

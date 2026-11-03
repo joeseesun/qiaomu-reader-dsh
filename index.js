@@ -24059,6 +24059,7 @@ function createReaderFontService({ directory, bundledBase64, systemFonts = syste
   const read = async (entry) => {
     await prepare();
     const filename = path2.join(directory, entry.id + "." + entry.format);
+    if ((await lstat(filename)).isSymbolicLink()) throw Error("\u5B57\u4F53\u6587\u4EF6\u4E0D\u80FD\u662F\u7B26\u53F7\u94FE\u63A5");
     const fd = await open(filename, constants.O_RDONLY | (constants.O_NOFOLLOW || 0));
     try {
       const stat2 = await fd.stat();

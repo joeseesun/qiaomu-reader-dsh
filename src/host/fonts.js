@@ -28,7 +28,7 @@ export function createReaderFontService({directory,bundledBase64,systemFonts=sys
  const entries=()=>{const data=files.read('index');if(data===null)return [];if(!Array.isArray(data.fonts)||!data.fonts.every(validEntry))throw Error('字体索引损坏，原文件已保留');return data.fonts.map(({id,name,format,bytes})=>({id,name,format,bytes}));};
  const prepare=async()=>{await mkdir(directory,{recursive:true,mode:0o700});if((await lstat(directory)).isSymbolicLink())throw Error('字体目录不能是符号链接');};
  const read=async entry=>{
-  await prepare();const filename=path.join(directory,entry.id+'.'+entry.format);const fd=await open(filename,constants.O_RDONLY|(constants.O_NOFOLLOW||0));
+  await prepare();const filename=path.join(directory,entry.id+'.'+entry.format);if((await lstat(filename)).isSymbolicLink())throw Error('字体文件不能是符号链接');const fd=await open(filename,constants.O_RDONLY|(constants.O_NOFOLLOW||0));
   try{const stat=await fd.stat();if(!stat.isFile()||stat.size>MAX_FONT_BYTES)throw Error('字体文件无效');const bytes=await fd.readFile();if(hash(bytes)!==entry.id||fontFileFormat(bytes)!==entry.format)throw Error('字体文件校验失败，原文件已保留');return bytes;}finally{await fd.close();}
  };
  const action=async input=>{

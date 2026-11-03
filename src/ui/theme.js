@@ -432,17 +432,15 @@ export const UI_CSS = `
   background:transparent;cursor:pointer;color:transparent}
 @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
 .qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
+.qmr-font-options :is(input,select):focus,.qmr-font-options button:focus-visible{outline:1px solid var(--qmr-muted);outline-offset:-1px;box-shadow:none}
 .qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
 .qmr-page-zone::after{font-size:26px;color:var(--qmr-muted);opacity:0;transition:opacity .12s}
 .qmr-page-zone-prev::after{content:'‹'}.qmr-page-zone-next::after{content:'›'}
-.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
-.qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
-.qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
-.qmr-page-zone::after{opacity:1}
+.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always .qmr-page-zone::after{opacity:1}
 .qmr-page-buttons-hidden .qmr-page-zone{display:none}
 .qmr-reader[data-qmr-eink=true],.qmr-reader[data-qmr-eink=true] .qmr-panel{--qmr-paper:#fff!important;--qmr-ink:#000!important;--qmr-muted:#444!important;--qmr-ui:#fff!important;--qmr-border:#000!important;--qmr-accent:#000!important;color:#000;background:#fff}
 .qmr-reader[data-qmr-eink=true]{color-scheme:light}.qmr-reader[data-qmr-eink=true] :is(.qmr-muted,.qmr-group-title,.qmr-panel-title,.qmr-field-label,.qmr-field-value){color:#444!important}.qmr-reader[data-qmr-eink=true] .qmr-panel :is(input,select,button){color:#000!important;background:#fff!important;border-color:#000!important}
-.qmr-reader[data-qmr-eink=true] *{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
+.qmr-reader[data-qmr-eink=true] *,.qmr-reader[data-qmr-eink=true] *::before,.qmr-reader[data-qmr-eink=true] *::after{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
 .qmr-reader[data-qmr-eink=true] .qmr-hl{background:transparent;text-decoration:underline;text-decoration-thickness:2px}
 .qmr-page-zone:hover{background:transparent}
 .qmr-page-zone:focus-visible{outline:1px solid var(--qmr-accent);outline-offset:-4px}
@@ -521,11 +519,10 @@ export const UI_CSS = `
 .qmr-native-chat>[data-conversation-content]{flex:1;min-height:0}
 .qmr-native-chat [data-content-phase="hero"] [data-conversation-scroll]{justify-content:flex-end}
 .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){color:var(--qmr-ink)}
-/* 伴读独立外观（对照原版 4.5.10/4.5.12）：自定义模式下仅会话文字换字体与字号，
-   主题整套变量随 data-qmr-ai-appearance 挂在伴读面板上（inline style 注入）。 */
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-companion{font-family:var(--qmr-ai-font)}
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
+/* 伴读始终使用已解析的字体/字号变量：跟随正文与独立外观共用同一渲染链路。 */
+.qmr-panel-companion .qmr-companion{font-family:var(--qmr-ai-font)}
+.qmr-panel-companion .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
+.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
 .qmr-prompt-backdrop{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.35);padding:20px}
 .qmr-prompt-dialog{display:flex;flex-direction:column;width:min(620px,100%);max-height:min(820px,calc(100dvh - 40px));min-height:0;border:1px solid var(--qmr-border);border-radius:12px;background:var(--qmr-paper);color:var(--qmr-ink);box-shadow:0 18px 50px rgba(0,0,0,.2);overflow:hidden;font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 .qmr-prompt-dialog header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 16px;flex:none}

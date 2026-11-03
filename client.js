@@ -114088,17 +114088,15 @@ var UI_CSS = `
   background:transparent;cursor:pointer;color:transparent}
 @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
 .qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
+.qmr-font-options :is(input,select):focus,.qmr-font-options button:focus-visible{outline:1px solid var(--qmr-muted);outline-offset:-1px;box-shadow:none}
 .qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
 .qmr-page-zone::after{font-size:26px;color:var(--qmr-muted);opacity:0;transition:opacity .12s}
 .qmr-page-zone-prev::after{content:'\u2039'}.qmr-page-zone-next::after{content:'\u203A'}
-.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
-.qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
-.qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
-.qmr-page-zone::after{opacity:1}
+.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always .qmr-page-zone::after{opacity:1}
 .qmr-page-buttons-hidden .qmr-page-zone{display:none}
 .qmr-reader[data-qmr-eink=true],.qmr-reader[data-qmr-eink=true] .qmr-panel{--qmr-paper:#fff!important;--qmr-ink:#000!important;--qmr-muted:#444!important;--qmr-ui:#fff!important;--qmr-border:#000!important;--qmr-accent:#000!important;color:#000;background:#fff}
 .qmr-reader[data-qmr-eink=true]{color-scheme:light}.qmr-reader[data-qmr-eink=true] :is(.qmr-muted,.qmr-group-title,.qmr-panel-title,.qmr-field-label,.qmr-field-value){color:#444!important}.qmr-reader[data-qmr-eink=true] .qmr-panel :is(input,select,button){color:#000!important;background:#fff!important;border-color:#000!important}
-.qmr-reader[data-qmr-eink=true] *{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
+.qmr-reader[data-qmr-eink=true] *,.qmr-reader[data-qmr-eink=true] *::before,.qmr-reader[data-qmr-eink=true] *::after{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
 .qmr-reader[data-qmr-eink=true] .qmr-hl{background:transparent;text-decoration:underline;text-decoration-thickness:2px}
 .qmr-page-zone:hover{background:transparent}
 .qmr-page-zone:focus-visible{outline:1px solid var(--qmr-accent);outline-offset:-4px}
@@ -114177,11 +114175,10 @@ var UI_CSS = `
 .qmr-native-chat>[data-conversation-content]{flex:1;min-height:0}
 .qmr-native-chat [data-content-phase="hero"] [data-conversation-scroll]{justify-content:flex-end}
 .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){color:var(--qmr-ink)}
-/* \u4F34\u8BFB\u72EC\u7ACB\u5916\u89C2\uFF08\u5BF9\u7167\u539F\u7248 4.5.10/4.5.12\uFF09\uFF1A\u81EA\u5B9A\u4E49\u6A21\u5F0F\u4E0B\u4EC5\u4F1A\u8BDD\u6587\u5B57\u6362\u5B57\u4F53\u4E0E\u5B57\u53F7\uFF0C
-   \u4E3B\u9898\u6574\u5957\u53D8\u91CF\u968F data-qmr-ai-appearance \u6302\u5728\u4F34\u8BFB\u9762\u677F\u4E0A\uFF08inline style \u6CE8\u5165\uFF09\u3002 */
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-companion{font-family:var(--qmr-ai-font)}
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
-.qmr-panel-companion[data-qmr-ai-appearance="custom"] .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
+/* \u4F34\u8BFB\u59CB\u7EC8\u4F7F\u7528\u5DF2\u89E3\u6790\u7684\u5B57\u4F53/\u5B57\u53F7\u53D8\u91CF\uFF1A\u8DDF\u968F\u6B63\u6587\u4E0E\u72EC\u7ACB\u5916\u89C2\u5171\u7528\u540C\u4E00\u6E32\u67D3\u94FE\u8DEF\u3002 */
+.qmr-panel-companion .qmr-companion{font-family:var(--qmr-ai-font)}
+.qmr-panel-companion .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
+.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
 .qmr-prompt-backdrop{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.35);padding:20px}
 .qmr-prompt-dialog{display:flex;flex-direction:column;width:min(620px,100%);max-height:min(820px,calc(100dvh - 40px));min-height:0;border:1px solid var(--qmr-border);border-radius:12px;background:var(--qmr-paper);color:var(--qmr-ink);box-shadow:0 18px 50px rgba(0,0,0,.2);overflow:hidden;font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 .qmr-prompt-dialog header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 16px;flex:none}
@@ -121139,7 +121136,7 @@ function ReaderFontOptions({ ui, bookId, settings, update, scope = "book" }) {
     { className: "qmr-font-options", "data-qmr-font-scope": scope, role: "group", "aria-label": fontLabel + tx("\u8BBE\u7F6E", " settings") },
     h16("label", { className: "qmr-appearance-option" }, h16("span", null, fontLabel), h16(
       "select",
-      { className: "qmr-select", "aria-label": fontLabel, value: settings.fontFamily, onChange: (event) => update({ fontFamily: event.target.value }) },
+      { className: "qmr-select", "aria-label": fontLabel, value: settings.fontFamily, disabled: busy, onChange: (event) => update({ fontFamily: event.target.value }) },
       [["serif", tx("\u886C\u7EBF", "Serif")], ["sans-serif", tx("\u65E0\u886C\u7EBF", "Sans serif")], ["mono", tx("\u7B49\u5BBD", "Monospace")]].map(([value, label]) => h16("option", { key: value, value }, label)),
       Object.values(READER_FONTS).filter((font) => font.id !== "custom").map((font) => h16("option", { key: font.id, value: font.id }, font.labels[english ? "en" : "zh"] + (font.id === "zhuque" ? tx(" \xB7 \u79BB\u7EBF\u5185\u7F6E", " \xB7 bundled") : ""))),
       fonts.map((font) => h16("option", { key: font.id, value: "imported:" + font.id }, font.name + " \xB7 " + font.format.toUpperCase() + tx(" \xB7 \u5DF2\u5BFC\u5165", " \xB7 imported"))),
@@ -121162,8 +121159,8 @@ function ReaderFontOptions({ ui, bookId, settings, update, scope = "book" }) {
           if (alive.current) setFamilies(result.families);
         }) }, busy ? tx("\u5904\u7406\u4E2D\u2026", "Working\u2026") : tx("\u8BFB\u53D6\u5BBF\u4E3B\u7CFB\u7EDF\u5B57\u4F53", "Read Host system fonts")),
         families.length ? h16("p", { role: "status", className: "qmr-muted qmr-small" }, `${families.length} ` + tx("\u4E2A\u5B57\u4F53\u65CF\u5DF2\u52A0\u5165\u4E0A\u65B9\u5217\u8868", "font families added above")) : null,
-        h16("label", { className: "qmr-appearance-option" }, h16("span", null, tx("\u5F53\u524D\u8BBE\u5907\u5B57\u4F53\u540D\u79F0\u6216\u5B57\u4F53\u6808", "Font family or stack installed on this device")), h16("input", { className: "qmr-input", value: family, maxLength: 512, onChange: (event) => setFamily(event.target.value) })),
-        h16("button", { type: "button", className: "qmr-btn", disabled: !readerFontStack(family), onClick: () => update({ fontFamily: "custom:" + family.trim() }) }, tx("\u4F7F\u7528\u8FD9\u4E2A\u5B57\u4F53", "Use this font")),
+        h16("label", { className: "qmr-appearance-option" }, h16("span", null, tx("\u5F53\u524D\u8BBE\u5907\u5B57\u4F53\u540D\u79F0\u6216\u5B57\u4F53\u6808", "Font family or stack installed on this device")), h16("input", { className: "qmr-input", value: family, disabled: busy, maxLength: 512, onChange: (event) => setFamily(event.target.value) })),
+        h16("button", { type: "button", className: "qmr-btn", disabled: busy || !readerFontStack(family), onClick: () => update({ fontFamily: "custom:" + family.trim() }) }, tx("\u4F7F\u7528\u8FD9\u4E2A\u5B57\u4F53", "Use this font")),
         h16("input", { ref: fileRef, type: "file", hidden: true, accept: FONT_FILE_ACCEPT, onChange: (event) => {
           const file = event.target.files?.[0];
           event.target.value = "";
