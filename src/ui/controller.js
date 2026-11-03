@@ -23,6 +23,7 @@ import { UI_SETTING_DEFAULTS, READER_THEMES } from './theme.js';
 import { chapterIndexForHref, copyText, formatPercent, localId, normalizePercent, toMarkdown } from './format.js';
 import { readCompanionAppearance, saveCompanionAppearance } from './companion-appearance.js';
 import { vocabularyEntry, upsertVocabulary } from '../core/vocabulary.js';
+import { normalizeAppearance } from '../core/appearance.js';
 import { percentLocation } from '../core/location.js';
 
 const SAVE_DEBOUNCE_MS = 500;
@@ -327,7 +328,7 @@ export function createController(getProps, store) {
     const base = { ...UI_SETTING_DEFAULTS, ...(DEFAULT_READER_SETTINGS || {}) };
     const own = (state && state.settings) || {};
     const merged = { ...base, ...own };
-    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 14, 28);
+    merged.fontSize = clampInt(merged.fontSize || base.fontSize, 12, 32);
     merged.lineHeight = Math.min(2.2, Math.max(1.4, Number(merged.lineHeight) || base.lineHeight));
     merged.margin = clampInt(merged.margin || base.margin, 32, 120);
     if (!READER_THEMES[merged.theme]) merged.theme = base.theme;
@@ -335,14 +336,14 @@ export function createController(getProps, store) {
     if (merged.flow !== 'scroll') merged.flow = 'paginated';
     merged.justify = merged.justify !== false;
     merged.spread = merged.spread === true;
-    return merged;
+    return normalizeAppearance(merged);
   }
 
   /** 更新阅读设置（未加载时先加载再写） */
   function updateSettings(id, patch) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
-      const preservePosition = id === uiStore.get().bookId && ['fontSize','fontFamily','lineHeight','margin','flow','spread','justify','pdfZoom'].some(key => Object.hasOwn(patch || {}, key));
+      const preservePosition = id === uiStore.get().bookId && ['fontSize','fontFamily','lineHeight','margin','flow','spread','justify','pdfZoom','textAlign','maxLineCh','vAlign'].some(key => Object.hasOwn(patch || {}, key));
       const anchor = preservePosition ? (pager.capture?.() || state.locator) : null;
       const merged = { ...(state.settings || {}), ...(patch || {}) };
       patchState(id, { settings: merged });

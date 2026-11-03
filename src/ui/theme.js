@@ -7,6 +7,7 @@
  * - 样式通过 <StyleSheet /> React 元素注入，随组件卸载自动移除，不写 document.head。
  */
 import * as React from 'react';
+import { READER_THEMES as ORIGINAL_THEMES } from '../core/reader-themes.js';
 
 const h = React.createElement;
 
@@ -25,7 +26,7 @@ export const HIGHLIGHT_COLOR_LABELS = Object.freeze({
  * 6 套阅读主题（含纯白）。每个主题定义页底色、正文色、次要色、选中高亮色、边线、强调色，
  * 以及 4 种划线的纸面覆盖色（paints）。
  */
-export const READER_THEMES = Object.freeze({
+const LEGACY_READER_THEMES = {
   white: {
     id: 'white',
     label: '纯白',
@@ -134,10 +135,17 @@ export const READER_THEMES = Object.freeze({
       pink: 'rgba(198,92,132,.32)',
     },
   },
+};
+
+export const READER_THEMES = Object.freeze({
+  ...Object.fromEntries(Object.entries(ORIGINAL_THEMES).map(([id,theme])=>[id,{...LEGACY_READER_THEMES[theme.dark?'night':'paper'],...theme,id,selection:theme.dark?'rgba(160,180,200,.3)':'rgba(100,120,140,.22)',hover:theme.dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.035)'}])),
+  ...LEGACY_READER_THEMES,
 });
+const THEME_LABELS={auto:['跟随宿主','Follow Host'],white:['纯白','White'],bright:['明亮','Bright'],paper:['纸白','Paper'],rice:['米纸','Rice paper'],warm:['暖纸','Warm paper'],celadon:['青瓷','Celadon'],bamboo:['竹青','Bamboo'],moon:['月白','Moon'],mist:['雾蓝','Mist'],night:['夜间','Night'],deepsea:['深海','Deep sea'],black:['墨黑','Ink black']};
+export function readerThemeLabel(id,english=false){return THEME_LABELS[id]?.[english?1:0]||id;}
 
 /** 主题 id 列表（设置面板展示顺序） */
-export const READER_THEME_IDS = Object.freeze(['white', 'paper', 'warm', 'celadon', 'moon', 'night']);
+export const READER_THEME_IDS = Object.freeze(['auto','white','bright','paper','rice','warm','celadon','bamboo','moon','mist','night','deepsea','black']);
 
 /** 字体族候选 */
 export const READER_FONT_STACKS = Object.freeze({
@@ -416,6 +424,18 @@ export const UI_CSS = `
 .qmr-paper-body sup,.qmr-paper-body sub{line-height:0}
 .qmr-page-zone{position:absolute;top:52px;bottom:44px;width:28px;padding:0;border:0;z-index:2;
   background:transparent;cursor:pointer;color:transparent}
+@container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
+.qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
+.qmr-page-zone::after{font-size:26px;color:var(--qmr-muted);opacity:0;transition:opacity .12s}
+.qmr-page-zone-prev::after{content:'‹'}.qmr-page-zone-next::after{content:'›'}
+.qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
+.qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
+.qmr-page-zone::after{opacity:1}
+.qmr-page-buttons-hidden .qmr-page-zone{display:none}
+.qmr-reader[data-qmr-eink=true],.qmr-reader[data-qmr-eink=true] .qmr-panel{--qmr-paper:#fff!important;--qmr-ink:#000!important;--qmr-muted:#444!important;--qmr-ui:#fff!important;--qmr-border:#000!important;--qmr-accent:#000!important;color:#000;background:#fff}
+.qmr-reader[data-qmr-eink=true]{color-scheme:light}.qmr-reader[data-qmr-eink=true] :is(.qmr-muted,.qmr-group-title,.qmr-panel-title,.qmr-field-label,.qmr-field-value){color:#444!important}.qmr-reader[data-qmr-eink=true] .qmr-panel :is(input,select,button){color:#000!important;background:#fff!important;border-color:#000!important}
+.qmr-reader[data-qmr-eink=true] *{animation:none!important;transition:none!important;box-shadow:none!important;scroll-behavior:auto!important}
+.qmr-reader[data-qmr-eink=true] .qmr-hl{background:transparent;text-decoration:underline;text-decoration-thickness:2px}
 .qmr-page-zone:hover{background:transparent}
 .qmr-page-zone:focus-visible{outline:1px solid var(--qmr-accent);outline-offset:-4px}
 .qmr-page-zone-prev{left:0}
@@ -450,12 +470,12 @@ export const UI_CSS = `
 .qmr-panel{display:flex;flex-direction:column;flex:0 0 340px;width:340px;min-height:0;
   border-left:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1)}
 .qmr-panel:not(.qmr-panel-companion){--qmr-paper:var(--dsw-alias-bg-layer-1,#fff);--qmr-ink:var(--dsw-alias-label-primary,#252629);--qmr-muted:var(--dsw-alias-label-secondary,#686b70);--qmr-ui:var(--dsw-alias-bg-layer-2,#f4f4f4);--qmr-border:var(--dsw-alias-border-l1,#ddd);color:var(--qmr-ink)}
-.qmr-panel-overlay{position:absolute;inset:0;z-index:6;width:auto;flex:1 1 auto;border-left:0;
+.qmr-panel.qmr-panel-overlay{position:absolute;inset:0;z-index:6;width:auto;max-width:100%;min-width:0;flex:1 1 auto;border-left:0;
   background:var(--dsw-alias-bg-overlay,var(--dsw-alias-bg-base))}
 .qmr-panel-head{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:8px 10px;
   border-bottom:1px solid var(--dsw-alias-border-l1);flex-wrap:wrap}
 .qmr-panel-title{flex:1 1 auto;font-size:14px;font-weight:600;min-width:80px}
-.qmr-panel-body{flex:1 1 auto;min-height:0;overflow:auto;padding:10px}
+.qmr-panel-body{container-type:inline-size;flex:1 1 auto;min-height:0;overflow:auto;padding:10px}
 .qmr-panel.qmr-panel-companion{flex:0 0 var(--qmr-companion-width,44%);width:var(--qmr-companion-width,44%);min-width:0;padding:0;border-left:0;background:var(--qmr-paper);color:var(--qmr-ink)}
 .qmr-companion-divider{position:relative;z-index:4;flex:0 0 1px;cursor:col-resize;touch-action:none;background:var(--qmr-border)}
 .qmr-companion-divider::before{content:'';position:absolute;inset:0 -6px;cursor:inherit}
