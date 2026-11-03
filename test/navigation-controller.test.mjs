@@ -40,3 +40,9 @@ test('layout settings capture an anchor before reflow and reject bookmarks durin
   h.store.set({chapterBusy:true});await assert.rejects(h.ui.saveBookmark({label:'Too early'}),/加载完成/);
   await h.ui.flushState('b');
 });
+
+test('position reports clear one-time fragment targets before creating bookmarks',async()=>{
+ const h=harness();h.ui.goHref('b#note');assert.equal(h.store.get().restoreAnchor.fragment,'note');
+ h.ui.reportPosition('b',{chapterIndex:1,scroll:0.3,textOffset:500,textQuote:'Remember this'});
+ assert.equal(h.store.get().states.b.locator.fragment,'');await h.ui.flushState('b');
+});

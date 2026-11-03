@@ -690,6 +690,7 @@ export function createController(getProps, store) {
       const locator = {
         ...(state.locator || {}),
         chapterIndex: clampInt(position.chapterIndex, 0, 100000),
+        fragment: '',
         scroll: Math.min(1, Math.max(0, Number(position.scroll) || 0)),
       };
       if (position.chapterHref) locator.chapterHref = String(position.chapterHref);

@@ -114598,6 +114598,7 @@ function createController(getProps, store) {
       const locator = {
         ...state.locator || {},
         chapterIndex: clampInt(position.chapterIndex, 0, 1e5),
+        fragment: "",
         scroll: Math.min(1, Math.max(0, Number(position.scroll) || 0))
       };
       if (position.chapterHref) locator.chapterHref = String(position.chapterHref);
@@ -121523,9 +121524,9 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       }
     }
     if (!target) return;
-    anchorAppliedRef.current = key;
     const frame = requestAnimationFrame(() => {
       if (!flow.isConnected) return;
+      anchorAppliedRef.current = key;
       if (settings.flow === "scroll") {
         const viewport = viewportRef.current, rect = target.getBoundingClientRect();
         if (viewport) viewport.scrollTop += rect.top - viewport.getBoundingClientRect().top - 8;
@@ -121729,7 +121730,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, ui, reportPosition]);
+  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
   React20.useEffect(() => {
     const isScroll = () => {
       const live = liveRef.current;

@@ -517,8 +517,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       if(restoreAnchor.textQuote){const matches=findRanges(index.text,restoreAnchor.textQuote,1000);matches.sort((a,b)=>Math.abs(a.start-at)-Math.abs(b.start-at));if(matches[0])at=matches[0].start;}
       const point=index.map[at];if(point){const range=document.createRange();range.setStart(point.node,point.offset);range.setEnd(point.node,Math.min(point.node.length,point.offset+1));target=range;}
     }
-    if(!target)return;anchorAppliedRef.current=key;
-    const frame=requestAnimationFrame(()=>{if(!flow.isConnected)return;if(settings.flow==='scroll'){const viewport=viewportRef.current,rect=target.getBoundingClientRect();if(viewport)viewport.scrollTop+=rect.top-viewport.getBoundingClientRect().top-8;}else revealNode(target);});
+    if(!target)return;
+    const frame=requestAnimationFrame(()=>{if(!flow.isConnected)return;anchorAppliedRef.current=key;if(settings.flow==='scroll'){const viewport=viewportRef.current,rect=target.getBoundingClientRect();if(viewport)viewport.scrollTop+=rect.top-viewport.getBoundingClientRect().top-8;}else revealNode(target);});
     return()=>cancelAnimationFrame(frame);
   },[html,chapterBusy,restoreAnchor,jumpToken,bookId,chapterIndex,settings.flow,engine,revealNode]);
 
@@ -714,7 +714,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, ui, reportPosition]);
+  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
 
   // ------------------------------------------------------------- pager 注册
 
