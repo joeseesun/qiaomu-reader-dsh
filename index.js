@@ -24091,34 +24091,39 @@ function createReaderFontService({ directory, bundledBase64, systemFonts = syste
     const format = fontFileFormat(bytes);
     if (!format || !/\.(ttf|otf|woff|woff2)$/i.test(String(input.filename || ""))) throw Error("\u8BF7\u9009\u62E9TTF\u3001OTF\u3001WOFF\u6216WOFF2\u5B57\u4F53\u6587\u4EF6");
     const id = hash(bytes), fonts = entries2(), existing = fonts.find((font) => font.id === id);
-    if (existing) {
-      await read(existing);
-      return { font: existing, fonts };
-    }
-    if (fonts.length >= 200) throw Error("\u5B57\u4F53\u6570\u91CF\u5DF2\u8FBE200\u4EFD");
+    if (!existing && fonts.length >= 200) throw Error("\u5B57\u4F53\u6570\u91CF\u5DF2\u8FBE200\u4EFD");
     await prepare();
-    const entry = { id, format, name: String(input.filename).replace(/\.[^.]+$/, "").replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, 120) || "Font", bytes: bytes.length };
-    const filename = path2.join(directory, id + "." + format), temp = path2.join(directory, "." + randomUUID2() + ".tmp");
+    const entry = existing || { id, format, name: String(input.filename).replace(/\.[^.]+$/, "").replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, 120) || "Font", bytes: bytes.length };
+    const filename = path2.join(directory, id + "." + entry.format), temp = path2.join(directory, "." + randomUUID2() + ".tmp");
+    let repaired = false;
     try {
       const info = await lstat(filename).catch((error) => {
         if (error.code !== "ENOENT") throw error;
         return null;
       });
-      if (info) {
-        if (info.isSymbolicLink()) throw Error("\u5B57\u4F53\u6587\u4EF6\u4E0D\u80FD\u662F\u7B26\u53F7\u94FE\u63A5");
-        const check = await read(entry);
-        if (hash(check) !== id) throw Error("\u5B57\u4F53\u6821\u9A8C\u5931\u8D25");
-      } else {
+      if (info && (info.isSymbolicLink() || !info.isFile())) throw Error("\u5B57\u4F53\u6587\u4EF6\u4E0D\u80FD\u662F\u7B26\u53F7\u94FE\u63A5\u6216\u76EE\u5F55");
+      let intact = false;
+      if (info) try {
+        await read(entry);
+        intact = true;
+      } catch {
+      }
+      if (!intact) {
         const fd = await open(temp, "wx", 384);
         try {
           await fd.writeFile(bytes);
+          await fd.sync();
         } finally {
           await fd.close();
         }
+        if (info) await rename(filename, filename + ".corrupt-" + randomUUID2());
         await rename(temp, filename);
+        await read(entry);
+        repaired = !!existing;
       }
-      files.write("index", { fonts: [...fonts, entry] });
-      return { font: entry, fonts: [...fonts, entry] };
+      const next = existing ? fonts : [...fonts, entry];
+      if (!existing) files.write("index", { fonts: next });
+      return { font: entry, fonts: next, repaired };
     } finally {
       await unlink(temp).catch((error) => {
         if (error.code !== "ENOENT") throw error;

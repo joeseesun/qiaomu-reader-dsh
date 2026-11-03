@@ -1,7 +1,7 @@
 import {createBookState,normalizeState} from '../src/core/state.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,readFile,writeFile,rm,symlink,unlink} from 'node:fs/promises';
+import {mkdtemp,readFile,writeFile,rm,symlink,unlink,readdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {webcrypto,createHash} from 'node:crypto';
@@ -64,3 +64,9 @@ test('late font loads cannot register after plugin disposal and oversized files 
 test('custom font stacks preserve quoted families and reject malformed CSS',()=>{assert.equal(readerFontStack('\"Georgia\", serif'),'\"Georgia\", serif');assert.equal(readerFontStack("'Songti SC', Georgia, serif"),'\"Songti SC\", \"Georgia\", serif');for(const value of ['a; color:red','\"unclosed',',serif',''])assert.equal(readerFontStack(value),'');assert.equal(isReaderFontKey('custom:Georgia, serif'),true);});
 
 test('new books use bundled Zhuque while existing font preferences are preserved',()=>{assert.equal(createBookState('new').settings.fontFamily,'zhuque');assert.equal(normalizeState({bookId:'old',settings:{fontFamily:'serif'}},'old').settings.fontFamily,'serif');});
+
+test('reimport repairs damaged assets, preserving the corrupt bytes and saved font key',async()=>{
+ const f=await fixture();try{const input={kind:'import',filename:'x.woff2',base64};const original=await f.service.action(input);const dir=path.join(f.root,'fonts'),file=path.join(dir,original.font.id+'.woff2');
+ await writeFile(file,'damaged font evidence');const restored=await f.service.action(input);assert.equal(restored.repaired,true);assert.equal(restored.font.id,original.font.id);assert.equal(restored.fonts.length,1);assert.equal((await f.service.action({kind:'read',id:original.font.id})).base64,base64);const archive=(await readdir(dir)).find(name=>name.includes('.corrupt-'));assert.equal(await readFile(path.join(dir,archive),'utf8'),'damaged font evidence');
+ }finally{await f.cleanup();}
+});

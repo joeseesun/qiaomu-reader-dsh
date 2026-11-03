@@ -10,15 +10,15 @@ export function ReaderFontOptions({ui,bookId,settings,update,scope='book'}){
  const fontLabel=scope==='companion'?tx('伴读字体','Companion font'):tx('字体','Font');
  React.useEffect(()=>{let active=true;alive.current=true;host?.fontAction({kind:'list'}).then(result=>{if(active)setFonts(result.fonts||[]);},cause=>{if(active)setError(cause.message);});return()=>{active=false;alive.current=false;};},[host,bookId]);
  const run=async fn=>{if(busy)return;setBusy(true);setError('');try{await fn();}catch(cause){if(alive.current)setError(cause.message);}finally{if(alive.current)setBusy(false);}};
- const importFile=async file=>{if(!file)return;await run(async()=>{if(!host?.fontAction)throw Error(tx('字体服务尚未就绪','The font service is not ready'));if(file.size>MAX_FONT_BYTES)throw Error(tx('字体不能超过64MB','Fonts must be within 64MB'));const bytes=await validateFontFile(file),result=await host.fontAction({kind:'import',filename:file.name,base64:fontBase64(bytes)});if(!alive.current)return;setFonts(result.fonts);if(ui.store.get().bookId===bookId&&(scope!=='companion'||ui.store.get().companionAppearance))update({fontFamily:'imported:'+result.font.id});});};
+ const importFile=async file=>{if(!file)return;await run(async()=>{if(!host?.fontAction)throw Error(tx('字体服务尚未就绪','The font service is not ready'));if(file.size>MAX_FONT_BYTES)throw Error(tx('字体不能超过64MB','Fonts must be within 64MB'));const bytes=await validateFontFile(file),result=await host.fontAction({kind:'import',filename:file.name,base64:fontBase64(bytes)});if(!alive.current)return;setFonts(result.fonts);if(ui.store.get().bookId===bookId&&(scope!=='companion'||ui.store.get().companionAppearance)){update({fontFamily:'imported:'+result.font.id});ui.store.set({fontRetry:(ui.store.get().fontRetry||0)+1});}});};
  const known=new Set(['serif','sans-serif','mono',...Object.keys(READER_FONTS),...fonts.map(font=>'imported:'+font.id),...families.map(name=>'system:'+name)]);
- return h('div',{className:'qmr-font-options','data-qmr-font-scope':scope},
+ return h('div',{className:'qmr-font-options','data-qmr-font-scope':scope,role:'group','aria-label':fontLabel+tx('设置',' settings')},
   h('label',{className:'qmr-appearance-option'},h('span',null,fontLabel),h('select',{className:'qmr-select','aria-label':fontLabel,value:settings.fontFamily,onChange:event=>update({fontFamily:event.target.value})},
    [['serif',tx('衬线','Serif')],['sans-serif',tx('无衬线','Sans serif')],['mono',tx('等宽','Monospace')]].map(([value,label])=>h('option',{key:value,value},label)),
    Object.values(READER_FONTS).filter(font=>font.id!=='custom').map(font=>h('option',{key:font.id,value:font.id},font.labels[english?'en':'zh']+(font.id==='zhuque'?tx(' · 离线内置',' · bundled'):''))),
    fonts.map(font=>h('option',{key:font.id,value:'imported:'+font.id},font.name+' · '+font.format.toUpperCase()+tx(' · 已导入',' · imported'))),
    families.map(name=>h('option',{key:name,value:'system:'+name},name)),
-   !known.has(settings.fontFamily)?h('option',{value:settings.fontFamily},settings.fontFamily.replace(/^(system|custom):/,'')):null)),
+   !known.has(settings.fontFamily)?h('option',{value:settings.fontFamily},settings.fontFamily.startsWith('imported:')?tx('已保存的导入字体','Saved imported font'):settings.fontFamily.replace(/^(system|custom):/,'')):null)),
   status?.loading?h('p',{role:'status',className:'qmr-muted qmr-small'},tx('正在加载字体…','Loading font…')):null,
   status?.error?h('p',{role:'alert'},status.error,h('button',{type:'button',className:'qmr-btn qmr-btn-sm',onClick:()=>ui.store.set({fontRetry:(ui.store.get().fontRetry||0)+1})},tx('重试','Retry'))):null,
   h('details',null,h('summary',null,tx('自定义与导入字体','Custom and imported fonts')),

@@ -121125,13 +121125,16 @@ function ReaderFontOptions({ ui, bookId, settings, update, scope = "book" }) {
       const bytes = await validateFontFile(file), result = await host.fontAction({ kind: "import", filename: file.name, base64: fontBase64(bytes) });
       if (!alive.current) return;
       setFonts(result.fonts);
-      if (ui.store.get().bookId === bookId && (scope !== "companion" || ui.store.get().companionAppearance)) update({ fontFamily: "imported:" + result.font.id });
+      if (ui.store.get().bookId === bookId && (scope !== "companion" || ui.store.get().companionAppearance)) {
+        update({ fontFamily: "imported:" + result.font.id });
+        ui.store.set({ fontRetry: (ui.store.get().fontRetry || 0) + 1 });
+      }
     });
   };
   const known = /* @__PURE__ */ new Set(["serif", "sans-serif", "mono", ...Object.keys(READER_FONTS), ...fonts.map((font) => "imported:" + font.id), ...families.map((name) => "system:" + name)]);
   return h16(
     "div",
-    { className: "qmr-font-options", "data-qmr-font-scope": scope },
+    { className: "qmr-font-options", "data-qmr-font-scope": scope, role: "group", "aria-label": fontLabel + tx("\u8BBE\u7F6E", " settings") },
     h16("label", { className: "qmr-appearance-option" }, h16("span", null, fontLabel), h16(
       "select",
       { className: "qmr-select", "aria-label": fontLabel, value: settings.fontFamily, onChange: (event) => update({ fontFamily: event.target.value }) },
@@ -121139,7 +121142,7 @@ function ReaderFontOptions({ ui, bookId, settings, update, scope = "book" }) {
       Object.values(READER_FONTS).filter((font) => font.id !== "custom").map((font) => h16("option", { key: font.id, value: font.id }, font.labels[english ? "en" : "zh"] + (font.id === "zhuque" ? tx(" \xB7 \u79BB\u7EBF\u5185\u7F6E", " \xB7 bundled") : ""))),
       fonts.map((font) => h16("option", { key: font.id, value: "imported:" + font.id }, font.name + " \xB7 " + font.format.toUpperCase() + tx(" \xB7 \u5DF2\u5BFC\u5165", " \xB7 imported"))),
       families.map((name) => h16("option", { key: name, value: "system:" + name }, name)),
-      !known.has(settings.fontFamily) ? h16("option", { value: settings.fontFamily }, settings.fontFamily.replace(/^(system|custom):/, "")) : null
+      !known.has(settings.fontFamily) ? h16("option", { value: settings.fontFamily }, settings.fontFamily.startsWith("imported:") ? tx("\u5DF2\u4FDD\u5B58\u7684\u5BFC\u5165\u5B57\u4F53", "Saved imported font") : settings.fontFamily.replace(/^(system|custom):/, "")) : null
     )),
     status?.loading ? h16("p", { role: "status", className: "qmr-muted qmr-small" }, tx("\u6B63\u5728\u52A0\u8F7D\u5B57\u4F53\u2026", "Loading font\u2026")) : null,
     status?.error ? h16("p", { role: "alert" }, status.error, h16("button", { type: "button", className: "qmr-btn qmr-btn-sm", onClick: () => ui.store.set({ fontRetry: (ui.store.get().fontRetry || 0) + 1 }) }, tx("\u91CD\u8BD5", "Retry"))) : null,

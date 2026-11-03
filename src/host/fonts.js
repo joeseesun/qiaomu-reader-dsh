@@ -42,14 +42,24 @@ export function createReaderFontService({directory,bundledBase64,systemFonts=sys
   const encoded=input.base64;if(typeof encoded!=='string'||encoded.length>Math.ceil(MAX_FONT_BYTES/3)*4||!encoded.length||!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded))throw Error('请选择64MB以内的字体文件');
   const bytes=Buffer.from(encoded,'base64');if(!bytes.length||bytes.length>MAX_FONT_BYTES||bytes.toString('base64')!==encoded)throw Error('字体数据无效');
   const format=fontFileFormat(bytes);if(!format||!/\.(ttf|otf|woff|woff2)$/i.test(String(input.filename||'')))throw Error('请选择TTF、OTF、WOFF或WOFF2字体文件');
-  const id=hash(bytes),fonts=entries(),existing=fonts.find(font=>font.id===id);if(existing){await read(existing);return {font:existing,fonts};}
-  if(fonts.length>=200)throw Error('字体数量已达200份');
-  await prepare();const entry={id,format,name:String(input.filename).replace(/\.[^.]+$/,'').replace(/[\x00-\x1f\x7f]/g,'').trim().slice(0,120)||'Font',bytes:bytes.length};
-  const filename=path.join(directory,id+'.'+format),temp=path.join(directory,'.'+randomUUID()+'.tmp');
-  try{const info=await lstat(filename).catch(error=>{if(error.code!=='ENOENT')throw error;return null;});if(info){if(info.isSymbolicLink())throw Error('字体文件不能是符号链接');const check=await read(entry);if(hash(check)!==id)throw Error('字体校验失败');}
-   else {const fd=await open(temp,'wx',0o600);try{await fd.writeFile(bytes);}finally{await fd.close();}await rename(temp,filename);}
-   files.write('index',{fonts:[...fonts,entry]});return {font:entry,fonts:[...fonts,entry]};
+  const id=hash(bytes),fonts=entries(),existing=fonts.find(font=>font.id===id);
+  if(!existing&&fonts.length>=200)throw Error('字体数量已达200份');
+  await prepare();const entry=existing||{id,format,name:String(input.filename).replace(/\.[^.]+$/,'').replace(/[\x00-\x1f\x7f]/g,'').trim().slice(0,120)||'Font',bytes:bytes.length};
+  const filename=path.join(directory,id+'.'+entry.format),temp=path.join(directory,'.'+randomUUID()+'.tmp');
+  let repaired=false;
+  try{
+   const info=await lstat(filename).catch(error=>{if(error.code!=='ENOENT')throw error;return null;});
+   if(info&&(info.isSymbolicLink()||!info.isFile()))throw Error('字体文件不能是符号链接或目录');
+   let intact=false;if(info)try{await read(entry);intact=true;}catch{ /* The selected file restores missing or damaged assets. */ }
+   if(!intact){
+    const fd=await open(temp,'wx',0o600);try{await fd.writeFile(bytes);await fd.sync();}finally{await fd.close();}
+    if(info)await rename(filename,filename+'.corrupt-'+randomUUID());
+    await rename(temp,filename);await read(entry);repaired=!!existing;
+   }
+   const next=existing?fonts:[...fonts,entry];if(!existing)files.write('index',{fonts:next});
+   return {font:entry,fonts:next,repaired};
   }finally{await unlink(temp).catch(error=>{if(error.code!=='ENOENT')throw error;});}
+
  };
  return {action(input){if(input?.kind!=='import')return action(input);const next=queue.then(()=>action(input));queue=next.catch(()=>{});return next;}};
 }
