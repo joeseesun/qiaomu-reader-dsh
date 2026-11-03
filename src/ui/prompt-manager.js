@@ -1,57 +1,51 @@
 import * as React from 'react';
-import { IconClose, IconTrash } from './icons.js';
+import { IconClose, IconTrash, IconPlus } from './icons.js';
 import { readQuickPrompts, saveQuickPrompts, resetQuickPrompts, defaultQuickPrompts } from './quick-prompts.js';
-
+import { useDialogFocus } from './dialog-focus.js';
 const h = React.createElement;
-
+/** Original Reader's one-draft editor: no edits reach the quick bar until Save succeeds. */
 export function PromptManager({ ui, onClose }) {
   const t = (key, fallback) => ui.t(`prompts.${key}`, fallback);
   const language = t('language', 'zh');
   const [items, setItems] = React.useState(() => readQuickPrompts(language));
   const [error, setError] = React.useState('');
-  const dialog = React.useRef(null);
-  React.useEffect(() => {
-    const previous = document.activeElement;
-    dialog.current?.querySelector('button')?.focus();
-    return () => { if (previous?.isConnected) previous.focus(); };
-  }, []);
-  const keyDown = event => {
-    if (event.key === 'Escape') { event.stopPropagation(); onClose(); }
-    if (event.key === 'Tab') {
-      const nodes = [...dialog.current.querySelectorAll('button:not(:disabled), input, textarea')];
-      const first = nodes[0], last = nodes[nodes.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-    }
+  const [restored, setRestored] = React.useState(false);
+  const dirty = React.useRef(false), dialog = React.useRef(null), pendingFocus = React.useRef(null);
+  const keyDown = useDialogFocus(dialog, onClose);
+  React.useEffect(() => { if (!dirty.current) setItems(readQuickPrompts(language)); }, [language]);
+  React.useLayoutEffect(() => {
+    if (!pendingFocus.current) return;
+    dialog.current?.querySelector(`[data-prompt-id="${pendingFocus.current}"] input`)?.focus();
+    pendingFocus.current = null;
+  }, [items.length]);
+  const change = (id, field, value) => { dirty.current = true; setRestored(false); setItems(previous => previous.map(item => item.id === id ? { ...item, [field]: value } : item)); };
+  const add = () => {
+    if (items.length >= 20) return;
+    const id = crypto.randomUUID(); pendingFocus.current = id; dirty.current = true; setRestored(false);
+    setItems(previous => [...previous, { id, title: '', body: '' }]);
   };
-  const persist = next => {
-    try { saveQuickPrompts(next); setItems(next); setError(''); return true; }
-    catch { setError(t('failed', '保存失败，修改已保留，请重试')); return false; }
-  };
-  React.useEffect(() => { setItems(readQuickPrompts(language)); }, [language]);
-  const [editing, setEditing] = React.useState(null);
-  const save = (event) => {
+  const save = event => {
     event.preventDefault();
-    const title = editing.title.trim();
-    const body = editing.body.trim();
-    if (!title || !body) return;
-    const next = editing.id ? items.map((item) => item.id === editing.id ? { id: item.id, title, body } : item)
-      : [...items, { id: crypto.randomUUID(), title, body }];
-    if (persist(next)) setEditing(null);
+    if (items.some(item => !item.title.trim() || !item.body.trim())) { setError(t('required', '请填写每条提示词的名称和正文')); return; }
+    try {
+      if (restored) resetQuickPrompts();
+      else saveQuickPrompts(items.map(item => ({ ...item, title: item.title.trim(), body: item.body.trim() })));
+      onClose();
+    } catch { setError(t('failed', '保存失败，修改已保留，请重试')); }
   };
-  return h('div', { className: 'qmr-prompt-backdrop', onClick: onClose },
-    h('section', { className: 'qmr-prompt-dialog', ref: dialog, role: 'dialog', 'aria-modal': 'true', 'aria-label': t('manage', '管理快捷提示词'), onClick: (event) => event.stopPropagation(), onKeyDown: keyDown },
-      h('header', null, h('strong', null, t('title', '快捷提示词')), h('button', { type: 'button', className: 'qmr-icon-btn', 'aria-label': t('close', '关闭'), onClick: onClose }, h(IconClose, { width: 16, height: 16 }))),
-      h('p', null, t('hint', '显示在伴读输入框上方。点击后直接发送；已有手写草稿时会保留草稿。')),
-      error ? h('p', { role: 'alert' }, error) : null,
-      h('button', { type: 'button', className: 'qmr-btn', onClick: () => { try { resetQuickPrompts(); setItems(defaultQuickPrompts(language)); setEditing(null); setError(''); } catch { setError(t('failed', '保存失败，修改已保留，请重试')); } } }, t('reset', '恢复内置')),
-      h('div', { className: 'qmr-prompt-list' }, items.map((item) => h('div', { className: 'qmr-prompt-row', key: item.id },
-        h('div', null, h('strong', null, item.title), h('span', null, item.body)),
-        h('button', { type: 'button', 'aria-label': `${t('edit', '编辑')} ${item.title}`, onClick: () => setEditing(item) }, t('edit', '编辑')),
-        h('button', { type: 'button', 'aria-label': `${t('delete', '删除')} ${item.title}`, onClick: () => { const next = items.filter((prompt) => prompt.id !== item.id); persist(next); } }, h(IconTrash, { width: 15, height: 15 }))))),
-      editing ? h('form', { className: 'qmr-prompt-editor', onSubmit: save },
-        h('label', null, t('name', '名称'), h('input', { autoFocus: true, maxLength: 60, value: editing.title, onChange: (event) => setEditing({ ...editing, title: event.target.value }) })),
-        h('label', null, t('body', '提示词'), h('textarea', { rows: 5, maxLength: 5000, value: editing.body, onChange: (event) => setEditing({ ...editing, body: event.target.value }) })),
-        h('div', null, h('button', { type: 'button', onClick: () => setEditing(null) }, t('cancel', '取消')), h('button', { type: 'submit', disabled: !editing.title.trim() || !editing.body.trim() }, t('save', '保存')))) :
-        h('button', { type: 'button', className: 'qmr-prompt-new', disabled: items.length >= 20, onClick: () => setEditing({ title: '', body: '' }) }, t('add', '+ 新增提示词'))));
+  return h('div', { className: 'qmr-prompt-backdrop', onClick: event => { if (event.target === event.currentTarget) onClose(); } },
+    h('section', { className: 'qmr-prompt-dialog', ref: dialog, role: 'dialog', 'aria-modal': 'true', 'aria-label': t('manage', '管理快捷提示词'), onKeyDown: keyDown },
+      h('header', null, h('div', null, h('h2', null, t('manage', '管理快捷提示词')), h('p', null, t('editorHint', '名称显示在按钮上，完整提示词发送给 AI。'))), h('button', { type: 'button', className: 'qmr-icon-btn', 'aria-label': t('close', '关闭'), onClick: onClose }, h(IconClose, { width: 18, height: 18 }))),
+      h('form', { className: 'qmr-prompt-editor', onSubmit: save },
+        h('div', { className: 'qmr-prompt-list' },
+          !items.length ? h('div', { className: 'qmr-prompt-empty' }, h('p', null, t('empty', '还没有快捷提示词。添加一条，或恢复内置提示词。'))) : null,
+          items.map((item, index) => h('div', { className: 'qmr-prompt-item', key: item.id, 'data-prompt-id': item.id },
+            h('label', null, h('span', null, t('name', '名称')), h('input', { 'data-autofocus': index === 0 ? true : undefined, maxLength: 60, value: item.title, onChange: event => change(item.id, 'title', event.target.value) })),
+            h('label', null, h('span', null, t('body', '提示词')), h('textarea', { rows: 3, maxLength: 5000, value: item.body, onChange: event => change(item.id, 'body', event.target.value) })),
+            h('button', { type: 'button', className: 'qmr-prompt-delete', 'aria-label': `${t('delete', '删除')} ${item.title || index + 1}`, onClick: () => { dirty.current = true; setRestored(false); setItems(previous => previous.filter(prompt => prompt.id !== item.id)); } }, h(IconTrash, { width: 14, height: 14 }), t('delete', '删除'))))),
+        error ? h('div', { className: 'qmr-prompt-error', role: 'alert' }, error) : null,
+        h('footer', { className: 'qmr-prompt-actions' },
+          h('button', { type: 'button', disabled: items.length >= 20, onClick: add }, h(IconPlus, { width: 14, height: 14 }), t('add', '新增提示词')),
+          h('button', { type: 'button', onClick: () => { dirty.current = true; setItems(defaultQuickPrompts(language)); setRestored(true); setError(''); } }, t('reset', '恢复内置')),
+          h('div', { className: 'qmr-prompt-submit' }, h('button', { type: 'button', onClick: onClose }, t('cancel', '取消')), h('button', { type: 'submit', className: 'is-primary' }, t('save', '保存')))))));
 }

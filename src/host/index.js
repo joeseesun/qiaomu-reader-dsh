@@ -541,7 +541,26 @@ export function apply(ctx, config = {}) {
       return { state: saved };
     },
 
-    /** 读取书籍字节（base64）：客户端在浏览器内存里解析。 */
+    /** Recover embedded covers lazily for pre-cover imports, only for visible books. */
+    async bookCover({ bookId }) {
+      const paths = pathsOf();
+      return serializeLibrary(paths.base, async () => {
+        const library = await readLibrary(paths);
+        const index = library.books.findIndex(book => book.id === bookId);
+        if (index < 0) return { cover: null };
+        const book = library.books[index];
+        if (book.cover || book.format !== 'epub' || !book.file) return { cover: book.cover || null };
+        const { parseEpub } = await import('../core/epub.js');
+        const parsed = await parseEpub(await readFile(safeJoin(paths.base, book.file)));
+        const mime = parsed.resources[parsed.coverHref]?.mediaType;
+        const bytes = parsed.coverHref && /^image\/(jpeg|png|webp|gif)$/i.test(mime || '') ? await parsed.resourceBytes(parsed.coverHref) : null;
+        const cover = bytes && bytes.byteLength <= 1024 * 1024 ? `data:${mime};base64,${Buffer.from(bytes).toString('base64')}` : null;
+        if (cover) { library.books[index] = { ...book, cover }; await writeLibrary(paths, library); }
+        return { cover };
+      });
+    },
+
+    // Read book bytes for the client reader.
     async readBookBytes(bookId) {
       const paths = await ensureFolders();
       const library = await readLibrary(paths);
@@ -820,6 +839,7 @@ export default class ReaderService extends TypertRemoteService {
   downloadBook(request) { return this.api.downloadBook(request); }
   loadState(request) { return this.api.loadState(request.bookId); }
   saveState(request) { return this.api.saveState(request.bookId, request.state); }
+  bookCover(request) { return this.api.bookCover(request); }
   readBookBytes(request) { return this.api.readBookBytes(request.bookId); }
   highlights(request) { return this.api.highlights(request.bookId); }
   exportNotes(request) { return this.api.exportNotes(request.bookId); }
@@ -845,7 +865,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

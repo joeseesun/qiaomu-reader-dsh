@@ -106,3 +106,18 @@
 正文划线取消 normal / is-focused 的 border、outline 与 box-shadow，只保留原来的半透明荧光色。去掉额外 padding，跨行不形成框角。划线文字继承当前阅读主题的正文色，夜间保持可读。点击仍打开划线 / 批注面板，定位行为保留。
 
 实际组件验收：在《道德经》第三章点击跨三行的粉色划线，is-focused 为 true，border 为 0px、outline 为 none、box-shadow 为 none；背景 rgba(248,123,168,.42)。纯白正文背景为 rgb(255,255,255)。截图见 `docs/qa/white-borderless-highlight.png`。
+
+
+## 2026-11-03 原版找书与提示词适配
+
+Reference: Qiaomu Reader 4.9.4 `book-shelf.js`, `ebook-library-ui.js`, `ai-prompts.js` and scoped discovery/prompt CSS. DSH's existing C library list, white/borderless highlights and native AI conversation remain the product frame.
+
+Discovery is a focused book-finding dialog, not a growing form inside the library. Reuse the original's 60px 2:3 covers, compact cover/text cards, 116px detail cover, restrained segmented navigation, 13px metadata hierarchy and 20px detail spacing. Keep the existing system Chinese font and Harness semantic colors; no new visual theme or decorative assets. Covers come from the original public mirror, with lazy loading and readable failure placeholders.
+
+Flow: Library → Find books → rankings/search/topics → detail → reading mark or external catalogue/Gutenberg → back to the same list position and focused book. Reading lists are one view with want/read counts. Recommendation, errors, loading, no results and no saved lists each have their own message and recovery. Search and public catalogue selection remain local until the user explicitly submits Gutenberg search.
+
+Prompt editing follows the original's single scrollable draft with title/body per item and one footer for Add, Restore, Cancel and Save. Changes apply only after Save; failure keeps the full draft. The native composer is untouched. Dialogs trap focus, close on Escape and restore focus.
+
+All new discovery CSS lives under `.qmr-discovery-dialog` or its backdrop/entry. Prompt styling is limited to `.qmr-prompt-dialog`. Never extend shared `.qmr-feature-panel` selectors. Dark mode uses inherited Harness tokens; narrow views collapse to one cover grid column with wrapping controls and a fixed dialog header/footer. No hover-only required action, duplicate tooltip or italic original title.
+
+Acceptance: actual original/DSH screen comparison, desktop/narrow and light/dark; covers, long titles, detail/comments, lists/recommendations, back scroll/focus, source switching, empty/error/retry, prompt failure/draft, EPUB and speech control regression. Test fixtures are identified separately from public/live data. Record unaligned host-specific behavior and unavailable environments in READER-ADAPTATION.md.

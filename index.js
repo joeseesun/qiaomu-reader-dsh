@@ -11978,6 +11978,27 @@ function apply(ctx, config = {}) {
       return { state: saved };
     },
     
+    async bookCover({ bookId: bookId2 }) {
+      const paths = pathsOf();
+      return serializeLibrary(paths.base, async () => {
+        const library = await readLibrary(paths);
+        const index = library.books.findIndex((book2) => book2.id === bookId2);
+        if (index < 0) return { cover: null };
+        const book = library.books[index];
+        if (book.cover || book.format !== "epub" || !book.file) return { cover: book.cover || null };
+        const { parseEpub: parseEpub2 } = await Promise.resolve().then(() => (init_epub(), epub_exports));
+        const parsed = await parseEpub2(await readFile2(safeJoin(paths.base, book.file)));
+        const mime = parsed.resources[parsed.coverHref]?.mediaType;
+        const bytes = parsed.coverHref && /^image\/(jpeg|png|webp|gif)$/i.test(mime || "") ? await parsed.resourceBytes(parsed.coverHref) : null;
+        const cover = bytes && bytes.byteLength <= 1024 * 1024 ? `data:${mime};base64,${Buffer.from(bytes).toString("base64")}` : null;
+        if (cover) {
+          library.books[index] = { ...book, cover };
+          await writeLibrary(paths, library);
+        }
+        return { cover };
+      });
+    },
+    // Read book bytes for the client reader.
     async readBookBytes(bookId2) {
       const paths = await ensureFolders();
       const library = await readLibrary(paths);
@@ -12279,6 +12300,9 @@ var ReaderService = class extends TypertRemoteService {
   saveState(request) {
     return this.api.saveState(request.bookId, request.state);
   }
+  bookCover(request) {
+    return this.api.bookCover(request);
+  }
   readBookBytes(request) {
     return this.api.readBookBytes(request.bookId);
   }
@@ -12312,7 +12336,7 @@ ${JSON.stringify(material)}
     return { ok: true };
   }
 };
-for (const name2 of ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "sendToAnki", "searchBooks", "downloadBook", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "highlights", "exportNotes", "setReadingContext"]) {
+for (const name2 of ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "sendToAnki", "searchBooks", "downloadBook", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "bookCover", "highlights", "exportNotes", "setReadingContext"]) {
   Remote(name2)(ReaderService.prototype[name2], {
     name: name2,
     private: false,

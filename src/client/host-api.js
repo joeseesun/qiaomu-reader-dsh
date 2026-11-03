@@ -23,6 +23,7 @@ export function remoteHostApi(ctx) {
     downloadBook: (request) => call('downloadBook', request),
     loadState: (bookId) => call('loadState', { bookId }),
     saveState: (bookId, state) => call('saveState', { bookId, state }),
+    bookCover: (bookId) => call('bookCover', { bookId }),
     readBookBytes: (bookId) => call('readBookBytes', { bookId }),
     highlights: (bookId) => call('highlights', { bookId }),
     exportNotes: (bookId) => call('exportNotes', { bookId }),
