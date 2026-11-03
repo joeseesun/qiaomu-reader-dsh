@@ -94,7 +94,7 @@
     "saveFailed": "Unable to save source position"
   },
   "discover": {
-    "title": "Find books · Project Gutenberg",
+    "title": "Find books",
     "query": "Title or author",
     "search": "Search",
     "offline": "Connect the host to search for books",
@@ -108,5 +108,48 @@
   },
   "navigation": {
     "return": "Back before jump"
+  },
+  "shelf": {
+    "language": "en",
+    "offline": "Connect the host and retry",
+    "privacy": "Hacker Books lists. Search and recommendations run locally; your library and lists are never uploaded.",
+    "best": "Worth reading",
+    "top": "Most mentioned",
+    "lindy": "Enduring classics",
+    "foryou": "For you",
+    "wish": "Want to read",
+    "read": "Read",
+    "views": "Lists",
+    "query": "Title or author",
+    "topics": "All topics",
+    "loading": "Loading books…",
+    "loadFailed": "Unable to load books; retry",
+    "saveFailed": "Save failed; your previous list is preserved. Retry.",
+    "retry": "Retry",
+    "back": "Back to books",
+    "owned": "In library",
+    "advice": "Reading advice",
+    "comments": "HN reader comments",
+    "related": "Related books",
+    "more": "Show more",
+    "seeds": "Add books to your lists or library for recommendations.",
+    "empty": "No books yet"
+  },
+  "prompts": {
+    "send": "Send: {title}",
+    "language": "en",
+    "manage": "Manage quick prompts",
+    "title": "Quick prompts",
+    "close": "Close",
+    "hint": "Shown above the chat input. Click to send; existing drafts are preserved.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "name": "Name",
+    "body": "Prompt",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "+ Add prompt",
+    "reset": "Restore defaults",
+    "failed": "Save failed; your edits are preserved. Retry."
   }
 }

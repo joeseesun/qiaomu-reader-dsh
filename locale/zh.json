@@ -94,7 +94,7 @@
     "saveFailed": "无法保存原文位置"
   },
   "discover": {
-    "title": "找书 · Project Gutenberg",
+    "title": "找书",
     "query": "书名或作者",
     "search": "搜索",
     "offline": "请连接宿主后再搜索书源",
@@ -108,5 +108,48 @@
   },
   "navigation": {
     "return": "回到跳转前"
+  },
+  "shelf": {
+    "language": "zh",
+    "offline": "请连接宿主后重试",
+    "privacy": "Hacker Books 书单；搜索和推荐在本地计算，书库与清单不上传。",
+    "best": "值得读",
+    "top": "最多人提",
+    "lindy": "经典常青",
+    "foryou": "为你推荐",
+    "wish": "想读",
+    "read": "读过",
+    "views": "书单",
+    "query": "书名或作者",
+    "topics": "全部主题",
+    "loading": "正在加载书单…",
+    "loadFailed": "书单加载失败，请重试",
+    "saveFailed": "保存失败，原清单已保留，请重试",
+    "retry": "重试",
+    "back": "返回书单",
+    "owned": "已拥有",
+    "advice": "阅读建议",
+    "comments": "HN 读者评论",
+    "related": "相关书籍",
+    "more": "显示更多",
+    "seeds": "先加入想读清单，或导入书籍以获取推荐。",
+    "empty": "暂无书籍"
+  },
+  "prompts": {
+    "send": "直接发送：{title}",
+    "language": "zh",
+    "manage": "管理快捷提示词",
+    "title": "快捷提示词",
+    "close": "关闭",
+    "hint": "显示在伴读输入框上方。点击后直接发送；已有手写草稿时会保留草稿。",
+    "edit": "编辑",
+    "delete": "删除",
+    "name": "名称",
+    "body": "提示词",
+    "cancel": "取消",
+    "save": "保存",
+    "add": "+ 新增提示词",
+    "reset": "恢复内置",
+    "failed": "保存失败，修改已保留，请重试"
   }
 }

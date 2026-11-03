@@ -40,3 +40,17 @@ Runtime evidence comes from macOS, bundled DSH 0.2.1-rc.3, an isolated Web profi
 The ordinary desktop process has not been reloaded. Actual model replies and real Anki cards remain unverified. Kindle transport, activated Qiaomu Library, extra speech engines, MOBI/FB2/comics and stable whole-book page numbers remain outside this first-stage release. These are not described as completed.
 
 Public-distribution evidence (merge SHA, tarball SHA256, unauthenticated download and second-profile install) is recorded in the v1.1.0 Release notes after publication. Preparing this source does not itself prove public availability. No new marketplace submission or npm publication is claimed.
+
+## v1.2.0 — 2026-11-03
+
+Based on remote main `b549874` (1.1.2), preserving explicit rc.2/rc.3/rc.4/rc.5 compatibility declarations. The implementation adapts Reader 4.9.3/4.9.4 prompt and discovery behavior to Host Remote + React; it does not copy Obsidian DOM or credentials. Original `b857729` was a local reference, not evidence of an upstream public release.
+
+`npm run check` passes build, 93 tests and the package guard. Tests cover public request coalescing and retry, bounded/validated metadata, bilingual search/ranking, local recommendations, concurrent reading-list writes, restart persistence, corrupt-file preservation, prompt defaults/custom/empty/reset/storage failure, matching locale files and native draft/attachment/busy guards. No dependency was added. Prebuilt tgz audit and installed-file comparison are separate checks.
+
+Runtime: macOS, bundled Harness 0.2.1-rc.3; isolated `DSH_HOME=/tmp/qmr-shelf-qa-20261103`, profile `reader-qa`, workspace under that home, tarball installation. Live UI verified public shelf, details/Chinese description/reading advice/HN comments and links, author search, topics, recommendations and reading-list persistence across host restart. Corrupting the isolated list JSON preserved the prior displayed mark and re-enabled buttons; restoring it and retrying saved successfully. An isolated process preload injected one HTTP 503; the real Retry button then loaded the real catalogue. The preload is not packaged.
+
+Prompt UI: injected browser storage quota failure, observed retained title/body editor fields and successful retry; removed every prompt, confirmed empty storage and remaining manager entry, restored defaults; a typed native chat draft was preserved on quick-send rejection. Switched Harness to English and inspected the English catalogue and default prompt titles/bodies. Gutenberg search Alice, download of book 11, EPUB validation, import and owned-state update succeeded; the previously opened Tao Te Ching remained readable. 390px screenshot uses browser viewport simulation, not a physical device.
+
+Screenshots: `docs/qa/discovery-*.png`. AI replies and actual Anki card writes are still not verified in this isolated profile. Activated Qiaomu Library, extra speech engines, Kindle transport/pairing/conversion, MOBI/FB2/comics, stable whole-book pagination and native slash integration remain gaps listed in READER-ADAPTATION.md. Windows/Linux and rc.2/rc.4/rc.5 runtime were not retested for this feature release. The ordinary desktop profile was not restarted.
+
+Public merge, release checksums and second-profile install are recorded in the v1.2.0 GitHub Release after publication. A local tarball is not itself a published release. No npm or marketplace publication is claimed.

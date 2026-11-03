@@ -1,3 +1,4 @@
+import { shelfDataUrl, shelfBookUrl, normalizeShelfBooks, normalizeShelfTopics, normalizeShelfDetail } from '../core/book-shelf.js';
 import { parseFragment } from 'parse5';
 import { parseEpub } from '../core/epub.js';
 const ORIGIN = 'https://www.gutenberg.org';
@@ -69,4 +70,33 @@ export async function downloadBook(id, request = globalThis.fetch) {
   const book = await parseEpub(bytes); // Validate ZIP CRC and readable spine before import.
   if (!book.chapters.length) throw new Error('下载文件没有可读章节');
   return { base64: bytes.toString('base64'), filename: `Gutenberg-${id}.epub`, identifier: `gutenberg:${id}` };
+}
+
+// Cache public metadata only. Never send local titles, queries or reading lists.
+export function createShelfSource(request = globalThis.fetch) {
+  const cached = new Map(), pending = new Map();
+  async function json(url, normalize) {
+    if (cached.has(url)) return cached.get(url);
+    if (pending.has(url)) return pending.get(url);
+    const work = (async () => {
+      const response = await request(url, { signal: AbortSignal.timeout(30000), redirect: 'error' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const bytes = await readResponse(response, 12 * 1024 * 1024);
+      const result = normalize(JSON.parse(bytes.toString('utf8')));
+      if (cached.size >= 100) cached.delete(cached.keys().next().value);
+      cached.set(url, result); return result;
+    })().finally(() => pending.delete(url));
+    pending.set(url, work); return work;
+  }
+  return async ({ kind = 'books', id } = {}) => {
+    if (kind === 'detail') return json(shelfBookUrl(id), data => normalizeShelfDetail(data, id));
+    if (kind === 'books') return json(shelfDataUrl('books'), normalizeShelfBooks);
+    if (kind === 'topics') return json(shelfDataUrl('topics'), normalizeShelfTopics);
+    if (kind === 'co-index') return json(shelfDataUrl('co-index'), data => {
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid recommendation data');
+      return Object.fromEntries(Object.entries(data).filter(([id, rows]) => /^OL\d+W$/.test(id) && Array.isArray(rows))
+        .map(([id, rows]) => [id, rows.filter(value => /^OL\d+W$/.test(value)).slice(0, 200)]));
+    });
+    throw new Error('Unknown shelf request');
+  };
 }

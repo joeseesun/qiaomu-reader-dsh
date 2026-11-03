@@ -16,7 +16,8 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
   const [pageText, setPageText] = React.useState('');
   const [pageReady, setPageReady] = React.useState(false);
   const [attached, setAttached] = React.useState('');
-  const [prompts, setPrompts] = React.useState(readQuickPrompts);
+  const promptLanguage = ui.t('prompts.language', 'zh');
+  const [prompts, setPrompts] = React.useState(() => readQuickPrompts(promptLanguage));
   const [promptMount, setPromptMount] = React.useState(null);
   const [sendingPrompt, setSendingPrompt] = React.useState(false);
   const generation = React.useRef(0);
@@ -43,10 +44,11 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
   }, [engine, chapterIndex]);
   React.useEffect(() => () => { generation.current += 1; owned.current?.release(); owned.current = null; }, []);
   React.useEffect(() => {
-    const reload = () => setPrompts(readQuickPrompts());
+    const reload = () => setPrompts(readQuickPrompts(promptLanguage));
+    reload();
     window.addEventListener('qmr-prompts-changed', reload);
     return () => window.removeEventListener('qmr-prompts-changed', reload);
-  }, []);
+  }, [promptLanguage]);
 
   const start = React.useCallback(async (fresh = false) => {
     if (!workspaceId || !chatApi) return;
@@ -156,11 +158,11 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
     chatVisible && SessionProvider && renderSlot
       ? h('div', { className: 'qmr-native-chat', ref: chatRoot }, h(SessionProvider, { session: chat.reference }, renderSlot('qiaomu-reader.chat', {})))
       : null,
-    promptMount ? createPortal(h('div', { className: 'qmr-companion-prompts', role: 'group', 'aria-label': '快捷提示词' },
+    promptMount ? createPortal(h('div', { className: 'qmr-companion-prompts', role: 'group', 'aria-label': ui.t('prompts.title', '快捷提示词') },
       h('div', { className: 'qmr-companion-prompt-scroll' }, prompts.map((item) => h('button', {
-        key: item.id, type: 'button', title: item.body, 'aria-label': `直接发送：${item.title}`,
+        key: item.id, type: 'button', title: item.body, 'aria-label': ui.t('prompts.send', '直接发送：{title}').replace('{title}', item.title),
         disabled: sendingPrompt || busy || attached !== contextKey, onClick: () => void quick(item),
       }, item.title))),
-      h('button', { type: 'button', className: 'qmr-companion-add-prompt', title: '新增快捷提示词', 'aria-label': '新增快捷提示词', onClick: () => ui.store.set({ promptManagerOpen: true }) }, h(IconPlus, { width: 14, height: 14 }))), promptMount) : null,
+      h('button', { type: 'button', className: 'qmr-companion-add-prompt', 'aria-label': ui.t('prompts.manage', '管理快捷提示词'), onClick: () => ui.store.set({ promptManagerOpen: true }) }, h(IconPlus, { width: 14, height: 14 }))), promptMount) : null,
   );
 }

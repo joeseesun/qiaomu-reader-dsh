@@ -1,6 +1,6 @@
 {
   "name": "qiaomu-reader-dsh",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -22,8 +22,10 @@
     "index.js",
     "locale/*.json",
     "docs/qa/adaptation-*.png",
+    "docs/qa/discovery-*.png",
     "docs/READER-ADAPTATION.md",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "docs/RELEASE-VALIDATION.md"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

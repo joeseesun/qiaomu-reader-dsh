@@ -28,11 +28,11 @@ const remoteCodec = () => ({
 });
 const REMOTE = {
   package: 'qiaomu-reader-dsh',
-  descriptors: ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
+  descriptors: ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext'].map((method) => ({
     id: `qiaomu-reader-dsh#qiaomuReader/${method}`,
     service: 'qiaomuReader', namespace: 'qiaomuReader', method,
     invocation: { kind: 'direct' },
-    parameters: ['info', 'library', 'speechVoices'].includes(method) ? [] : [{ name: 'request', wire: 'request', source: 'json', codec: remoteCodec() }],
+    parameters: ['info', 'library', 'speechVoices', 'shelfMarks'].includes(method) ? [] : [{ name: 'request', wire: 'request', source: 'json', codec: remoteCodec() }],
     result: { mode: 'src-json' }, cancellation: { parameter: 'signal' },
   })),
 };
