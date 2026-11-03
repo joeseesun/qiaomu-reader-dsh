@@ -368,7 +368,7 @@ test("epub：目录 href 的 ../ 与 %20 归一化到 zip 根坐标系", async (
   <li><a href="../text/ch2.xhtml">第二章</a>
     <ol><li><a href="../text/ch2.xhtml#s1">第一节</a></li></ol>
   </li>
-</ol></nav></body></html>`;
+</ol></nav><nav epub:type="page-list"><ol><li><a href="../text/ch%201.xhtml#iv">iv</a></li><li><a href="../text/ch2.xhtml#p1">1</a></li></ol></nav></body></html>`;
 
   const book = await parseEpub(makeZip([
     { name: "mimetype", data: "application/epub+zip", method: "store" },
@@ -382,6 +382,7 @@ test("epub：目录 href 的 ../ 与 %20 归一化到 zip 根坐标系", async (
     { name: "OEBPS/img/cover.jpg", data: Buffer.from([0xff, 0xd8, 0xff, 0xd9]), method: "store" },
   ]));
 
+  assert.deepEqual(book.pageList.map(({label,href})=>({label,href})),[{label:"iv",href:"OEBPS/text/ch 1.xhtml#iv"},{label:"1",href:"OEBPS/text/ch2.xhtml#p1"}]);
   assert.equal(book.title, "测试书 & 示例");
   assert.equal(book.author, "测试作者");
   assert.equal(book.rootDir, "OEBPS/");
@@ -437,7 +438,7 @@ test("epub：EPUB2 的 NCX 目录与缺 spine 的报错", async () => {
       <navPoint id="n2"><navLabel><text>小节</text></navLabel><content src="text/ch1.xhtml#s"/></navPoint>
     </navPoint>
     <navPoint id="n3"><navLabel><text>第二章</text></navLabel><content src="text/ch2.xhtml"/></navPoint>
-  </navMap></ncx>`;
+  </navMap><pageList><pageTarget><navLabel><text>iv</text></navLabel><content src="text/ch1.xhtml#iv"/></pageTarget></pageList></ncx>`;
 
   const book = await parseEpub(makeZip([
     { name: "META-INF/container.xml", data: container, method: "deflate" },
@@ -448,6 +449,7 @@ test("epub：EPUB2 的 NCX 目录与缺 spine 的报错", async () => {
   ]));
 
   assert.equal(book.rootDir, "");
+  assert.deepEqual(book.pageList,[{label:"iv",href:"text/ch1.xhtml#iv"}]);
   assert.equal(book.title, "NCX 书");
   assert.equal(book.chapters.length, 2);
   assert.equal(book.toc[0].label, "第一章 & 开端");

@@ -426,6 +426,7 @@ export function addBookmark(state, input) {
     percent,
     label,
     createdAt,
+    ...(isObject(source.locator) ? { locator: normalizeLocator(source.locator) } : {}),
   };
   return {
     state: {

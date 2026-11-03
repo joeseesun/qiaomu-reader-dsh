@@ -392,6 +392,7 @@ export const UI_CSS = `
 .qmr-paper-body h1,.qmr-paper-body h2,.qmr-paper-body h3,.qmr-paper-body h4{margin:1.1em 0 .6em;line-height:1.35;font-weight:600}
 .qmr-paper-body h1{font-size:1.5em}.qmr-paper-body h2{font-size:1.3em}.qmr-paper-body h3{font-size:1.15em}
 .qmr-paper-body img{max-width:100%;height:auto;border-radius:6px;margin:.6em 0}
+.qmr-format-pdf.qmr-flow-scroll .qmr-page-viewport{overflow:auto}
 .qmr-pdf-sheet{position:relative;container-type:inline-size;max-width:100%;height:auto;margin:0 auto 20px;
   background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12)}
 .qmr-pdf-sheet img{display:block;width:100%;height:100%;max-width:none;object-fit:fill;margin:0;border-radius:0}
@@ -443,6 +444,7 @@ export const UI_CSS = `
 .qmr-track{position:relative;display:flex;align-items:center;flex:1 1 auto;height:16px;cursor:pointer;touch-action:none}
 .qmr-track-rail{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:var(--qmr-border)}
 .qmr-track-fill{position:absolute;left:0;height:4px;border-radius:2px;background:var(--qmr-accent)}
+.qmr-position-trigger{border:0;background:none;color:var(--qmr-muted);padding:3px 4px;font:inherit;cursor:pointer;white-space:nowrap}.qmr-position-trigger:focus-visible{outline:1px solid var(--qmr-muted);outline-offset:1px}
 .qmr-track-knob{position:absolute;width:12px;height:12px;border-radius:50%;transform:translateX(-50%);
   background:var(--qmr-accent);box-shadow:0 0 0 2px var(--qmr-ui)}
 .qmr-panel{display:flex;flex-direction:column;flex:0 0 340px;width:340px;min-height:0;

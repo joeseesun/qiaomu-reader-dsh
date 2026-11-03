@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.5.0：新增免费 Google 查词翻译、完整朗读服务与音色设置、选文/段落控制，以及 Kokoro/MeloTTS 本地模型安装。[适配与验证范围](docs/READER-ADAPTATION.md)。
+> v1.6.0：新增命名书签、原书页码与稳定位置跳转，以及 PDF 目录、缩放和同页多次搜索命中。保留免费 Google 翻译与完整朗读服务。[适配与验证范围](docs/READER-ADAPTATION.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -33,11 +33,11 @@
 
 ## 安装预构建发布包
 
-从 [v1.5.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.5.0) 下载 `qiaomu-reader-dsh-1.5.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
+从 [v1.6.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.6.0) 下载 `qiaomu-reader-dsh-1.6.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
 
 ```sh
 shasum -a 256 -c SHA256SUMS
-dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.5.0.tgz
+dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.6.0.tgz
 ```
 
 `YOUR_PROFILE` 需要替换为目标 profile。macOS 桌面版请使用应用自带 CLI：`/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh`。不要把隔离测试配置直接覆盖日用配置。
@@ -74,7 +74,7 @@ npm pack --pack-destination /tmp
 
 ## English
 
-Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.5.0 GitHub Release; no npm publication is provided.
+Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.6.0 GitHub Release; no npm publication is provided.
 
 Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and installed in the ordinary desktop profile with existing books preserved. Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Qiaomu Library activation/search/download is implemented and fixture-tested; real activated service downloads still require the user’s activation code. Speech providers and Kokoro/MeloTTS setup are implemented. Edge/Mac synthesis and both local-model auditions passed; paid provider accounts still require user keys. Kindle, MOBI/FB2/comics and stable whole-book pagination remain separate parity tasks.
 
