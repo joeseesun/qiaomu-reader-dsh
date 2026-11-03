@@ -239,6 +239,148 @@ for (const [language, index] of [['zh', 0], ['en', 1]]) {
   messages.discover.title = index ? 'Find books' : '找书';
 }
 
+const DISCOVERY_MESSAGES = {
+  "shelf": {
+    "mine": [
+      "我的清单",
+      "My lists"
+    ],
+    "mentions": [
+      "{count} 人提及",
+      "{count} mentions"
+    ],
+    "recommended": [
+      "{count} 人推荐",
+      "{count} recommendations"
+    ],
+    "score": [
+      "值得读指数 {score}",
+      "Score {score}"
+    ],
+    "getBook": [
+      "在哪里读",
+      "Find a copy"
+    ],
+    "stancer": [
+      "推荐",
+      "Recommended"
+    ],
+    "stancen": [
+      "提及",
+      "Mentioned"
+    ],
+    "stancec": [
+      "批评",
+      "Critical"
+    ],
+    "fit": [
+      "适合谁",
+      "For readers who"
+    ],
+    "warn": [
+      "读前留意",
+      "Before you read"
+    ],
+    "about": [
+      "内容简介",
+      "About the book"
+    ],
+    "clear": [
+      "清除",
+      "Clear"
+    ],
+    "searchResults": [
+      "搜索结果",
+      "Search results"
+    ],
+    "bestHint": [
+      "读者真正推荐的好书",
+      "Books readers recommend"
+    ],
+    "topHint": [
+      "Hacker News 讨论中被提及最多的书",
+      "The most mentioned books on Hacker News"
+    ],
+    "lindyHint": [
+      "经受时间检验、仍被读者推荐的经典",
+      "Classics readers still recommend"
+    ],
+    "foryouHint": [
+      "根据书库与清单，在本地寻找相关好书",
+      "Related books based on your library and lists, computed locally"
+    ],
+    "mineHint": [
+      "留下下一本想读的书，也记住读过的书",
+      "Keep your next reads and the books you have read"
+    ],
+    "noResults": [
+      "没有找到相关书籍",
+      "No matching books"
+    ],
+    "noResultsHint": [
+      "换个书名、作者或主题试试。",
+      "Try another title, author or topic."
+    ],
+    "emptyHint": [
+      "打开一本书的详情，标记想读或读过。",
+      "Open a book and mark it as want to read or read."
+    ]
+  },
+  "discover": {
+    "publicSource": ["公开书源", "Public books"],
+    "localSource": ["本地书库", "Local library"],
+    "subtitle": [
+      "发现值得读的书",
+      "Discover your next read"
+    ],
+    "sources": [
+      "书源",
+      "Book sources"
+    ],
+    "hint": [
+      "在 Project Gutenberg 搜索公版书，下载后直接加入书库。",
+      "Search public-domain books on Project Gutenberg and add them to your library."
+    ],
+    "retry": [
+      "重试搜索",
+      "Retry search"
+    ],
+    "start": [
+      "找一本公版书",
+      "Find a public-domain book"
+    ],
+    "startHint": [
+      "输入书名或作者，如 Alice 或 Shakespeare。",
+      "Enter a title or author, such as Alice or Shakespeare."
+    ],
+    "localHint": [
+      "书库和清单留在本地；公开目录仅提供找书线索。",
+      "Your library and lists stay local. Public catalogues help you find a copy."
+    ]
+  },
+  "prompts": {
+    "required": [
+      "请填写每条提示词的名称和正文",
+      "Enter a name and text for every prompt"
+    ],
+    "editorHint": [
+      "名称显示在按钮上，完整提示词发送给 AI。",
+      "The name appears on the button. The full prompt is sent to AI."
+    ],
+    "empty": [
+      "还没有快捷提示词。添加一条，或恢复内置提示词。",
+      "No quick prompts yet. Add one or restore the defaults."
+    ],
+    "add": [
+      "新增提示词",
+      "Add prompt"
+    ]
+  }
+};
+for (const [language, index] of [["zh", 0], ["en", 1]]) {
+  for (const [section, rows] of Object.entries(DISCOVERY_MESSAGES)) Object.assign(LIBRARY_MESSAGES[language][section], Object.fromEntries(Object.entries(rows).map(([key, values]) => [key, values[index]])));
+}
+
 // DSH LocaleFace looks up literal keys; it does not traverse nested objects.
 export function flatMessages(messages, prefix = '') {
   return Object.fromEntries(Object.entries(messages).flatMap(([key, value]) => {

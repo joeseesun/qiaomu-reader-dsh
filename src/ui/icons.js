@@ -146,3 +146,6 @@ export const IconSort = makeIcon('Sort', [
   p('M14 12h4', 'd'),
   p('M14 17h2', 'e'),
 ]);
+
+export const IconArrowLeft = makeIcon('ArrowLeft', [p('m12 19-7-7 7-7M5 12h14', 'a')]);
+export const IconExternal = makeIcon('External', [p('M15 3h6v6m0-6L10 14M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4', 'a')]);

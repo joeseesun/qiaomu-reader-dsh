@@ -104,7 +104,16 @@
     "added": "已加入书库",
     "empty": "没有匹配的书籍",
     "owned": "已拥有",
-    "download": "下载 EPUB"
+    "download": "下载 EPUB",
+    "publicSource": "公开书源",
+    "localSource": "本地书库",
+    "subtitle": "发现值得读的书",
+    "sources": "书源",
+    "hint": "在 Project Gutenberg 搜索公版书，下载后直接加入书库。",
+    "retry": "重试搜索",
+    "start": "找一本公版书",
+    "startHint": "输入书名或作者，如 Alice 或 Shakespeare。",
+    "localHint": "书库和清单留在本地；公开目录仅提供找书线索。"
   },
   "navigation": {
     "return": "回到跳转前"
@@ -133,7 +142,28 @@
     "related": "相关书籍",
     "more": "显示更多",
     "seeds": "先加入想读清单，或导入书籍以获取推荐。",
-    "empty": "暂无书籍"
+    "empty": "暂无书籍",
+    "mine": "我的清单",
+    "mentions": "{count} 人提及",
+    "recommended": "{count} 人推荐",
+    "score": "值得读指数 {score}",
+    "getBook": "在哪里读",
+    "stancer": "推荐",
+    "stancen": "提及",
+    "stancec": "批评",
+    "fit": "适合谁",
+    "warn": "读前留意",
+    "about": "内容简介",
+    "clear": "清除",
+    "searchResults": "搜索结果",
+    "bestHint": "读者真正推荐的好书",
+    "topHint": "Hacker News 讨论中被提及最多的书",
+    "lindyHint": "经受时间检验、仍被读者推荐的经典",
+    "foryouHint": "根据书库与清单，在本地寻找相关好书",
+    "mineHint": "留下下一本想读的书，也记住读过的书",
+    "noResults": "没有找到相关书籍",
+    "noResultsHint": "换个书名、作者或主题试试。",
+    "emptyHint": "打开一本书的详情，标记想读或读过。"
   },
   "prompts": {
     "send": "直接发送：{title}",
@@ -148,8 +178,11 @@
     "body": "提示词",
     "cancel": "取消",
     "save": "保存",
-    "add": "+ 新增提示词",
+    "add": "新增提示词",
     "reset": "恢复内置",
-    "failed": "保存失败，修改已保留，请重试"
+    "failed": "保存失败，修改已保留，请重试",
+    "required": "请填写每条提示词的名称和正文",
+    "editorHint": "名称显示在按钮上，完整提示词发送给 AI。",
+    "empty": "还没有快捷提示词。添加一条，或恢复内置提示词。"
   }
 }

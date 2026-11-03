@@ -104,7 +104,16 @@
     "added": "Added to library",
     "empty": "No matching books",
     "owned": "In library",
-    "download": "Download EPUB"
+    "download": "Download EPUB",
+    "publicSource": "Public books",
+    "localSource": "Local library",
+    "subtitle": "Discover your next read",
+    "sources": "Book sources",
+    "hint": "Search public-domain books on Project Gutenberg and add them to your library.",
+    "retry": "Retry search",
+    "start": "Find a public-domain book",
+    "startHint": "Enter a title or author, such as Alice or Shakespeare.",
+    "localHint": "Your library and lists stay local. Public catalogues help you find a copy."
   },
   "navigation": {
     "return": "Back before jump"
@@ -133,7 +142,28 @@
     "related": "Related books",
     "more": "Show more",
     "seeds": "Add books to your lists or library for recommendations.",
-    "empty": "No books yet"
+    "empty": "No books yet",
+    "mine": "My lists",
+    "mentions": "{count} mentions",
+    "recommended": "{count} recommendations",
+    "score": "Score {score}",
+    "getBook": "Find a copy",
+    "stancer": "Recommended",
+    "stancen": "Mentioned",
+    "stancec": "Critical",
+    "fit": "For readers who",
+    "warn": "Before you read",
+    "about": "About the book",
+    "clear": "Clear",
+    "searchResults": "Search results",
+    "bestHint": "Books readers recommend",
+    "topHint": "The most mentioned books on Hacker News",
+    "lindyHint": "Classics readers still recommend",
+    "foryouHint": "Related books based on your library and lists, computed locally",
+    "mineHint": "Keep your next reads and the books you have read",
+    "noResults": "No matching books",
+    "noResultsHint": "Try another title, author or topic.",
+    "emptyHint": "Open a book and mark it as want to read or read."
   },
   "prompts": {
     "send": "Send: {title}",
@@ -148,8 +178,11 @@
     "body": "Prompt",
     "cancel": "Cancel",
     "save": "Save",
-    "add": "+ Add prompt",
+    "add": "Add prompt",
     "reset": "Restore defaults",
-    "failed": "Save failed; your edits are preserved. Retry."
+    "failed": "Save failed; your edits are preserved. Retry.",
+    "required": "Enter a name and text for every prompt",
+    "editorHint": "The name appears on the button. The full prompt is sent to AI.",
+    "empty": "No quick prompts yet. Add one or restore the defaults."
   }
 }

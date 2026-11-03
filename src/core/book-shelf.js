@@ -203,3 +203,9 @@ export function markedShelf(byId, marks, status) {
   return Object.entries(marks).filter(([, mark]) => mark.s === status).sort((a, b) => b[1].at - a[1].at)
     .map(([id]) => byId.get(id)).filter(Boolean);
 }
+
+/** Original Reader's external catalogue links; only navigation, never automatic requests. */
+export function externalBookSearchUrls(query) {
+  const value = String(query || '').trim();
+  return { anna: `https://annas-archive.gl/search?q=${encodeURIComponent(value)}`, zlibrary: `https://z-library.sk/s/${encodeURIComponent(value)}` };
+}

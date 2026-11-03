@@ -140,7 +140,7 @@ export function createDataLayer(options = {}) {
           filename: `${book.title || book.id}.${book.format}`,
           base64: bytesToBase64(bytes), title: book.title, author: book.author,
           chapterCount: book.chapterCount, language: book.language, identifier: book.identifier, textLayout: book.textLayout || 1,
-          localId: book.id,
+          localId: book.id, cover: book.cover,
         });
         const nextId = result?.book?.id;
         if (!nextId) continue;
