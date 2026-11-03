@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
+import { QiaomuLibrary } from './ebook-library.js';
 import { BookShelf } from './book-shelf.js';
 import { ShelfCover } from './shelf-components.js';
 import { IconClose, IconSearch, IconArrowLeft } from './icons.js';
@@ -50,7 +51,7 @@ function Gutenberg({ ui, initialQuery, memory }) {
         h('button', { type: 'button', className: 'qmr-discovery-button', disabled: busy || owned, onClick: () => download(book) }, owned ? t('owned', '已拥有') : busyId === book.id ? t(status, status === 'importing' ? '正在加入书库…' : '正在下载并校验…') : t('download', '下载 EPUB')));
     })));
 }
-function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
+function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory, ebookMemory }) {
   const [source, setSource] = React.useState(memory.current.source || 'shelf');
   const [query, setQuery] = React.useState('');
   const dialog = React.useRef(null), scrollRef = React.useRef(null);
@@ -63,15 +64,16 @@ function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
       h('header', { className: 'qmr-discovery-header' }, h('h1', null, ui.t('discover.title', '浏览书库')),
         h('div', { className: 'qmr-discovery-source-nav', role: 'group', 'aria-label': ui.t('discover.sources', '书源') },
           h('button', { type: 'button', 'aria-pressed': source === 'shelf', onClick: () => setSource('shelf') }, ui.t('discover.publicSource', '公开书源')),
+          h('button', { type: 'button', 'aria-pressed': source === 'qiaomu', onClick: () => { if (source === 'shelf' && !memory.current.inDetail) memory.current.scroll = scrollRef.current?.scrollTop || 0; setSource('qiaomu'); } }, ui.t('ebook.source', '乔木书库')),
           h('button', { type: 'button', 'aria-pressed': source === 'gutenberg', onClick: () => { if (source === 'shelf' && !memory.current.inDetail) memory.current.scroll = scrollRef.current?.scrollTop || 0; setSource('gutenberg'); } }, 'Gutenberg')),
         h('button', { className: 'qmr-discovery-icon', type: 'button', 'aria-label': ui.t('prompts.close', '关闭'), onClick: close }, h(IconClose, { width: 20, height: 20 }))),
-      h('div', { className: 'qmr-discovery-scroll', ref: scrollRef }, source === 'shelf' ? h(BookShelf, { ui, scrollRef, memory, searchGutenberg }) : h(React.Fragment, null,
+      h('div', { className: 'qmr-discovery-scroll', ref: scrollRef }, source === 'shelf' ? h(BookShelf, { ui, scrollRef, memory, searchGutenberg }) : source === 'qiaomu' ? h(QiaomuLibrary, { ui, memory: ebookMemory, onOpen: id => { close(); void ui.openBook(id); } }) : h(React.Fragment, null,
         query ? h('button', { type: 'button', className: 'qmr-discovery-text-button', onClick: () => setSource('shelf') }, h(IconArrowLeft, { width: 15, height: 15 }), ui.t('shelf.back', '返回书单')) : null,
         h(Gutenberg, { ui, initialQuery: query, memory: gutenbergMemory }))))), document.body);
 }
 export function BookDiscovery({ ui }) {
   const [open, setOpen] = React.useState(false);
-  const memory = React.useRef({}), gutenbergMemory = React.useRef({});
+  const memory = React.useRef({}), gutenbergMemory = React.useRef({}), ebookMemory = React.useRef({});
   return h('div', { className: 'qmr-discovery-entry' }, h('button', { className: 'qmr-btn', type: 'button', onClick: () => setOpen(true) }, h(IconSearch, { width: 16, height: 16 }), ui.t('discover.title', '浏览书库')),
-    open ? h(DiscoveryDialog, { ui, memory, gutenbergMemory, onClose: () => setOpen(false) }) : null);
+    open ? h(DiscoveryDialog, { ui, memory, gutenbergMemory, ebookMemory, onClose: () => setOpen(false) }) : null);
 }

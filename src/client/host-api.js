@@ -16,6 +16,7 @@ export function remoteHostApi(ctx) {
     speechVoices: () => call('speechVoices'),
     speechAudio: (request) => call('speechAudio', request),
     sendToAnki: (request) => call('sendToAnki', request),
+    ebookAction: (request) => call('ebookAction', request),
     shelfData: (request) => call('shelfData', request),
     shelfMarks: () => call('shelfMarks'),
     markShelf: (request) => call('markShelf', request),

@@ -381,6 +381,255 @@ for (const [language, index] of [["zh", 0], ["en", 1]]) {
   for (const [section, rows] of Object.entries(DISCOVERY_MESSAGES)) Object.assign(LIBRARY_MESSAGES[language][section], Object.fromEntries(Object.entries(rows).map(([key, values]) => [key, values[index]])));
 }
 
+const EBOOK_MESSAGES = {
+  "ownedOpen": ["已拥有 · 打开阅读", "In library · Open"],
+  "source": [
+    "乔木书库",
+    "Qiaomu Library"
+  ],
+  "connecting": [
+    "正在验证服务状态…",
+    "Verifying service access…"
+  ],
+  "activationHelp": [
+    "输入乔木书库激活码，连接后可搜索并下载到本地书库。",
+    "Enter your Qiaomu Library activation code to search and download into your local library."
+  ],
+  "code": [
+    "激活码",
+    "Activation code"
+  ],
+  "activate": [
+    "激活书库",
+    "Activate library"
+  ],
+  "activating": [
+    "正在激活…",
+    "Activating…"
+  ],
+  "privacy": [
+    "激活码不会保存；刷新凭据仅保存在此设备的 Host 私有文件中。",
+    "The activation code is not saved. Refresh credentials stay in private Host files on this device."
+  ],
+  "retry": [
+    "重试",
+    "Retry"
+  ],
+  "connected": [
+    "已连接乔木书库",
+    "Connected to Qiaomu Library"
+  ],
+  "remaining": [
+    "今日剩余 {remaining} / {limit} 次",
+    "Today: {remaining} / {limit} downloads remaining"
+  ],
+  "expires": [
+    "有效期至 {date}",
+    "Expires {date}"
+  ],
+  "logout": [
+    "退出激活",
+    "Sign out"
+  ],
+  "query": [
+    "书名或作者",
+    "Title or author"
+  ],
+  "search": [
+    "搜索",
+    "Search"
+  ],
+  "searching": [
+    "正在搜索…",
+    "Searching…"
+  ],
+  "cancel": [
+    "取消下载",
+    "Cancel download"
+  ],
+  "open": [
+    "打开阅读",
+    "Open book"
+  ],
+  "pendingJobs": [
+    "可继续的下载",
+    "Downloads to resume"
+  ],
+  "unfinished": [
+    "未完成的下载",
+    "Unfinished download"
+  ],
+  "resume": [
+    "继续下载 / 重试入库",
+    "Resume / retry import"
+  ],
+  "versions": [
+    "找到 {count} 个版本",
+    "{count} editions found"
+  ],
+  "format": [
+    "格式",
+    "Format"
+  ],
+  "allFormats": [
+    "全部格式",
+    "All formats"
+  ],
+  "referenceCover": [
+    "作品参考封面",
+    "Reference work cover"
+  ],
+  "noCover": [
+    "暂无封面",
+    "No cover"
+  ],
+  "download": [
+    "下载并加入书库",
+    "Download and import"
+  ],
+  "unsupported": [
+    "当前阅读器不支持此格式，请选择 EPUB、PDF 或 TXT",
+    "This format is not supported. Choose EPUB, PDF or TXT."
+  ],
+  "empty": [
+    "未找到相关版本，请换个书名或作者",
+    "No editions found. Try another title or author."
+  ],
+  "startHint": [
+    "搜索后选择版本和格式。下载完成会校验文件，再保存到本地书库。",
+    "Search and choose an edition. Downloads are verified before import into your local library."
+  ],
+  "queued": [
+    "正在排队…",
+    "Queued…"
+  ],
+  "running": [
+    "正在下载…",
+    "Downloading…"
+  ],
+  "verifying": [
+    "正在校验文件…",
+    "Verifying file…"
+  ],
+  "importing": [
+    "正在加入本地书库…",
+    "Importing into local library…"
+  ],
+  "imported": [
+    "已加入本地书库",
+    "Imported into local library"
+  ],
+  "cancelled": [
+    "下载已取消，可在任务中继续",
+    "Download cancelled. You can resume it from downloads."
+  ],
+  "error": [
+    "下载未完成，请重试",
+    "Download incomplete. Retry."
+  ],
+  "idle": [
+    "准备下载",
+    "Ready"
+  ],
+  "error-offline": [
+    "请连接宿主后再试",
+    "Connect to the Host and retry."
+  ],
+  "error-service": [
+    "服务暂不可用，请重试",
+    "Service unavailable. Retry."
+  ],
+  "error-network": [
+    "连接失败，请检查网络后重试",
+    "Connection failed. Check the network and retry."
+  ],
+  "error-invalid-code": [
+    "激活码格式或内容不正确",
+    "Invalid activation code."
+  ],
+  "error-invalid-device": [
+    "设备身份无效，请重试激活",
+    "Invalid device identity. Retry activation."
+  ],
+  "error-unauthorized": [
+    "激活状态无效，请重新激活",
+    "Access is invalid. Activate again."
+  ],
+  "error-inactive": [
+    "激活已过期或停用，请重新激活",
+    "Access expired or inactive. Activate again."
+  ],
+  "error-device-revoked": [
+    "此设备已被移除，请重新激活",
+    "This device was revoked. Activate again."
+  ],
+  "error-device-limit": [
+    "激活设备数已达上限",
+    "Activation device limit reached."
+  ],
+  "error-quota": [
+    "今日下载配额已用完",
+    "Today’s download quota is exhausted."
+  ],
+  "error-save": [
+    "凭据保存失败，原有文件已保留，请重试",
+    "Credential save failed. Existing files were preserved. Retry."
+  ],
+  "error-file": [
+    "文件校验失败，未加入书库",
+    "File validation failed. Nothing was imported."
+  ],
+  "error-busy": [
+    "已有下载正在进行",
+    "A download is already in progress."
+  ],
+  "error-pending": [
+    "下载仍在服务端处理中，可稍后继续",
+    "The service is still preparing the download. Resume later."
+  ],
+  "error-search-expired": [
+    "搜索版本已过期，请重新搜索",
+    "Search results expired. Search again."
+  ],
+  "error-file-expired": [
+    "下载文件已过期，请重新搜索",
+    "Download expired. Search again."
+  ],
+  "error-file-missing": [
+    "下载文件不可用，请重新搜索",
+    "File unavailable. Search again."
+  ],
+  "error-import": [
+    "加入书库失败，下载任务已保留，可重试入库",
+    "Import failed. The download is retained for retry."
+  ],
+  "error-already-imported": [
+    "此下载已加入书库",
+    "This download was already imported."
+  ],
+  "error-download-failed": [
+    "下载失败，请重试或重新搜索",
+    "Download failed. Retry or search again."
+  ],
+  "error-service-restarted": [
+    "服务已重启，请重新搜索",
+    "The service restarted. Search again."
+  ],
+  "error-cancelled": [
+    "下载已取消，可在任务中继续",
+    "Download cancelled. Resume it from downloads."
+  ],
+  "error-invalid-query": [
+    "请输入160字以内的书名或作者",
+    "Enter a title or author within 160 characters."
+  ],
+  "error-unsupported-format": [
+    "请选择 EPUB、PDF 或 TXT 版本",
+    "Choose an EPUB, PDF or TXT edition."
+  ]
+};
+for (const [language,index] of [['zh',0],['en',1]]) LIBRARY_MESSAGES[language].ebook = Object.fromEntries(Object.entries(EBOOK_MESSAGES).map(([key,values])=>[key,values[index]]));
+
 // DSH LocaleFace looks up literal keys; it does not traverse nested objects.
 export function flatMessages(messages, prefix = '') {
   return Object.fromEntries(Object.entries(messages).flatMap(([key, value]) => {

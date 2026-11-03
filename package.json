@@ -1,6 +1,6 @@
 {
   "name": "qiaomu-reader-dsh",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -24,6 +24,7 @@
     "docs/qa/adaptation-*.png",
     "docs/qa/discovery-*.png",
     "docs/qa/parity-*.png",
+    "docs/qa/ebook-*.png",
     "docs/READER-ADAPTATION.md",
     "THIRD_PARTY_NOTICES.md",
     "docs/RELEASE-VALIDATION.md"
