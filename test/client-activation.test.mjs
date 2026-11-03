@@ -106,7 +106,7 @@ test('client mounts Reader Remote descriptors when Harness remote is available',
   assert.equal(descriptor.descriptors.find(item => item.method === 'speechVoices').parameters.length, 0);
   assert.equal(descriptor.descriptors.find(item => item.method === 'shelfMarks').parameters.length, 0);
   assert.deepEqual(Array.from(descriptor.descriptors, (item) => item.method), [
-    'info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext',
+    'info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext',
   ]);
   app.dispose();
 });

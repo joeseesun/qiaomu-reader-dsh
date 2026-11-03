@@ -1,3 +1,5 @@
+import { createHostEbookLibrary, ebookCredentialDirectory, safeEbookError } from './ebook-library.js';
+import { bookMetadata } from '../core/book-metadata.js';
 import { normalizeShelfMarks, toggleShelfMark } from '../core/book-shelf.js';
 /**
  * 乔木阅读 · 宿主半
@@ -226,6 +228,8 @@ function normalizeBook(raw) {
     textLayout: raw.textLayout === 2 ? 2 : 1,
     readProgress: Number.isFinite(raw.readProgress) ? raw.readProgress : null,
     highlightCount: Number.isFinite(raw.highlightCount) ? raw.highlightCount : null,
+    ...bookMetadata(raw),
+    qiaomuJobs: Array.isArray(raw.qiaomuJobs) ? raw.qiaomuJobs.filter(id => /^[a-f0-9]{32}$/.test(id)).slice(-200) : [],
     aliases: Array.isArray(raw.aliases) ? raw.aliases.filter(id => typeof id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(id)) : [],
   };
 }
@@ -271,6 +275,10 @@ async function importBook(paths, input) {
     aliases: [...new Set([...(previous.aliases || []), ...(typeof input.localId === 'string' ? [input.localId] : [])])],
     identifier: previous.identifier || input.identifier || '',
     cover: input.cover ?? previous.cover ?? null,
+    ...bookMetadata({ ...bookMetadata(input), ...bookMetadata(previous) }),
+    source: input.source ?? previous.source ?? 'upload',
+    sourceId: input.sourceId || previous.sourceId || '',
+    qiaomuJobs: [...new Set([...(previous.qiaomuJobs || []), ...(input.qiaomuJob ? [input.qiaomuJob] : [])])],
   });
   if (index >= 0) library.books[index] = book;
   else library.books.push(book);
@@ -404,7 +412,29 @@ export function apply(ctx, config = {}) {
    * 每个方法都返回可 JSON 序列化的结果，失败时抛带原因的 Error。
    */
   const shelfData = createShelfSource();
+  let ebook = null;
+  const getEbook = () => ebook ||= createHostEbookLibrary({
+    directory: ebookCredentialDirectory(pathsOf().base),
+    library: async () => (await readLibrary(pathsOf())).books,
+    importer: async file => {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const format = formatOf(file.name);
+      let parsed = null, cover = null;
+      if (format === 'epub') {
+        const { parseEpub } = await import('../core/epub.js');
+        parsed = await parseEpub(bytes);
+        if (!parsed.chapters.length) throw new Error('Empty EPUB');
+        const mime = parsed.resources[parsed.coverHref]?.mediaType;
+        const image = /^image\/(jpeg|png|webp|gif)$/i.test(mime || '') ? await parsed.resourceBytes(parsed.coverHref) : null;
+        if (image && image.byteLength <= 1024*1024) cover = `data:${mime};base64,${Buffer.from(image).toString('base64')}`;
+      }
+      const paths = await ensureFolders();
+      return serializeLibrary(paths.base, () => importBook(paths, { filename:file.name, bytes, ...bookMetadata(file.bookMetadata), title:file.bookMetadata?.title || parsed?.title, author:file.bookMetadata?.author || parsed?.author, language:file.bookMetadata?.language || parsed?.language, chapterCount:parsed?.chapters.length, identifier:parsed?.identifier, cover, source:'qiaomu', sourceId:file.bookMetadata?.sourceId, qiaomuJob:file.bookJobId }));
+    },
+  });
+  ctx.effect(() => () => ebook?.dispose());
   const api = {
+    async ebookAction(request) { try { return await getEbook().action(request); } catch (cause) { return { error: safeEbookError(cause) }; } },
     shelfData,
     async shelfMarks() {
       const raw = await readJson(path.join(pathsOf().base, 'reading-lists.json'), {});
@@ -441,16 +471,18 @@ export function apply(ctx, config = {}) {
     /** 读取书库。 */
     async library() {
       await ensureFolders();
-      const library = await readLibrary(pathsOf());
-      let migrated = false;
-      for (const book of library.books) {
-        if (Number.isFinite(book.readProgress) && Number.isFinite(book.highlightCount)) continue;
-        const state = await readState(pathsOf(), book.id);
-        Object.assign(book, stateSummary(state, book.chapterCount)); migrated = true;
-      }
-      if (migrated) await writeLibrary(pathsOf(), library);
-      return { ...library, books: library.books.filter(book => !book.removedAt).map(normalizeBook),
-        removedBooks: library.books.filter(book => book.removedAt).map(normalizeBook) };
+      return serializeLibrary(pathsOf().base, async () => {
+        const library = await readLibrary(pathsOf());
+        let migrated = false;
+        for (const book of library.books) {
+          if (Number.isFinite(book.readProgress) && Number.isFinite(book.highlightCount)) continue;
+          const state = await readState(pathsOf(), book.id);
+          Object.assign(book, stateSummary(state, book.chapterCount)); migrated = true;
+        }
+        if (migrated) await writeLibrary(pathsOf(), library);
+        return { ...library, books: library.books.filter(book => !book.removedAt).map(normalizeBook),
+          removedBooks: library.books.filter(book => book.removedAt).map(normalizeBook) };
+      });
     },
 
     /**
@@ -464,7 +496,7 @@ export function apply(ctx, config = {}) {
       const paths = await ensureFolders();
       const bytes = Buffer.from(input.base64, 'base64');
       if (bytes.byteLength === 0) throw new Error('导入失败：文件为空');
-      const book = await importBook(paths, {
+      const book = await serializeLibrary(paths.base, () => importBook(paths, {
         filename: input.filename,
         bytes,
         title: input.title,
@@ -477,7 +509,7 @@ export function apply(ctx, config = {}) {
         cover: typeof input.cover === 'string' && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(input.cover)
           && input.cover.length <= 1400000 ? input.cover : null,
         source: input.source ?? 'upload',
-      });
+      }));
       return { book };
     },
 
@@ -493,29 +525,33 @@ export function apply(ctx, config = {}) {
       if (info === null || !info.isFile()) throw new Error(`找不到文件：${filePath}`);
       const paths = await ensureFolders();
       const bytes = await readFile(absolute);
-      const book = await importBook(paths, { filename: path.basename(absolute), bytes, source: 'workspace' });
+      const book = await serializeLibrary(paths.base, () => importBook(paths, { filename: path.basename(absolute), bytes, source: 'workspace' }));
       return { book, from: absolute };
     },
 
     /** Only remove membership. Bytes, state and handwritten notes remain recoverable. */
     async remove(bookId) {
       const paths = await ensureFolders();
-      const library = await readLibrary(paths);
-      const book = library.books.find((entry) => entry.id === bookId);
-      if (book === undefined) throw new Error(`书库里没有这本书：${bookId}`);
-      book.removedAt = Date.now();
-      await writeLibrary(paths, library);
-      return { removed: bookId };
+      return serializeLibrary(paths.base, async () => {
+        const library = await readLibrary(paths);
+        const book = library.books.find((entry) => entry.id === bookId);
+        if (book === undefined) throw new Error(`书库里没有这本书：${bookId}`);
+        book.removedAt = Date.now();
+        await writeLibrary(paths, library);
+        return { removed: bookId };
+      });
     },
 
     async restore(bookId) {
       const paths = await ensureFolders();
-      const library = await readLibrary(paths);
-      const book = library.books.find(entry => entry.id === bookId);
-      if (!book) throw new Error(`没有可恢复的书籍：${bookId}`);
-      book.removedAt = null;
-      await writeLibrary(paths, library);
-      return { book: normalizeBook(book) };
+      return serializeLibrary(paths.base, async () => {
+        const library = await readLibrary(paths);
+        const book = library.books.find(entry => entry.id === bookId);
+        if (!book) throw new Error(`没有可恢复的书籍：${bookId}`);
+        book.removedAt = null;
+        await writeLibrary(paths, library);
+        return { book: normalizeBook(book) };
+      });
     },
 
     /** 读取某本书的阅读状态。 */
@@ -527,18 +563,20 @@ export function apply(ctx, config = {}) {
     /** 写入某本书的阅读状态，并把 openedAt 回填索引。 */
     async saveState(bookId, state) {
       const paths = await ensureFolders();
-      const previous = await readState(paths, bookId);
-      const saved = await writeState(paths, bookId, state ?? emptyState(bookId));
-      const library = await readLibrary(paths);
-      const index = library.books.findIndex((entry) => entry.id === bookId);
-      if (index >= 0) {
-        library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now(), ...stateSummary(saved, library.books[index].chapterCount) });
-        await writeLibrary(paths, library);
-      }
-      if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights) || JSON.stringify(previous.vocabulary) !== JSON.stringify(saved.vocabulary)) {
-        await api.exportNotes(bookId);
-      }
-      return { state: saved };
+      return serializeLibrary(paths.base, async () => {
+        const previous = await readState(paths, bookId);
+        const saved = await writeState(paths, bookId, state ?? emptyState(bookId));
+        const library = await readLibrary(paths);
+        const index = library.books.findIndex((entry) => entry.id === bookId);
+        if (index >= 0) {
+          library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now(), ...stateSummary(saved, library.books[index].chapterCount) });
+          await writeLibrary(paths, library);
+        }
+        if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights) || JSON.stringify(previous.vocabulary) !== JSON.stringify(saved.vocabulary)) {
+          await api.exportNotes(bookId);
+        }
+        return { state: saved };
+      });
     },
 
     /** Recover embedded covers lazily for pre-cover imports, only for visible books. */
@@ -832,6 +870,7 @@ export default class ReaderService extends TypertRemoteService {
   speechVoices() { return this.api.speechVoices(); }
   speechAudio(request) { return this.api.speechAudio(request); }
   sendToAnki(request) { return this.api.sendToAnki(request); }
+  ebookAction(request) { return this.api.ebookAction(request); }
   shelfData(request) { return this.api.shelfData(request); }
   shelfMarks() { return this.api.shelfMarks(); }
   markShelf(request) { return this.api.markShelf(request); }
@@ -865,7 +904,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

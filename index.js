@@ -5991,22 +5991,22 @@ var init_default = __esm({
           node.parentNode = null;
         }
       },
-      insertText(parentNode, text) {
+      insertText(parentNode, text2) {
         if (parentNode.childNodes.length > 0) {
           const prevNode = parentNode.childNodes[parentNode.childNodes.length - 1];
           if (defaultTreeAdapter.isTextNode(prevNode)) {
-            prevNode.value += text;
+            prevNode.value += text2;
             return;
           }
         }
-        defaultTreeAdapter.appendChild(parentNode, defaultTreeAdapter.createTextNode(text));
+        defaultTreeAdapter.appendChild(parentNode, defaultTreeAdapter.createTextNode(text2));
       },
-      insertTextBefore(parentNode, text, referenceNode) {
+      insertTextBefore(parentNode, text2, referenceNode) {
         const prevNode = parentNode.childNodes[parentNode.childNodes.indexOf(referenceNode) - 1];
         if (prevNode && defaultTreeAdapter.isTextNode(prevNode)) {
-          prevNode.value += text;
+          prevNode.value += text2;
         } else {
-          defaultTreeAdapter.insertBefore(parentNode, defaultTreeAdapter.createTextNode(text), referenceNode);
+          defaultTreeAdapter.insertBefore(parentNode, defaultTreeAdapter.createTextNode(text2), referenceNode);
         }
       },
       adoptAttributes(recipient, attrs) {
@@ -9626,9 +9626,9 @@ function fromCodePoint(code) {
   if (!Number.isFinite(code) || code < 0 || code > 1114111 || code >= 55296 && code <= 57343) return "\uFFFD";
   return String.fromCodePoint(code);
 }
-function decodeEntities(text) {
-  if (!text || text.indexOf("&") < 0) return text;
-  return String(text).replace(/&(#[xX][0-9a-fA-F]+|#\d+|[a-zA-Z][a-zA-Z0-9]*);/g, (match, body) => {
+function decodeEntities(text2) {
+  if (!text2 || text2.indexOf("&") < 0) return text2;
+  return String(text2).replace(/&(#[xX][0-9a-fA-F]+|#\d+|[a-zA-Z][a-zA-Z0-9]*);/g, (match, body) => {
     if (body[0] === "#") {
       const hex = body[1] === "x" || body[1] === "X";
       return fromCodePoint(parseInt(body.slice(hex ? 2 : 1), hex ? 16 : 10));
@@ -9637,8 +9637,8 @@ function decodeEntities(text) {
     return value === void 0 ? match : value;
   });
 }
-function escapeText2(text) {
-  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function escapeText2(text2) {
+  return String(text2).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 function escapeAttr(value) {
   return String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -9853,20 +9853,20 @@ function sanitizeHtml(html) {
 }
 function toPlainText(html) {
   if (typeof html !== "string" || !html) return "";
-  let text = html;
-  text = text.replace(/<head\b[^>]*>[\s\S]*?<\/head\s*>/gi, " ");
-  text = text.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, " ");
-  text = text.replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, " ");
-  text = text.replace(/<svg\b[^>]*>[\s\S]*?<\/svg\s*>/gi, " ");
-  text = text.replace(/<(?:br|hr)\s*\/?>/gi, "\n");
-  text = text.replace(/<\/(?:p|div|h[1-6]|li|tr|blockquote|pre|section|article|dd|dt|table|thead|tbody|figure|figcaption|header|footer|ul|ol|dl|nav|aside|main|td|th)\s*>/gi, "\n");
-  text = text.replace(/<!--[\s\S]*?-->/g, "");
-  text = text.replace(/<[^>]*>/g, "");
-  text = decodeEntities(text);
-  text = text.replace(/[^\S\n]+/g, " ");
-  text = text.replace(/ *\n */g, "\n");
-  text = text.replace(/\n{2,}/g, "\n");
-  return text.trim();
+  let text2 = html;
+  text2 = text2.replace(/<head\b[^>]*>[\s\S]*?<\/head\s*>/gi, " ");
+  text2 = text2.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, " ");
+  text2 = text2.replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, " ");
+  text2 = text2.replace(/<svg\b[^>]*>[\s\S]*?<\/svg\s*>/gi, " ");
+  text2 = text2.replace(/<(?:br|hr)\s*\/?>/gi, "\n");
+  text2 = text2.replace(/<\/(?:p|div|h[1-6]|li|tr|blockquote|pre|section|article|dd|dt|table|thead|tbody|figure|figcaption|header|footer|ul|ol|dl|nav|aside|main|td|th)\s*>/gi, "\n");
+  text2 = text2.replace(/<!--[\s\S]*?-->/g, "");
+  text2 = text2.replace(/<[^>]*>/g, "");
+  text2 = decodeEntities(text2);
+  text2 = text2.replace(/[^\S\n]+/g, " ");
+  text2 = text2.replace(/ *\n */g, "\n");
+  text2 = text2.replace(/\n{2,}/g, "\n");
+  return text2.trim();
 }
 function absolutize(html, baseDir) {
   if (typeof html !== "string" || !html) return "";
@@ -10117,8 +10117,8 @@ function buildPattern(needle) {
   const parts = needle.split(" ").filter(Boolean).map(escapeRegExp);
   return new RegExp(parts.join("[\\s\\u3000]+"), "giu");
 }
-function searchInText(text, query, opts) {
-  const haystack = toText(text);
+function searchInText(text2, query, opts) {
+  const haystack = toText(text2);
   const needle = normalizeQuery(query);
   if (!needle) return [];
   const raw = opts?.limit;
@@ -10133,8 +10133,8 @@ function searchInText(text, query, opts) {
   }
   return hits;
 }
-function makeSnippet(text, at2, span, width = 80) {
-  const source = toText(text);
+function makeSnippet(text2, at2, span, width = 80) {
+  const source = toText(text2);
   if (!source) return "";
   const total = Math.max(1, toCount(width, 80));
   const matchStart = Math.min(Math.max(toCount(at2, 0), 0), source.length);
@@ -10204,13 +10204,13 @@ function normalizePath(value) {
   return out.join("/");
 }
 function dirOf2(href) {
-  const path3 = normalizePath(href);
-  const cut = path3.lastIndexOf("/");
-  return cut >= 0 ? path3.slice(0, cut + 1) : "";
+  const path4 = normalizePath(href);
+  const cut = path4.lastIndexOf("/");
+  return cut >= 0 ? path4.slice(0, cut + 1) : "";
 }
-function resolveFrom(baseDir, path3) {
-  if (!path3) return "";
-  return normalizePath(path3.startsWith("/") ? path3.slice(1) : `${baseDir}${path3}`);
+function resolveFrom(baseDir, path4) {
+  if (!path4) return "";
+  return normalizePath(path4.startsWith("/") ? path4.slice(1) : `${baseDir}${path4}`);
 }
 function endsWithPath(full, suffix) {
   if (!suffix) return false;
@@ -10263,14 +10263,14 @@ function createReaderEngine(book) {
   }
   async function plainTextAt(index) {
     if (textCache.has(index)) return textCache.get(index);
-    let text = "";
+    let text2 = "";
     try {
-      text = toText2(toPlainText(sanitizedBody(index)));
+      text2 = toText2(toPlainText(sanitizedBody(index)));
     } catch {
-      text = "";
+      text2 = "";
     }
-    textCache.set(index, text);
-    return text;
+    textCache.set(index, text2);
+    return text2;
   }
   function matchChapterByPath(target) {
     if (!target) return null;
@@ -10328,14 +10328,14 @@ function createReaderEngine(book) {
       if (!needle || max <= 0 || !chapters.length) return [];
       const hits = [];
       for (let index = 0; index < chapters.length && hits.length < max; index++) {
-        const text = await plainTextAt(index);
-        if (!text) continue;
-        const found = searchInText(text, needle, { limit: MAX_HITS_PER_CHAPTER });
+        const text2 = await plainTextAt(index);
+        if (!text2) continue;
+        const found = searchInText(text2, needle, { limit: MAX_HITS_PER_CHAPTER });
         for (const match of found) {
           hits.push({
             chapterIndex: index,
             chapterLabel: labelOf(index),
-            snippet: makeSnippet(text, match.index, match.length, SNIPPET_WIDTH),
+            snippet: makeSnippet(text2, match.index, match.length, SNIPPET_WIDTH),
             offset: match.index,
             percent: index / chapters.length
           });
@@ -10349,11 +10349,11 @@ function createReaderEngine(book) {
       const current = indexOf(currentIndex);
       const raw = toText2(href).trim();
       if (!raw || EXTERNAL_SCHEME.test(raw)) return null;
-      const path3 = stripFragment(raw);
-      if (!path3) return current >= 0 ? current : null;
+      const path4 = stripFragment(raw);
+      if (!path4) return current >= 0 ? current : null;
       const currentHref = current >= 0 ? chapters[current]?.href : "";
-      const resolved = resolveFrom(dirOf2(currentHref), path3);
-      const matched = matchChapterByPath(resolved) ?? matchChapterByPath(normalizePath(path3));
+      const resolved = resolveFrom(dirOf2(currentHref), path4);
+      const matched = matchChapterByPath(resolved) ?? matchChapterByPath(normalizePath(path4));
       return matched === null ? null : matched;
     },
     
@@ -10383,10 +10383,10 @@ __export(text_book_exports, {
   parseTextBook: () => parseTextBook
 });
 function legacyTextBook(bytes, title = "\u6587\u672C") {
-  const text = new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
-  if (!text.trim()) throw new Error("TXT \u6587\u4EF6\u6CA1\u6709\u53EF\u8BFB\u6587\u5B57");
+  const text2 = new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+  if (!text2.trim()) throw new Error("TXT \u6587\u4EF6\u6CA1\u6709\u53EF\u8BFB\u6587\u5B57");
   const chunks = [];
-  const lines = text.split("\n");
+  const lines = text2.split("\n");
   let current = [];
   let size = 0;
   for (const line of lines) {
@@ -10411,21 +10411,21 @@ function decodeBookText(bytes) {
   const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   if (data.length > 20 * 1024 * 1024) throw new Error("\u6587\u672C\u6587\u4EF6\u4E0D\u80FD\u8D85\u8FC7 20 MB");
   const encoding = data[0] === 255 && data[1] === 254 ? "utf-16le" : data[0] === 254 && data[1] === 255 ? "utf-16be" : "utf-8";
-  let text;
+  let text2;
   try {
-    text = new TextDecoder(encoding, { fatal: true }).decode(data);
+    text2 = new TextDecoder(encoding, { fatal: true }).decode(data);
   } catch {
     if (encoding !== "utf-8" || data[0] === 239 && data[1] === 187 && data[2] === 191) throw new Error("\u65E0\u6CD5\u89E3\u7801\u6587\u672C\u7F16\u7801");
     try {
-      text = new TextDecoder("gb18030", { fatal: true }).decode(data);
+      text2 = new TextDecoder("gb18030", { fatal: true }).decode(data);
     } catch {
       throw new Error("\u65E0\u6CD5\u89E3\u7801\u6587\u672C\u7F16\u7801");
     }
   }
-  text = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
-  if (/[\u0000-\u0008\u000e-\u001f]/.test(text)) throw new Error("\u6587\u4EF6\u542B\u65E0\u6548\u6587\u672C\u5B57\u7B26");
-  if (!text.trim()) throw new Error("\u6587\u4EF6\u6CA1\u6709\u53EF\u8BFB\u6587\u5B57");
-  return text;
+  text2 = text2.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+  if (/[\u0000-\u0008\u000e-\u001f]/.test(text2)) throw new Error("\u6587\u4EF6\u542B\u65E0\u6548\u6587\u672C\u5B57\u7B26");
+  if (!text2.trim()) throw new Error("\u6587\u4EF6\u6CA1\u6709\u53EF\u8BFB\u6587\u5B57");
+  return text2;
 }
 function cleanNodes(nodes) {
   return nodes.flatMap((node) => {
@@ -10448,19 +10448,19 @@ function cleanNodes(nodes) {
 }
 function parseTextBook(bytes, title = "\u6587\u672C", format = "txt", options = {}) {
   if (format === "txt" && options.layout === 1) return legacyTextBook(bytes, title);
-  let text = decodeBookText(bytes);
+  let text2 = decodeBookText(bytes);
   let author = "";
   let language = "";
   let nodes;
   if (format === "txt") {
-    const html = text.split("\n").map((line) => CHAPTER.test(line.trim()) && line.trim().length <= 80 ? `<h2>${escapeHtml(line.trim())}</h2>` : `<p>${escapeHtml(line) || "<br>"}</p>`).join("");
+    const html = text2.split("\n").map((line) => CHAPTER.test(line.trim()) && line.trim().length <= 80 ? `<h2>${escapeHtml(line.trim())}</h2>` : `<p>${escapeHtml(line) || "<br>"}</p>`).join("");
     nodes = parseFragment(html).childNodes;
   } else if (format === "md") {
-    const frontmatter = /^---\n[\s\S]*?\n(?:---|\.\.\.)\s*(?:\n|$)/.exec(text);
-    if (frontmatter) text = text.slice(frontmatter[0].length);
-    nodes = parseFragment(markdown.parse(text)).childNodes;
+    const frontmatter = /^---\n[\s\S]*?\n(?:---|\.\.\.)\s*(?:\n|$)/.exec(text2);
+    if (frontmatter) text2 = text2.slice(frontmatter[0].length);
+    nodes = parseFragment(markdown.parse(text2)).childNodes;
   } else {
-    const doc = parse(text);
+    const doc = parse(text2);
     let body;
     walk(doc, (node) => {
       if (node.tagName === "title") title = content(node).trim() || title;
@@ -10813,9 +10813,9 @@ function fromCodePoint2(code) {
   if (!Number.isFinite(code) || code < 0 || code > 1114111 || code >= 55296 && code <= 57343) return "\uFFFD";
   return String.fromCodePoint(code);
 }
-function decodeEntities2(text) {
-  if (!text || text.indexOf("&") < 0) return text;
-  return String(text).replace(/&(#[xX][0-9a-fA-F]+|#\d+|[a-zA-Z][a-zA-Z0-9]*);/g, (match, body) => {
+function decodeEntities2(text2) {
+  if (!text2 || text2.indexOf("&") < 0) return text2;
+  return String(text2).replace(/&(#[xX][0-9a-fA-F]+|#\d+|[a-zA-Z][a-zA-Z0-9]*);/g, (match, body) => {
     if (body[0] === "#") {
       const hex = body[1] === "x" || body[1] === "X";
       return fromCodePoint2(parseInt(body.slice(hex ? 2 : 1), hex ? 16 : 10));
@@ -10829,10 +10829,10 @@ function localName(name2) {
   const at2 = value.indexOf(":");
   return (at2 >= 0 ? value.slice(at2 + 1) : value).toLowerCase();
 }
-function findTagEnd2(text, from) {
+function findTagEnd2(text2, from) {
   let quote = "";
-  for (let i = from; i < text.length; i += 1) {
-    const ch = text[i];
+  for (let i = from; i < text2.length; i += 1) {
+    const ch = text2[i];
     if (quote) {
       if (ch === quote) quote = "";
     } else if (ch === '"' || ch === "'") quote = ch;
@@ -10855,8 +10855,8 @@ function parseAttrs2(source) {
 function parseMarkup(source) {
   const root = { name: "#root", attrs: /* @__PURE__ */ Object.create(null), children: [] };
   const stack = [root];
-  const text = String(source || "");
-  const n = text.length;
+  const text2 = String(source || "");
+  const n = text2.length;
   let i = 0;
   const current = () => stack[stack.length - 1];
   const addText = (value) => {
@@ -10866,33 +10866,33 @@ function parseMarkup(source) {
     if (value) current().children.push({ name: "#text", text: value, attrs: null, children: [] });
   };
   while (i < n) {
-    const lt2 = text.indexOf("<", i);
+    const lt2 = text2.indexOf("<", i);
     if (lt2 < 0) {
-      addText(text.slice(i));
+      addText(text2.slice(i));
       break;
     }
-    if (lt2 > i) addText(text.slice(i, lt2));
-    if (text.startsWith("<!--", lt2)) {
-      const end = text.indexOf("-->", lt2 + 4);
+    if (lt2 > i) addText(text2.slice(i, lt2));
+    if (text2.startsWith("<!--", lt2)) {
+      const end = text2.indexOf("-->", lt2 + 4);
       i = end < 0 ? n : end + 3;
       continue;
     }
-    if (text.startsWith("<![CDATA[", lt2)) {
-      const end = text.indexOf("]]>", lt2 + 9);
-      addRawText(text.slice(lt2 + 9, end < 0 ? n : end));
+    if (text2.startsWith("<![CDATA[", lt2)) {
+      const end = text2.indexOf("]]>", lt2 + 9);
+      addRawText(text2.slice(lt2 + 9, end < 0 ? n : end));
       i = end < 0 ? n : end + 3;
       continue;
     }
-    if (text.startsWith("<?", lt2)) {
-      const end = text.indexOf("?>", lt2 + 2);
+    if (text2.startsWith("<?", lt2)) {
+      const end = text2.indexOf("?>", lt2 + 2);
       i = end < 0 ? n : end + 2;
       continue;
     }
-    if (text.startsWith("<!", lt2)) {
+    if (text2.startsWith("<!", lt2)) {
       let depth = 0;
       let j = lt2 + 2;
       for (; j < n; j += 1) {
-        const ch = text[j];
+        const ch = text2[j];
         if (ch === "[") depth += 1;
         else if (ch === "]") depth -= 1;
         else if (ch === ">" && depth <= 0) break;
@@ -10900,12 +10900,12 @@ function parseMarkup(source) {
       i = j + 1;
       continue;
     }
-    const gt2 = findTagEnd2(text, lt2 + 1);
+    const gt2 = findTagEnd2(text2, lt2 + 1);
     if (gt2 < 0) {
-      addText(text.slice(lt2));
+      addText(text2.slice(lt2));
       break;
     }
-    const inner = text.slice(lt2 + 1, gt2);
+    const inner = text2.slice(lt2 + 1, gt2);
     i = gt2 + 1;
     if (!inner) continue;
     if (inner[0] === "/") {
@@ -11005,8 +11005,8 @@ function safeDecode3(value) {
     return value;
   }
 }
-function dirOf3(path3) {
-  const value = String(path3 == null ? "" : path3).replace(/\\/g, "/");
+function dirOf3(path4) {
+  const value = String(path4 == null ? "" : path4).replace(/\\/g, "/");
   const at2 = value.lastIndexOf("/");
   return at2 < 0 ? "" : value.slice(0, at2 + 1);
 }
@@ -11057,8 +11057,8 @@ function chapterLabel(xhtml) {
   }
   return "";
 }
-function parseNavDoc(text, navPath) {
-  const doc = parseMarkup(text);
+function parseNavDoc(text2, navPath) {
+  const doc = parseMarkup(text2);
   const navs = descendantsNamed(doc, "nav");
   let target = navs.find((node) => String(attr2(node, "type") || "").toLowerCase() === "toc") || null;
   if (!target) target = navs[0] || null;
@@ -11083,8 +11083,8 @@ function navListItems(listNode, basePath) {
   }
   return out;
 }
-function parseNcxDoc(text, ncxPath) {
-  const doc = parseMarkup(text);
+function parseNcxDoc(text2, ncxPath) {
+  const doc = parseMarkup(text2);
   const navMap = firstDescendant(doc, "navMap");
   if (!navMap) return [];
   const dir = dirOf3(ncxPath);
@@ -11103,7 +11103,7 @@ function parseNcxDoc(text, ncxPath) {
   return walk2(navMap);
 }
 function pickCoverHref(items, metadataNode, zip) {
-  const exists = (path3) => !!path3 && zip.has(path3);
+  const exists = (path4) => !!path4 && zip.has(path4);
   const isImage = (item) => /^image\//i.test(item.mediaType || "");
   for (const meta of metadataNode ? childrenNamed(metadataNode, "meta") : []) {
     if (String(attr2(meta, "name") || "").toLowerCase() !== "cover") continue;
@@ -11268,6 +11268,512 @@ var init_epub = __esm({
   }
 });
 
+// src/host/ebook-library.js
+import { createHash, randomUUID } from "node:crypto";
+import { homedir } from "node:os";
+import path from "node:path";
+import { mkdirSync, readFileSync, writeFileSync, renameSync, lstatSync, chmodSync } from "node:fs";
+
+// src/host/ebook-protocol.js
+import { webcrypto } from "node:crypto";
+
+// src/core/book-metadata.js
+var text = (value) => typeof value === "string" || typeof value === "number" ? String(value).trim().slice(0, 1e3) : "";
+var people = (value) => (Array.isArray(value) ? value : [value]).map((x) => text(x?.name ?? x)).filter(Boolean).join(", ");
+function bookMetadata(value = {}) {
+  value ||= {};
+  const fields = { title: text(value.title), author: people(value.author || value.authors), year: text(value.year || value.published || value.date).slice(0, 40), language: people(value.language), isbn: text(value.isbn), publisher: people(value.publisher), source: text(value.source), sourceId: text(value.sourceId) };
+  const identifier = value.identifier;
+  if (!fields.isbn && typeof identifier === "string" && /^(?:urn:isbn:)?[\dXx -]{10,25}$/.test(identifier)) fields.isbn = identifier.replace(/^urn:isbn:/, "");
+  return Object.fromEntries(Object.entries(fields).filter(([, value2]) => value2));
+}
+function canonicalIsbn(value) {
+  let isbn = String(value || "").replace(/[\s-]/g, "").toUpperCase();
+  if (/^\d{9}[\dX]$/.test(isbn)) {
+    if ([...isbn].reduce((sum, n, i) => sum + (n === "X" ? 10 : +n) * (10 - i), 0) % 11) return "";
+    isbn = "978" + isbn.slice(0, 9);
+    isbn += (10 - [...isbn].reduce((sum, n, i) => sum + +n * (i % 2 ? 3 : 1), 0) % 10) % 10;
+  }
+  return /^\d{13}$/.test(isbn) && [...isbn].reduce((sum, n, i) => sum + +n * (i % 2 ? 3 : 1), 0) % 10 === 0 ? isbn : "";
+}
+function matchBook(candidate, records) {
+  const book = bookMetadata(candidate), isbn = canonicalIsbn(book.isbn);
+  const normalize = (s) => String(s || "").normalize("NFKC").toLocaleLowerCase().replace(/[\p{P}\p{Z}\s]/gu, "");
+  let possible = null;
+  for (const record of records) {
+    const other = bookMetadata(record);
+    if (isbn && isbn === canonicalIsbn(other.isbn) || book.source && book.sourceId && book.source === other.source && book.sourceId === other.sourceId) return { record, exact: true };
+    if (book.title && book.author && normalize(book.title) === normalize(other.title) && normalize(book.author) === normalize(other.author)) possible ||= { record, exact: false };
+  }
+  return possible;
+}
+
+// src/host/ebook-protocol.js
+var EBOOK_API = "https://ebook-mcp.qiaomu.ai/reader/api";
+var LOCAL_KEY = "qiaomu-reader-ebook-access";
+var MAX_BYTES = 32 * 1024 * 1024;
+var FORMATS = /* @__PURE__ */ new Set(["epub", "pdf", "mobi", "azw3", "txt", "fb2"]);
+var ebookError = (code) => Object.assign(new Error(code), { code });
+var jobId = (value) => typeof value === "string" && /^[a-f0-9]{32}$/.test(value);
+function safeCover(value) {
+  if (!value || value.match !== "work" || value.source !== "Open Library" || typeof value.url !== "string" || !/^https:\/\/covers\.openlibrary\.org\/b\/id\/[1-9]\d{0,9}-M\.jpg\?default=false$/.test(value.url) || typeof value.sourceUrl !== "string" || !/^https:\/\/openlibrary\.org\/works\/OL\d+W$/.test(value.sourceUrl)) return null;
+  return Object.freeze({ url: value.url, sourceUrl: value.sourceUrl, source: value.source, match: "work" });
+}
+var pause = (ms, signal) => new Promise((resolve, reject) => {
+  if (signal?.aborted) return reject(ebookError("cancelled"));
+  const abort = () => {
+    clearTimeout(timer);
+    reject(ebookError("cancelled"));
+  };
+  const timer = setTimeout(() => {
+    signal?.removeEventListener("abort", abort);
+    resolve();
+  }, ms);
+  signal?.addEventListener("abort", abort, { once: true });
+});
+async function verifyEbook(bytes, result, cryptoApi = webcrypto) {
+  const buffer = bytes instanceof ArrayBuffer ? bytes : null;
+  const format = String(result?.format || "").toLowerCase();
+  const name2 = result?.filename;
+  if (!buffer || !FORMATS.has(format) || typeof name2 !== "string" || !name2 || name2.length > 180 || /[/\\]/.test(name2) || [...name2].some((c2) => c2.charCodeAt(0) < 32 || c2.charCodeAt(0) === 127) || !name2.toLowerCase().endsWith("." + format) || !Number.isInteger(result.bytes) || result.bytes !== buffer.byteLength || !result.bytes || result.bytes > MAX_BYTES || !/^[a-f0-9]{64}$/.test(result.sha256 || "")) throw ebookError("file");
+  const data = new Uint8Array(buffer), head = new TextDecoder().decode(data.subarray(0, 256));
+  if (format === "epub" && (data[0] !== 80 || data[1] !== 75 || data[2] !== 3 || data[3] !== 4) || format === "pdf" && !head.startsWith("%PDF-") || ["mobi", "azw3"].includes(format) && new TextDecoder().decode(data.subarray(60, 68)) !== "BOOKMOBI" || format === "fb2" && !new TextDecoder().decode(data.subarray(0, 4096)).includes("<FictionBook") || /^\s*(<!doctype html|<html)/i.test(head)) throw ebookError("file");
+  const sha = Array.from(new Uint8Array(await cryptoApi.subtle.digest("SHA-256", buffer)), (n) => n.toString(16).padStart(2, "0")).join("");
+  if (sha !== result.sha256) throw ebookError("file");
+  return { name: name2, type: "application/octet-stream", arrayBuffer: async () => buffer };
+}
+function createEbookLibrary(plugin, request, { cryptoApi = webcrypto, delay = pause, now = Date.now } = {}) {
+  let disposed = false, access = null, refreshing = null, downloading = false;
+  const aborters = /* @__PURE__ */ new Set();
+  const alive = (signal) => {
+    if (disposed || plugin._unloading || signal?.aborted) throw ebookError("cancelled");
+  };
+  const local = () => {
+    try {
+      const value = plugin.app.loadLocalStorage(LOCAL_KEY);
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    } catch {
+      throw ebookError("save");
+    }
+  };
+  const save = (next) => {
+    alive();
+    try {
+      plugin.app.saveLocalStorage(LOCAL_KEY, next);
+      if (JSON.stringify(local()) !== JSON.stringify(next)) throw Error("readback");
+    } catch {
+      throw ebookError("save");
+    }
+  };
+  const storeTokens = (value) => {
+    alive();
+    if (typeof value?.accessToken !== "string" || value.accessToken.length < 32 || typeof value.refreshToken !== "string" || value.refreshToken.length < 32 || !Number.isFinite(value.expiresAt)) throw ebookError("service");
+    const storage = plugin.app.secretStorage, state = local();
+    if (!storage || !state.secretId) throw ebookError("save");
+    const encoded = JSON.stringify({ refreshToken: value.refreshToken });
+    try {
+      storage.setSecret(state.secretId, encoded);
+      if (storage.getSecret(state.secretId) !== encoded) throw Error("readback");
+    } catch {
+      access = null;
+      throw ebookError("save");
+    }
+    access = { token: value.accessToken, expires: value.expiresAt * 1e3 };
+  };
+  const raw = async (path4, body, token2, signal) => {
+    alive(signal);
+    let response;
+    try {
+      response = await request({ url: EBOOK_API + path4, method: body === void 0 ? "GET" : "POST", signal, headers: { ...body === void 0 ? {} : { "Content-Type": "application/json" }, ...token2 ? { Authorization: "Bearer " + token2 } : {} }, ...body === void 0 ? {} : { body: JSON.stringify(body) }, throw: false });
+    } catch {
+      alive(signal);
+      throw ebookError("network");
+    }
+    alive(signal);
+    if (response.status < 200 || response.status >= 300) {
+      let code;
+      try {
+        code = response.json?.error;
+      } catch {
+      }
+      throw Object.assign(ebookError(typeof code === "string" ? code : "service"), { status: response.status });
+    }
+    return response;
+  };
+  const token = async (signal) => {
+    alive(signal);
+    if (access?.expires > now() + 3e4) return access.token;
+    if (!refreshing) refreshing = (async () => {
+      const state = local();
+      let value2;
+      try {
+        value2 = state.secretId && JSON.parse(plugin.app.secretStorage.getSecret(state.secretId) || "null");
+      } catch {
+        throw ebookError("save");
+      }
+      if (!value2?.refreshToken) throw ebookError("unauthorized");
+      const response = await raw("/refresh", { refreshToken: value2.refreshToken });
+      storeTokens(response.json);
+      return access.token;
+    })().finally(() => {
+      refreshing = null;
+    });
+    const value = await refreshing;
+    alive(signal);
+    return value;
+  };
+  const api = async (path4, body, signal) => {
+    let value = await token(signal);
+    try {
+      return await raw(path4, body, value, signal);
+    } catch (error) {
+      if (error.status !== 401) throw error;
+      if (access?.token === value) access = null;
+      value = await token(signal);
+      return raw(path4, body, value, signal);
+    }
+  };
+  const run = async (fn, signal) => {
+    const controller2 = new AbortController();
+    aborters.add(controller2);
+    const abort = () => controller2.abort();
+    signal?.addEventListener("abort", abort, { once: true });
+    if (signal?.aborted) abort();
+    try {
+      alive(controller2.signal);
+      return await fn(controller2.signal);
+    } finally {
+      signal?.removeEventListener("abort", abort);
+      aborters.delete(controller2);
+    }
+  };
+  const controller = {
+    isActivated() {
+      try {
+        return !!local().secretId && !!plugin.app.secretStorage?.getSecret(local().secretId);
+      } catch {
+        throw ebookError("save");
+      }
+    },
+    async activate(code, signal) {
+      return run(async (activeSignal) => {
+        if (typeof code !== "string" || !/^QM-[A-F0-9]{32}$/.test(code.trim().toUpperCase())) throw ebookError("invalid-code");
+        let state = local();
+        if (!state.installationId || !state.secretId) {
+          state = { ...state, installationId: cryptoApi.randomUUID(), secretId: "qme-" + cryptoApi.randomUUID() };
+          save(state);
+        }
+        if (!plugin.app.secretStorage) throw ebookError("save");
+        const response = await raw("/activate", { code: code.trim().toUpperCase(), installationId: state.installationId, deviceName: String(plugin.app.vault.getName()).slice(0, 60) }, null, activeSignal);
+        storeTokens(response.json);
+        return controller.profile(activeSignal);
+      }, signal);
+    },
+    async profile(signal) {
+      return (await api("/me", void 0, signal)).json;
+    },
+    async logout(signal) {
+      try {
+        await api("/logout", {}, signal);
+      } catch (error) {
+        if (![401, 403].includes(error.status)) throw error;
+      }
+      alive(signal);
+      const state = local();
+      if (state.secretId) plugin.app.secretStorage.setSecret(state.secretId, "");
+      access = null;
+    },
+    async search(query, signal) {
+      const value = String(query || "").trim();
+      if (!value || value.length > 160) throw ebookError("invalid-query");
+      const result = (await api("/search", { query: value }, signal)).json;
+      if (!Array.isArray(result?.results)) throw ebookError("service");
+      return result.results.filter((x) => jobId(x.id) && typeof x.title === "string" && FORMATS.has(x.format)).map((x) => Object.freeze({ ...x }));
+    },
+    async covers(books, signal) {
+      const ids = [...new Set((Array.isArray(books) ? books : []).map((book) => book?.id).filter(jobId))];
+      if (!ids.length) return [];
+      if (ids.length > 20) throw ebookError("service");
+      const result = (await api("/covers", { candidateIds: ids }, signal)).json;
+      if (!Array.isArray(result?.results)) throw ebookError("service");
+      const allowed = new Set(ids);
+      return result.results.filter((book) => allowed.has(book?.id)).map((book) => Object.freeze({
+        id: book.id,
+        cover: safeCover(book.cover),
+        pending: book.pending === true
+      }));
+    },
+    async jobs(signal) {
+      const response = (await api("/jobs", void 0, signal)).json;
+      const imported = new Set(local().importedJobs || []);
+      return (response?.jobs || []).filter((x) => jobId(x.id) && !imported.has(x.id) && !plugin.bookRecords?.hasJob(x.id) && x.availableUntil * 1e3 > now() && ["queued", "running", "complete"].includes(x.state));
+    },
+    async download(candidate, importer, progress, signal, resumeId) {
+      if (downloading) throw ebookError("busy");
+      downloading = true;
+      try {
+        return await run(async (activeSignal) => {
+          let job;
+          if (resumeId) {
+            if (!jobId(resumeId)) throw ebookError("file");
+            job = (await api("/jobs/" + resumeId, void 0, activeSignal)).json;
+          } else {
+            if (!jobId(candidate?.id)) throw ebookError("search-expired");
+            const requestId = local().pendingRequests?.[candidate.id] || cryptoApi.randomUUID();
+            save({ ...local(), pendingRequests: { ...local().pendingRequests, [candidate.id]: requestId } });
+            job = (await api("/jobs", { candidateId: candidate.id, requestId }, activeSignal)).json;
+            const pendingRequests = { ...local().pendingRequests };
+            delete pendingRequests[candidate.id];
+            save({ ...local(), pendingRequests });
+          }
+          if (!jobId(job?.id)) throw ebookError("service");
+          if (candidate && jobId(job.id)) save({ ...local(), pendingBooks: { ...local().pendingBooks, [job.id]: bookMetadata(candidate) } });
+          const deadline = now() + 21e4;
+          while (job.state === "queued" || job.state === "running") {
+            progress?.(job.state);
+            if (now() > deadline) throw ebookError("pending");
+            await delay(1500, activeSignal);
+            job = (await api("/jobs/" + job.id, void 0, activeSignal)).json;
+            if (!jobId(job?.id)) throw ebookError("service");
+          }
+          if (!jobId(job.id) || job.state !== "complete" || !job.result) throw ebookError(job.error || "download-failed");
+          if ((local().importedJobs || []).includes(job.id) || plugin.bookRecords?.hasJob(job.id)) throw ebookError("already-imported");
+          progress?.("running");
+          const response = await api("/jobs/" + job.id + "/file", void 0, activeSignal);
+          progress?.("verifying");
+          const file = await verifyEbook(response.arrayBuffer, job.result, cryptoApi);
+          alive(activeSignal);
+          file.bookMetadata = { ...bookMetadata(local().pendingBooks?.[job.id]), ...bookMetadata(candidate), source: "qiaomu" };
+          file.bookJobId = job.id;
+          progress?.("importing");
+          const imported = await importer([file]);
+          if (!imported) throw ebookError("import");
+          alive();
+          const pendingBooks = { ...local().pendingBooks };
+          delete pendingBooks[job.id];
+          save({ ...local(), pendingBooks, importedJobs: [.../* @__PURE__ */ new Set([...local().importedJobs || [], job.id])].slice(-200) });
+          return file.name;
+        }, signal);
+      } finally {
+        downloading = false;
+      }
+    },
+    dispose() {
+      disposed = true;
+      access = null;
+      for (const aborter of aborters) aborter.abort();
+      aborters.clear();
+    }
+  };
+  return controller;
+}
+
+// src/host/ebook-library.js
+var READABLE_EBOOK_FORMATS = ["epub", "pdf", "txt"];
+var idPattern = /^[a-f0-9]{32}$/;
+var knownErrors = /* @__PURE__ */ new Set(["cancelled", "invalid-code", "invalid-device", "unauthorized", "inactive", "device-revoked", "device-limit", "quota", "save", "file", "busy", "pending", "search-expired", "file-expired", "file-missing", "import", "already-imported", "download-failed", "service-restarted", "network", "service", "invalid-query", "unsupported-format"]);
+var safeEbookError = (cause) => knownErrors.has(cause?.code) ? cause.code : "service";
+function ebookCredentialDirectory(libraryRoot, home = process.env.DSH_HOME || path.join(homedir(), ".dsh")) {
+  return path.join(home, "credentials", "qiaomu-reader", createHash("sha256").update(path.resolve(libraryRoot)).digest("hex").slice(0, 32));
+}
+function credentialStore(directory) {
+  const prepare = () => {
+    mkdirSync(directory, { recursive: true, mode: 448 });
+    if (lstatSync(directory).isSymbolicLink()) throw ebookError("save");
+    chmodSync(directory, 448);
+  };
+  const target = (key) => path.join(directory, key === "secret" ? "refresh.json" : "installation.json");
+  const load = (key) => {
+    try {
+      const file = target(key);
+      if (lstatSync(file).isSymbolicLink()) throw ebookError("save");
+      chmodSync(file, 384);
+      return JSON.parse(readFileSync(file, "utf8"));
+    } catch (error) {
+      if (error.code === "ENOENT") return null;
+      throw ebookError("save");
+    }
+  };
+  const save = (key, value) => {
+    try {
+      prepare();
+      const file = target(key);
+      let previous;
+      try {
+        previous = lstatSync(file);
+      } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+      }
+      if (previous?.isSymbolicLink()) throw ebookError("save");
+      const temp = path.join(directory, "." + randomUUID() + ".tmp");
+      writeFileSync(temp, JSON.stringify(value), { mode: 384, flag: "wx" });
+      renameSync(temp, file);
+      chmodSync(file, 384);
+    } catch {
+      throw ebookError("save");
+    }
+  };
+  return { load, save };
+}
+function ebookTransport(fetcher = globalThis.fetch) {
+  return async ({ url, method, headers, body, signal }) => {
+    if (!url.startsWith(EBOOK_API + "/") || new URL(url).origin !== new URL(EBOOK_API).origin) throw ebookError("network");
+    const active2 = AbortSignal.any([AbortSignal.timeout(45e3), ...signal ? [signal] : []]);
+    try {
+      const response = await fetcher(url, { method, headers, body, signal: active2, redirect: "error" });
+      const limit = /\/file$/.test(url) && response.ok ? 32 * 1024 * 1024 : 1024 * 1024;
+      if (Number(response.headers.get("content-length")) > limit) {
+        await response.body?.cancel();
+        throw ebookError("file");
+      }
+      const chunks = [];
+      let size = 0;
+      const reader = response.body?.getReader();
+      if (reader) {
+        try {
+          while (true) {
+            const value = await reader.read();
+            if (value.done) break;
+            size += value.value.byteLength;
+            if (size > limit) throw ebookError("file");
+            chunks.push(value.value);
+          }
+        } finally {
+          await reader.cancel().catch(() => {
+          });
+        }
+      }
+      const bytes = Buffer.concat(chunks, size), arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      let json = null;
+      if (!/\/file$/.test(url) || !response.ok) {
+        try {
+          json = JSON.parse(bytes.toString("utf8"));
+        } catch {
+          if (response.ok) throw ebookError("service");
+        }
+      }
+      return { status: response.status, json, arrayBuffer };
+    } catch (error) {
+      if (signal?.aborted) throw ebookError("cancelled");
+      if (error?.code === "file" || error?.code === "service") throw error;
+      throw ebookError("network");
+    }
+  };
+}
+function createHostEbookLibrary({ directory, deviceName = "DeepSeek Harness", library, importer, request = ebookTransport(), store = credentialStore(directory), delay, now }) {
+  let records = [], operation = null, aborter = null, disposed = false, starting = false;
+  const candidates = /* @__PURE__ */ new Map();
+  const plugin = {
+    app: {
+      loadLocalStorage: () => store.load("state"),
+      saveLocalStorage: (_key, value) => store.save("state", value),
+      secretStorage: { getSecret: () => store.load("secret") || "", setSecret: (_key, value) => store.save("secret", value) },
+      vault: { getName: () => deviceName }
+    },
+    bookRecords: { hasJob: (id) => records.some((book) => book.qiaomuJobs?.includes(id)) }
+  };
+  const service = createEbookLibrary(plugin, request, { ...delay ? { delay } : {}, ...now ? { now } : {} });
+  const refreshRecords = async () => {
+    records = await library();
+  };
+  const profile = async () => {
+    const value = await service.profile();
+    if (![value?.dailyLimit, value?.usedToday, value?.expiresAt].every(Number.isFinite) || value.dailyLimit < 0 || value.usedToday < 0) throw ebookError("service");
+    if (value.expiresAt * 1e3 <= (now ? now() : Date.now())) throw ebookError("inactive");
+    return { dailyLimit: value.dailyLimit, usedToday: value.usedToday, expiresAt: value.expiresAt };
+  };
+  const owned = (candidate) => matchBook({ ...candidate, source: "qiaomu", sourceId: candidate.sourceId || candidate.id }, records)?.exact ? matchBook({ ...candidate, source: "qiaomu", sourceId: candidate.sourceId || candidate.id }, records).record : null;
+  const start = async (input) => {
+    if (starting || operation?.active) throw ebookError("busy");
+    starting = true;
+    try {
+      await refreshRecords();
+      const candidate = candidates.get(input.candidateId);
+      if (!input.jobId && !candidate) throw ebookError("search-expired");
+      if (candidate && !READABLE_EBOOK_FORMATS.includes(candidate.format)) throw ebookError("unsupported-format");
+      const existing = candidate && owned(candidate);
+      if (existing && !existing.removedAt) return { stage: "imported", book: existing, active: false };
+      if (input.jobId && !idPattern.test(input.jobId)) throw ebookError("file");
+      aborter = new AbortController();
+      const signal = aborter.signal;
+      operation = { id: randomUUID(), stage: "queued", active: true, candidateId: candidate?.id || null, jobId: input.jobId || null };
+      const current = operation;
+      void service.download(candidate, async (files) => {
+        const file = files[0];
+        if (!READABLE_EBOOK_FORMATS.includes(file.name.split(".").at(-1).toLowerCase())) throw ebookError("unsupported-format");
+        current.stage = "importing";
+        current.jobId = file.bookJobId;
+        try {
+          current.book = await importer(file);
+          await refreshRecords();
+          return true;
+        } catch {
+          throw ebookError("import");
+        }
+      }, (stage) => {
+        current.stage = stage;
+      }, signal, input.jobId).then(() => {
+        current.stage = "imported";
+      }, (error) => {
+        current.stage = safeEbookError(error) === "cancelled" ? "cancelled" : "error";
+        current.error = safeEbookError(error);
+      }).finally(() => {
+        current.active = false;
+      });
+      return { ...current };
+    } finally {
+      starting = false;
+    }
+  };
+  return {
+    async action(input = {}) {
+      if (disposed) throw ebookError("cancelled");
+      switch (input.action) {
+        case "profile":
+          return service.isActivated() ? { profile: await profile() } : { profile: null };
+        case "activate":
+          await service.activate(input.code);
+          return { profile: await profile() };
+        case "logout":
+          if (operation?.active) throw ebookError("busy");
+          await service.logout();
+          return { profile: null };
+        case "search": {
+          const rows = await service.search(input.query);
+          await refreshRecords();
+          candidates.clear();
+          const results = rows.slice(0, 100).map((row) => {
+            const value = { ...bookMetadata(row), sourceId: row.sourceId || row.id, id: row.id, title: String(row.title).slice(0, 1e3), format: row.format, size_str: String(row.size_str || "").slice(0, 40) };
+            candidates.set(value.id, value);
+            return { ...value, readable: READABLE_EBOOK_FORMATS.includes(value.format), ownedId: owned(value)?.removedAt ? null : owned(value)?.id || null };
+          });
+          return { results };
+        }
+        case "covers":
+          return { results: await service.covers((input.ids || []).filter((id) => candidates.has(id)).map((id) => ({ id }))) };
+        case "jobs":
+          await refreshRecords();
+          return { jobs: (await service.jobs()).slice(0, 100).map((job) => ({ id: job.id, state: job.state, title: store.load("state")?.pendingBooks?.[job.id]?.title || String(job.result?.filename || "").slice(0, 180) })) };
+        case "start":
+          return start(input);
+        case "status":
+          return operation ? { ...operation } : { active: false, stage: "idle" };
+        case "cancel":
+          if (operation?.active && operation.stage !== "importing") aborter?.abort();
+          return operation ? { ...operation } : { active: false, stage: "idle" };
+        default:
+          throw ebookError("service");
+      }
+    },
+    dispose() {
+      disposed = true;
+      plugin._unloading = true;
+      aborter?.abort();
+      service.dispose();
+    }
+  };
+}
+
 // src/core/book-shelf.js
 var SHELF_ORIGIN = "https://hackerbooks.qiaomu.ai";
 var SHELF_ID = /^OL\d+W$/;
@@ -11337,9 +11843,9 @@ function toggleShelfMark(marks, id, status, now = Date.now()) {
 }
 
 // src/host/index.js
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 import { mkdir, readFile as readFile2, readdir, rename, rm as rm2, stat, writeFile, copyFile } from "node:fs/promises";
-import path2 from "node:path";
+import path3 from "node:path";
 
 // src/core/backlink.js
 function highlightLink(bookId2, highlightId) {
@@ -11383,7 +11889,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import path from "node:path";
+import path2 from "node:path";
 var exec = promisify(execFile);
 var voices;
 async function speechVoices() {
@@ -11397,8 +11903,8 @@ async function speechVoices() {
 var active = 0;
 async function speechAudio(input) {
   if (process.platform !== "darwin") throw new Error("macOS \u7CFB\u7EDF\u8BED\u97F3\u53EA\u9002\u7528\u4E8E Mac \u5BBF\u4E3B");
-  const text = String(input?.text || "").trim();
-  if (!text || text.length > 1e3) throw new Error("\u6717\u8BFB\u6587\u672C\u987B\u4E3A 1\u20131000 \u4E2A\u5B57\u7B26");
+  const text2 = String(input?.text || "").trim();
+  if (!text2 || text2.length > 1e3) throw new Error("\u6717\u8BFB\u6587\u672C\u987B\u4E3A 1\u20131000 \u4E2A\u5B57\u7B26");
   const options = await speechVoices();
   const voice = input.voice ? options.voices.find((v2) => v2.id === input.voice) : null;
   if (input.voice && !voice) throw new Error("\u7CFB\u7EDF\u97F3\u8272\u4E0D\u5B58\u5728\uFF0C\u8BF7\u91CD\u65B0\u9009\u62E9");
@@ -11406,10 +11912,10 @@ async function speechAudio(input) {
   active++;
   let folder;
   try {
-    folder = await mkdtemp(path.join(tmpdir(), "qmr-speech-"));
-    const file = path.join(folder, "speech.wav");
+    folder = await mkdtemp(path2.join(tmpdir(), "qmr-speech-"));
+    const file = path2.join(folder, "speech.wav");
     const rate = Math.round(180 * Math.max(0.5, Math.min(2, Number(input.rate) || 1)));
-    await exec("/usr/bin/say", [...voice ? ["-v", voice.id] : [], "-r", String(rate), "-o", file, "--file-format=WAVE", "--data-format=LEI16@22050", "--", text], { timeout: 45e3, maxBuffer: 1024 * 1024 });
+    await exec("/usr/bin/say", [...voice ? ["-v", voice.id] : [], "-r", String(rate), "-o", file, "--file-format=WAVE", "--data-format=LEI16@22050", "--", text2], { timeout: 45e3, maxBuffer: 1024 * 1024 });
     const bytes = await readFile(file);
     if (bytes.length < 44 || bytes.toString("ascii", 0, 4) !== "RIFF") throw new Error("\u7CFB\u7EDF\u672A\u751F\u6210\u6709\u6548\u97F3\u9891");
     return { base64: bytes.toString("base64") };
@@ -11559,9 +12065,9 @@ async function readResponse(response, limit) {
   return Buffer.concat(chunks);
 }
 async function searchBooks(query, request = globalThis.fetch) {
-  const text = String(query || "").trim().slice(0, 200);
-  if (!text) return { books: [] };
-  const bytes = await getBounded(`${ORIGIN}/ebooks/search.opds/?query=${encodeURIComponent(text)}`, 2e6, request);
+  const text2 = String(query || "").trim().slice(0, 200);
+  if (!text2) return { books: [] };
+  const bytes = await getBounded(`${ORIGIN}/ebooks/search.opds/?query=${encodeURIComponent(text2)}`, 2e6, request);
   return { books: parseCatalog(bytes.toString("utf8")) };
 }
 async function downloadBook(id, request = globalThis.fetch) {
@@ -11649,7 +12155,7 @@ function serializeLibrary(key, run) {
 function writeTextAtomic(file, content2) {
   const previous = writeChains.get(file) ?? Promise.resolve();
   const next = previous.catch(() => void 0).then(async () => {
-    await mkdir(path2.dirname(file), { recursive: true });
+    await mkdir(path3.dirname(file), { recursive: true });
     const temp = `${file}.tmp-${process.pid}-${Date.now().toString(36)}`;
     await writeFile(temp, content2, "utf8");
     await rename(temp, file);
@@ -11665,24 +12171,24 @@ async function readJson(file, fallback) {
     return JSON.parse(await readFile2(file, "utf8"));
   } catch (error) {
     if (error?.code === "ENOENT") return fallback;
-    throw new Error(`\u65E0\u6CD5\u8BFB\u53D6\u4E66\u5E93\u6570\u636E\uFF0C\u5DF2\u4FDD\u7559\u539F\u6587\u4EF6\uFF1A${path2.basename(file)}`, { cause: error });
+    throw new Error(`\u65E0\u6CD5\u8BFB\u53D6\u4E66\u5E93\u6570\u636E\uFF0C\u5DF2\u4FDD\u7559\u539F\u6587\u4EF6\uFF1A${path3.basename(file)}`, { cause: error });
   }
 }
 function isInside(parent, candidate) {
-  const rel = path2.relative(parent, candidate);
-  return rel === "" || !rel.startsWith("..") && !path2.isAbsolute(rel);
+  const rel = path3.relative(parent, candidate);
+  return rel === "" || !rel.startsWith("..") && !path3.isAbsolute(rel);
 }
 function safeJoin(root, ...parts) {
-  const target = path2.resolve(root, ...parts);
+  const target = path3.resolve(root, ...parts);
   if (!isInside(root, target)) throw new Error(`\u8DEF\u5F84\u8D8A\u754C\uFF1A${parts.join("/")}`);
   return target;
 }
 function fallbackRoot(config) {
   if (typeof config?.workspaceRoot === "string" && config.workspaceRoot.trim() !== "") {
-    return path2.resolve(config.workspaceRoot.trim());
+    return path3.resolve(config.workspaceRoot.trim());
   }
   const fromEnv = process.env.DSH_WORKSPACE;
-  if (typeof fromEnv === "string" && fromEnv.trim() !== "") return path2.resolve(fromEnv.trim());
+  if (typeof fromEnv === "string" && fromEnv.trim() !== "") return path3.resolve(fromEnv.trim());
   return process.cwd();
 }
 function resolveWorkspaceRoot(_ctx, config) {
@@ -11693,10 +12199,10 @@ function libraryPaths(root, config) {
   const base = safeJoin(root, folder);
   return {
     base,
-    books: path2.join(base, "books"),
-    state: path2.join(base, "state"),
-    index: path2.join(base, "library.json"),
-    notes: path2.join(base, "notes")
+    books: path3.join(base, "books"),
+    state: path3.join(base, "state"),
+    index: path3.join(base, "library.json"),
+    notes: path3.join(base, "notes")
   };
 }
 async function readLibrary(paths) {
@@ -11716,7 +12222,7 @@ async function writeLibrary(paths, library) {
   return next;
 }
 function bookIdOf(bytes) {
-  return createHash("sha1").update(bytes).digest("hex").slice(0, 16);
+  return createHash2("sha1").update(bytes).digest("hex").slice(0, 16);
 }
 function normalizeBook(raw) {
   return {
@@ -11737,6 +12243,8 @@ function normalizeBook(raw) {
     textLayout: raw.textLayout === 2 ? 2 : 1,
     readProgress: Number.isFinite(raw.readProgress) ? raw.readProgress : null,
     highlightCount: Number.isFinite(raw.highlightCount) ? raw.highlightCount : null,
+    ...bookMetadata(raw),
+    qiaomuJobs: Array.isArray(raw.qiaomuJobs) ? raw.qiaomuJobs.filter((id) => /^[a-f0-9]{32}$/.test(id)).slice(-200) : [],
     aliases: Array.isArray(raw.aliases) ? raw.aliases.filter((id) => typeof id === "string" && /^[a-zA-Z0-9-]{1,80}$/.test(id)) : []
   };
 }
@@ -11751,7 +12259,7 @@ async function importBook(paths, input) {
   const index = library.books.findIndex((book2) => book2.id === id);
   const previous = index >= 0 ? library.books[index] : {};
   const textLayout = index >= 0 ? previous.textLayout || 1 : input.textLayout || 2;
-  const parsed = TEXT_FORMATS.includes(format) ? parseTextBook(bytes, input.title || previous.title || path2.basename(filename, path2.extname(filename)), format, { layout: textLayout }).book : null;
+  const parsed = TEXT_FORMATS.includes(format) ? parseTextBook(bytes, input.title || previous.title || path3.basename(filename, path3.extname(filename)), format, { layout: textLayout }).book : null;
   await mkdir(paths.books, { recursive: true });
   const exists = await stat(absolute).then(() => true).catch(() => false);
   if (!exists) await writeFile(absolute, bytes);
@@ -11759,10 +12267,10 @@ async function importBook(paths, input) {
     ...previous,
     id,
     removedAt: null,
-    title: previous.title || input.title || parsed?.title || path2.basename(filename, path2.extname(filename)),
+    title: previous.title || input.title || parsed?.title || path3.basename(filename, path3.extname(filename)),
     author: previous.author || input.author || parsed?.author || "",
     format,
-    file: path2.posix.join("books", storedName),
+    file: path3.posix.join("books", storedName),
     bytes: bytes.byteLength,
     addedAt: typeof previous.addedAt === "number" ? previous.addedAt : Date.now(),
     source: input.source ?? previous.source ?? "upload",
@@ -11771,7 +12279,11 @@ async function importBook(paths, input) {
     textLayout,
     aliases: [.../* @__PURE__ */ new Set([...previous.aliases || [], ...typeof input.localId === "string" ? [input.localId] : []])],
     identifier: previous.identifier || input.identifier || "",
-    cover: input.cover ?? previous.cover ?? null
+    cover: input.cover ?? previous.cover ?? null,
+    ...bookMetadata({ ...bookMetadata(input), ...bookMetadata(previous) }),
+    source: input.source ?? previous.source ?? "upload",
+    sourceId: input.sourceId || previous.sourceId || "",
+    qiaomuJobs: [.../* @__PURE__ */ new Set([...previous.qiaomuJobs || [], ...input.qiaomuJob ? [input.qiaomuJob] : []])]
   });
   if (index >= 0) library.books[index] = book;
   else library.books.push(book);
@@ -11822,10 +12334,10 @@ function safeCodePoint(code) {
     return "";
   }
 }
-function clip(text, max) {
-  if (text.length <= max) return text;
-  return `${text.slice(0, max)}
-\u2026\uFF08\u5DF2\u622A\u65AD\uFF0C\u5171 ${text.length} \u5B57\u7B26\uFF09`;
+function clip(text2, max) {
+  if (text2.length <= max) return text2;
+  return `${text2.slice(0, max)}
+\u2026\uFF08\u5DF2\u622A\u65AD\uFF0C\u5171 ${text2.length} \u5B57\u7B26\uFF09`;
 }
 async function loadEpubTools() {
   const [zipModule, epubModule] = await Promise.all([
@@ -11851,10 +12363,38 @@ function apply(ctx, config = {}) {
     return paths;
   };
   const shelfData = createShelfSource();
+  let ebook = null;
+  const getEbook = () => ebook ||= createHostEbookLibrary({
+    directory: ebookCredentialDirectory(pathsOf().base),
+    library: async () => (await readLibrary(pathsOf())).books,
+    importer: async (file) => {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const format = formatOf(file.name);
+      let parsed = null, cover = null;
+      if (format === "epub") {
+        const { parseEpub: parseEpub2 } = await Promise.resolve().then(() => (init_epub(), epub_exports));
+        parsed = await parseEpub2(bytes);
+        if (!parsed.chapters.length) throw new Error("Empty EPUB");
+        const mime = parsed.resources[parsed.coverHref]?.mediaType;
+        const image = /^image\/(jpeg|png|webp|gif)$/i.test(mime || "") ? await parsed.resourceBytes(parsed.coverHref) : null;
+        if (image && image.byteLength <= 1024 * 1024) cover = `data:${mime};base64,${Buffer.from(image).toString("base64")}`;
+      }
+      const paths = await ensureFolders();
+      return serializeLibrary(paths.base, () => importBook(paths, { filename: file.name, bytes, ...bookMetadata(file.bookMetadata), title: file.bookMetadata?.title || parsed?.title, author: file.bookMetadata?.author || parsed?.author, language: file.bookMetadata?.language || parsed?.language, chapterCount: parsed?.chapters.length, identifier: parsed?.identifier, cover, source: "qiaomu", sourceId: file.bookMetadata?.sourceId, qiaomuJob: file.bookJobId }));
+    }
+  });
+  ctx.effect(() => () => ebook?.dispose());
   const api = {
+    async ebookAction(request) {
+      try {
+        return await getEbook().action(request);
+      } catch (cause) {
+        return { error: safeEbookError(cause) };
+      }
+    },
     shelfData,
     async shelfMarks() {
-      const raw = await readJson(path2.join(pathsOf().base, "reading-lists.json"), {});
+      const raw = await readJson(path3.join(pathsOf().base, "reading-lists.json"), {});
       if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Invalid reading lists; original file preserved");
       return normalizeShelfMarks(raw);
     },
@@ -11863,7 +12403,7 @@ function apply(ctx, config = {}) {
       return serializeLibrary(pathsOf().base, async () => {
         const marks = await api.shelfMarks();
         const next = normalizeShelfMarks(toggleShelfMark(marks, id, status));
-        await writeTextAtomic(path2.join(pathsOf().base, "reading-lists.json"), JSON.stringify(next, null, 2));
+        await writeTextAtomic(path3.join(pathsOf().base, "reading-lists.json"), JSON.stringify(next, null, 2));
         return next;
       });
     },
@@ -11882,25 +12422,27 @@ function apply(ctx, config = {}) {
     
     info() {
       const paths = pathsOf();
-      return { folder: path2.basename(paths.base), root: paths.base, version: LIBRARY_VERSION };
+      return { folder: path3.basename(paths.base), root: paths.base, version: LIBRARY_VERSION };
     },
     
     async library() {
       await ensureFolders();
-      const library = await readLibrary(pathsOf());
-      let migrated = false;
-      for (const book of library.books) {
-        if (Number.isFinite(book.readProgress) && Number.isFinite(book.highlightCount)) continue;
-        const state = await readState(pathsOf(), book.id);
-        Object.assign(book, stateSummary(state, book.chapterCount));
-        migrated = true;
-      }
-      if (migrated) await writeLibrary(pathsOf(), library);
-      return {
-        ...library,
-        books: library.books.filter((book) => !book.removedAt).map(normalizeBook),
-        removedBooks: library.books.filter((book) => book.removedAt).map(normalizeBook)
-      };
+      return serializeLibrary(pathsOf().base, async () => {
+        const library = await readLibrary(pathsOf());
+        let migrated = false;
+        for (const book of library.books) {
+          if (Number.isFinite(book.readProgress) && Number.isFinite(book.highlightCount)) continue;
+          const state = await readState(pathsOf(), book.id);
+          Object.assign(book, stateSummary(state, book.chapterCount));
+          migrated = true;
+        }
+        if (migrated) await writeLibrary(pathsOf(), library);
+        return {
+          ...library,
+          books: library.books.filter((book) => !book.removedAt).map(normalizeBook),
+          removedBooks: library.books.filter((book) => book.removedAt).map(normalizeBook)
+        };
+      });
     },
     
     async import(input) {
@@ -11910,7 +12452,7 @@ function apply(ctx, config = {}) {
       const paths = await ensureFolders();
       const bytes = Buffer.from(input.base64, "base64");
       if (bytes.byteLength === 0) throw new Error("\u5BFC\u5165\u5931\u8D25\uFF1A\u6587\u4EF6\u4E3A\u7A7A");
-      const book = await importBook(paths, {
+      const book = await serializeLibrary(paths.base, () => importBook(paths, {
         filename: input.filename,
         bytes,
         title: input.title,
@@ -11922,39 +12464,43 @@ function apply(ctx, config = {}) {
         localId: input.localId,
         cover: typeof input.cover === "string" && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(input.cover) && input.cover.length <= 14e5 ? input.cover : null,
         source: input.source ?? "upload"
-      });
+      }));
       return { book };
     },
     
     async importPath(filePath) {
       if (typeof filePath !== "string" || filePath.trim() === "") throw new Error("\u5BFC\u5165\u5931\u8D25\uFF1A\u7F3A\u5C11\u6587\u4EF6\u8DEF\u5F84");
       const root = rootOf();
-      const absolute = path2.isAbsolute(filePath) ? path2.resolve(filePath) : path2.resolve(root, filePath);
+      const absolute = path3.isAbsolute(filePath) ? path3.resolve(filePath) : path3.resolve(root, filePath);
       const info = await stat(absolute).catch(() => null);
       if (info === null || !info.isFile()) throw new Error(`\u627E\u4E0D\u5230\u6587\u4EF6\uFF1A${filePath}`);
       const paths = await ensureFolders();
       const bytes = await readFile2(absolute);
-      const book = await importBook(paths, { filename: path2.basename(absolute), bytes, source: "workspace" });
+      const book = await serializeLibrary(paths.base, () => importBook(paths, { filename: path3.basename(absolute), bytes, source: "workspace" }));
       return { book, from: absolute };
     },
     
     async remove(bookId2) {
       const paths = await ensureFolders();
-      const library = await readLibrary(paths);
-      const book = library.books.find((entry) => entry.id === bookId2);
-      if (book === void 0) throw new Error(`\u4E66\u5E93\u91CC\u6CA1\u6709\u8FD9\u672C\u4E66\uFF1A${bookId2}`);
-      book.removedAt = Date.now();
-      await writeLibrary(paths, library);
-      return { removed: bookId2 };
+      return serializeLibrary(paths.base, async () => {
+        const library = await readLibrary(paths);
+        const book = library.books.find((entry) => entry.id === bookId2);
+        if (book === void 0) throw new Error(`\u4E66\u5E93\u91CC\u6CA1\u6709\u8FD9\u672C\u4E66\uFF1A${bookId2}`);
+        book.removedAt = Date.now();
+        await writeLibrary(paths, library);
+        return { removed: bookId2 };
+      });
     },
     async restore(bookId2) {
       const paths = await ensureFolders();
-      const library = await readLibrary(paths);
-      const book = library.books.find((entry) => entry.id === bookId2);
-      if (!book) throw new Error(`\u6CA1\u6709\u53EF\u6062\u590D\u7684\u4E66\u7C4D\uFF1A${bookId2}`);
-      book.removedAt = null;
-      await writeLibrary(paths, library);
-      return { book: normalizeBook(book) };
+      return serializeLibrary(paths.base, async () => {
+        const library = await readLibrary(paths);
+        const book = library.books.find((entry) => entry.id === bookId2);
+        if (!book) throw new Error(`\u6CA1\u6709\u53EF\u6062\u590D\u7684\u4E66\u7C4D\uFF1A${bookId2}`);
+        book.removedAt = null;
+        await writeLibrary(paths, library);
+        return { book: normalizeBook(book) };
+      });
     },
     
     async loadState(bookId2) {
@@ -11964,18 +12510,20 @@ function apply(ctx, config = {}) {
     
     async saveState(bookId2, state) {
       const paths = await ensureFolders();
-      const previous = await readState(paths, bookId2);
-      const saved = await writeState(paths, bookId2, state ?? emptyState(bookId2));
-      const library = await readLibrary(paths);
-      const index = library.books.findIndex((entry) => entry.id === bookId2);
-      if (index >= 0) {
-        library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now(), ...stateSummary(saved, library.books[index].chapterCount) });
-        await writeLibrary(paths, library);
-      }
-      if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights) || JSON.stringify(previous.vocabulary) !== JSON.stringify(saved.vocabulary)) {
-        await api.exportNotes(bookId2);
-      }
-      return { state: saved };
+      return serializeLibrary(paths.base, async () => {
+        const previous = await readState(paths, bookId2);
+        const saved = await writeState(paths, bookId2, state ?? emptyState(bookId2));
+        const library = await readLibrary(paths);
+        const index = library.books.findIndex((entry) => entry.id === bookId2);
+        if (index >= 0) {
+          library.books[index] = normalizeBook({ ...library.books[index], openedAt: Date.now(), ...stateSummary(saved, library.books[index].chapterCount) });
+          await writeLibrary(paths, library);
+        }
+        if (JSON.stringify(previous.highlights) !== JSON.stringify(saved.highlights) || JSON.stringify(previous.vocabulary) !== JSON.stringify(saved.vocabulary)) {
+          await api.exportNotes(bookId2);
+        }
+        return { state: saved };
+      });
     },
     
     async bookCover({ bookId: bookId2 }) {
@@ -12279,6 +12827,9 @@ var ReaderService = class extends TypertRemoteService {
   sendToAnki(request) {
     return this.api.sendToAnki(request);
   }
+  ebookAction(request) {
+    return this.api.ebookAction(request);
+  }
   shelfData(request) {
     return this.api.shelfData(request);
   }
@@ -12336,7 +12887,7 @@ ${JSON.stringify(material)}
     return { ok: true };
   }
 };
-for (const name2 of ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "sendToAnki", "searchBooks", "downloadBook", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "bookCover", "highlights", "exportNotes", "setReadingContext"]) {
+for (const name2 of ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "sendToAnki", "searchBooks", "downloadBook", "ebookAction", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "bookCover", "highlights", "exportNotes", "setReadingContext"]) {
   Remote(name2)(ReaderService.prototype[name2], {
     name: name2,
     private: false,
