@@ -1,5 +1,20 @@
 # Obsidian Reader → DeepSeek Harness 阅读流程
 
+
+## 2026-11-03 完整朗读与免费翻译：1.5.0
+
+实现提交16bf6c8、3a1f7f5及最终样式/验证提交。复用原版TTS协议、音色/模型选择、Mac显示名与本地运行脚本。Host私有配置与密钥，Client/书库/笔记/包不含密钥；保存密钥只标记已保存，不冒称服务已连接。支持Edge、Mac、OpenAI/兼容、通义、豆包、MiniMax、SiliconFlow、ElevenLabs、Azure及Kokoro/MeloTTS；自定义模型/音色ID、部分提供方远端目录、帮助链接、试听与独立取消。
+
+上一段/下一段跳过空章，选文菜单一键朗读保留选段且不写整书朗读书签；浏览时停跟随，章节边界可暂停；内容SHA256防旧位置用于变更后的书。切书/关闭或切换面板停止播放器/请求；跨服务目录及保存结果带服务身份检查，忽略过期回调。Host20MiB音频缓存、单Edge请求队列和429冷却，取消不换身份/端点。系统与云端分别处理倍速，Host音频按客户端倍速播放。
+
+免费Google查词/翻译默认可用，临时与默认目标隔离、自动语言识别/同语言换译、AI不可用回退、手写保护、重试、保存生词与关闭。原生模型会话/草稿保留。实际安装版Wonderland→“仙境”并保存Host生词状态，无模型密钥。
+
+137项Node测试及Python安装器回归通过。真实隔离DSH中Edge audio playing、readyState4、currentTime前进、暂停与关闭后全部paused；选文菜单可打开面板并实际播放，试听成功；390px控件越界0。深色宿主+纸白书页的面板前景/背景及输入框已配对，查词卡按钮/标签亦读纸张令牌。截图 `speech-*.png`、`lookup-google-installed.png`。
+
+Mac实读191音色；Edge生成21600字节MP3，Mac生成145220字节WAV。Kokoro/MeloTTS完整下载安装、校验和合成通过（144610/221634字节WAV），日用原生窗口两模型均完成试听成功。Kokoro上游同名资产2026-10-26被替换：官方GitHub资产677613419的SHA256 `b78e1ac42b852e839cceaafbe88f66806bf5860992d1d7b9a3f2ad1198427aed`匹配实际下载；核对377个成员，更新两项变更及固定清单，没有跳过校验。参考[官方模型说明](https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/kokoro.html)。模型/独立Python在DSH home之外的书库目录以外，不改全局Python。
+
+日用候选43文件匹配、重启前七个原有Reader文件摘要不变，备份 `/Users/joe/.dsh/backups/reader-1.5.0-20261103`；后续主动试听设置写入是预期变化。包含聊天侧栏的日用截图仅存本地可视化目录。付费服务真实账号、Windows/Linux与实体移动设备未验收；乔木书库真实激活和Kindle设备边界保留。没有用无密钥阻塞协议与UI实现。其余60项继续执行，不能把本版称为原版已全部对齐。
+
 ## 2026-11-03 乔木书库：1.4.0
 
 已从原版 `ebook-library.js`、`ebook-library-ui.js`、`book-records.js` 和 `book-catalog.js` 核对并适配协议。入口为“公开书源 / 乔木书库 / Gutenberg”，不恢复“本地书库”页签。输入的是 `QM-…` 服务激活码，不是短信验证码。连接状态依赖真实 `/me` 校验，不能仅凭本地存在凭据显示已连接。
@@ -93,11 +108,11 @@ Host 独占 activate/refresh/me/search/covers/jobs/file 请求；Client 只接�
 | ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
 |---|---|---|------|
 | E01 | 系统/Mac朗读、暂停继续、倍速、跟随、跨章与位置保存 | 已有基础。D: `client/tts.js`、`ui/panel-speech.js`、`host/speech.js` | 实际发声、停止取消、切书释放、跨章/空PDF页、恢复位置；当前两服务不等于全部朗读。  v1.2已见实际playing/跨章/暂停；当前开始完整朗读批次 |
-| E02 | 上一段/下一段、只读选文、浏览暂停跟随、书内容变化使旧位置失效 | 部分/缺失。D: controller公开play/pause/dispose，面板无段落前后及选文入口；O: `tts-controller.js`、`tts-progress.js`、README | 选文不覆盖整书朗读书签；首次从当前页；翻页与恢复策略逐一对照。  当前实施批次，分服务协议/本机运行/真实账号试听验收 |
-| E03 | Edge免密朗读 | 缺失。O: `tts-edge.js`、`tts-edge-client.js`；D: 仅browser/macOS | Host侧接入，主动播放才请求、取消/超时/音频缓存上限；实际试听。  当前实施批次，分服务协议/本机运行/真实账号试听验收 |
-| E04 | OpenAI/兼容、通义、豆包、MiniMax、硅基流动、ElevenLabs、Azure | 缺失。O: `tts-providers.js`、`tts-choices.js`；D: 无对应provider | 逐服务模型/音色/自定义ID/密钥/帮助链接/请求协议；凭据Host保护，真实账号试听与协议测试分开。  当前实施批次，分服务协议/本机运行/真实账号试听验收 |
-| E05 | Kokoro/MeloTTS本地模型安装、声音切换与试听 | 缺失。O: `tts-local.js`、`tts-local-ui.js`、runtime与models JSON | 本机目录、进度/取消/重试、平台限制；只迁当前两模型，不恢复原版已淘汰克隆模型。  当前实施批次，分服务协议/本机运行/真实账号试听验收 |
-| E06 | 音色搜索/预览、远端声音列表、试听不改阅读进度 | 部分。D: voice下拉已有，但无完整试听管理；O: tts-ui/tts-mac-voices | 搜索声音、预览独立取消、切服务保留段落、选择和试听分离。  当前实施批次，分服务协议/本机运行/真实账号试听验收 |
+| E02 | 上一段/下一段、只读选文、浏览暂停跟随、书内容变化使旧位置失效 | 部分/缺失。D: controller公开play/pause/dispose，面板无段落前后及选文入口；O: `tts-controller.js`、`tts-progress.js`、README | 选文不覆盖整书朗读书签；首次从当前页；翻页与恢复策略逐一对照。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E03 | Edge免密朗读 | 缺失。O: `tts-edge.js`、`tts-edge-client.js`；D: 仅browser/macOS | Host侧接入，主动播放才请求、取消/超时/音频缓存上限；实际试听。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E04 | OpenAI/兼容、通义、豆包、MiniMax、硅基流动、ElevenLabs、Azure | 缺失。O: `tts-providers.js`、`tts-choices.js`；D: 无对应provider | 逐服务模型/音色/自定义ID/密钥/帮助链接/请求协议；凭据Host保护，真实账号试听与协议测试分开。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E05 | Kokoro/MeloTTS本地模型安装、声音切换与试听 | 缺失。O: `tts-local.js`、`tts-local-ui.js`、runtime与models JSON | 本机目录、进度/取消/重试、平台限制；只迁当前两模型，不恢复原版已淘汰克隆模型。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E06 | 音色搜索/预览、远端声音列表、试听不改阅读进度 | 部分。D: voice下拉已有，但无完整试听管理；O: tts-ui/tts-mac-voices | 搜索声音、预览独立取消、切服务保留段落、选择和试听分离。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
 | E07 | Kindle KOReader无线配对/传书 | 缺失。O: `kindle.js`、`kindle-config.js`、`kindle-transport.js`、`kindle-ui.js` | Host适配、身份和凭据分离、局域网传输完整回读、冲突不覆盖、失败恢复；实体Kindle另验。  待逐项核验；静态发现不计运行完成 |
 | E08 | Kindle原生接收、EPUB本地AZW3转换及原格式直传 | 缺失。O: `kindle-native.js`、`kindle-converter.js`、`kindle-epub.js` | 两模式配对独立；原文件不动；转换/文件送达/刷新请求/真机可阅读分别记证据，不自动运行外部接收端安装。  待逐项核验；静态发现不计运行完成 |
 
@@ -262,7 +277,3 @@ Markdown 保存可读摘录与回跳链接；精确定位仍依赖结构化划�
 新增测试 `test/upgrades.test.mjs`（60 个用例全绿）：伴读外观归一化/持久化/容错、`readerPageDirection` 守卫矩阵（含 shadow DOM composedPath）、PDF 资源工厂（CMap 字节、wasm `\0asm` 魔数、未知资源报错、选项契约）。构建通过，`client.js` 5,782,813 字节。
 
 1.4.0日用验收补记：物理包已安装、重启；原生窗口实际显示三个书源和未激活的乔木书库输入框。候选39个文件匹配，七个既有数据文件摘要不变，备份 `/Users/joe/.dsh/backups/reader-1.4.0-20261103`。未把隔离夹具的凭据带入日用profile。恢复任务后结果行立即显示“已拥有 · 打开阅读”、待恢复列表清空，并从该按钮实际打开Alice正文，截图 `ebook-fixture-imported.png` / `ebook-fixture-reading.png`。完整原版对齐继续进行，未用本版发布代替其余入口验收。
-
-### 当前开发批次：1.5.0（未发布）
-
-已接入Host语音配置/私有密钥、原版Edge及8类云端协议、AVFoundation Mac音色、Kokoro/MeloTTS安装与合成管理；客户端增加服务/模型/音色管理、试听、段落前后、选文朗读、浏览暂停跟随和内容指纹恢复保护。关闭/切面板、切书/切服务的异步保护正在安装包内复验。Google免费查词/目标语言/AI不可用回退亦已接入Host和选文卡。135项本地测试通过；Edge实际生成21600字节MP3，Mac读到191音色并生成145220字节WAV；MeloTTS本机安装/合成已通过，Kokoro真实下载发现上游资产大小与旧manifest不同，正在校验完整成员摘要，未降低校验要求。以上仍需候选安装/真实UI及公开发布关卡，未标为全部对齐。

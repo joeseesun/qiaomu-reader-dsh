@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.4.0：新增乔木书库激活、搜索与下载入库；保留原版封面/详情、主工具栏和批量提示词编辑。[适配与验证范围](docs/READER-ADAPTATION.md)。
+> v1.5.0：新增免费 Google 查词翻译、完整朗读服务与音色设置、选文/段落控制，以及 Kokoro/MeloTTS 本地模型安装。[适配与验证范围](docs/READER-ADAPTATION.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -10,8 +10,10 @@
 
 - EPUB、PDF、TXT、Markdown / HTML 导入；UTF-8、UTF-16 BOM 与 GB18030 文本解码。
 - 从书库移除后保留原副本、进度、划线、生词和 Markdown 笔记，可恢复或重新导入。
-- 浏览器系统语音与 macOS 宿主语音：跨章朗读、暂停续读、音色/速度、跟随和回到朗读处。
-- 选区查词卡复用 Harness 原生会话；生词保留上下文与原文回跳，可导出 Markdown，可选 AnkiConnect。
+- 系统、Mac 本地、Edge、OpenAI/兼容、通义、豆包、MiniMax、硅基流动、ElevenLabs、Azure 语音；模型/音色配置、独立试听、段落前后、选文、跨章与位置恢复。
+- Kokoro/MeloTTS 一键安装、进度/取消/重试；模型和 Python 环境独立于书库及系统 Python。
+- 默认免费 Google 查词/翻译，目标语言可临时选择或保存默认；可切原生 AI 解释，未就绪时回退。
+- 选区免费翻译和可选 Harness 原生 AI 解释；生词保留上下文与原文回跳，可导出 Markdown，可选 AnkiConnect。
 - Hacker Books 榜单、主题、搜索、中文简介和 HN 评论；想读 / 读过与本地推荐。
 - 乔木书库激活、配额状态、版本搜索、参考封面与下载恢复；EPUB/PDF/TXT 校验后加入本地书库。
 - Gutenberg 搜索、EPUB 下载校验、已拥有提示；大书库窗口渲染。
@@ -25,13 +27,17 @@
 
 图：实际安装包的未激活界面；成功下载流程经协议夹具验证，真实服务仍需输入用户激活码验收。
 
+![真实安装版免费查词](docs/qa/lookup-google-installed.png)
+
+图：DSH Host 实际请求 Google，Wonderland→仙境；无需配置模型。朗读付费服务的协议测试不代表真实账号试听。
+
 ## 安装预构建发布包
 
-从 [v1.4.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.4.0) 下载 `qiaomu-reader-dsh-1.4.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
+从 [v1.5.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.5.0) 下载 `qiaomu-reader-dsh-1.5.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
 
 ```sh
 shasum -a 256 -c SHA256SUMS
-dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.4.0.tgz
+dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.5.0.tgz
 ```
 
 `YOUR_PROFILE` 需要替换为目标 profile。macOS 桌面版请使用应用自带 CLI：`/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh`。不要把隔离测试配置直接覆盖日用配置。
@@ -44,15 +50,15 @@ dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.4.0.tgz
 
 默认书库在宿主工作目录下的 `乔木阅读/`，由 `workspaceRoot` 配置固定；书籍、状态、生成的笔记分别在 `books/`、`state/`、`notes/`。更新笔记只替换受管理区块，保留手写文字。不要删除这些目录来卸载插件。
 
-AI 需要用户在 Harness 配置模型。查词打开独立原生会话并提供引用上下文，点击「生成解释」后发送；可直接手填释义。Anki 需要在本机安装并运行 AnkiConnect，默认使用 `Default` 牌组的 `Basic` 笔记类型及 `Front` / `Back` 字段。
+免费查词无需模型，只有本次选文发送 Google；AI 解释需要用户在 Harness 配置模型，打开独立原生会话并提供上下文，点击「生成解释」后发送；可直接手填释义。Anki 需要在本机安装并运行 AnkiConnect，默认使用 `Default` 牌组的 `Basic` 笔记类型及 `Front` / `Back` 字段。
 
 ## 数据与联网
 
-阅读副本和结构化状态保存在本机，浏览器保留离线缓存。公开书单访问 Hacker Books，Gutenberg 搜索/下载访问 `www.gutenberg.org`；可选乔木书库访问 `ebook-mcp.qiaomu.ai/reader/api`，参考封面访问 Open Library。乔木书库刷新凭据仅保存在 Host 私有目录（0700/0600，本机权限控制，未宣称加密），不随书库或导出笔记传出；激活码不保存。浏览器语音使用运行环境所提供的声音，其联网行为由该环境决定。macOS 语音通过 `/usr/bin/say` 本地合成，临时音频随请求清理。只有点击发送到 Anki 才访问固定本机端口 `127.0.0.1:8765`。AI 上下文交给用户选择的 Harness 模型，沿用宿主账号、工具与授权机制；本插件不搬迁原版 AI 密钥。
+阅读副本和结构化状态保存在本机，浏览器保留离线缓存。公开书单访问 Hacker Books，Gutenberg 搜索/下载访问 `www.gutenberg.org`；可选乔木书库访问 `ebook-mcp.qiaomu.ai/reader/api`，参考封面访问 Open Library。乔木书库刷新凭据仅保存在 Host 私有目录（0700/0600，本机权限控制，未宣称加密），不随书库或导出笔记传出；激活码不保存。浏览器语音使用运行环境所提供的声音，其联网行为由该环境决定。Mac 语音优先 AVFoundation（保留旧 say 音色兼容），Edge 将播放文字发送微软；其他在线语音发送所选服务，密钥保存在 Host 私有文件。Kokoro/MeloTTS 本机合成，首次下载固定摘要的模型和独立运行环境；模型及缓存位于 `$DSH_HOME/reader-tts` / `$DSH_HOME/cache/reader-tts`。只有点击发送到 Anki 才访问固定本机端口 `127.0.0.1:8765`。AI 上下文交给用户选择的 Harness 模型，沿用宿主账号、工具与授权机制；本插件不搬迁原版 AI 密钥。
 
 ## 当前边界
 
-本轮交付阅读/书库的第一阶段。乔木书库代码与协议夹具闭环已完成；真实服务激活下载需用户输入激活码后另行验收。Kindle 双模式传书、原版云端/本地模型 TTS 服务仍需后续宿主适配。MOBI、FB2、漫画不在本版支持范围。分页页码随窗口和排版变化，不宣称全书稳定页码。AI 实际回答、真实 Anki 卡片与 Kindle 设备阅读分别未验收。
+本轮交付阅读/书库的第一阶段。乔木书库代码与协议夹具闭环已完成；真实服务激活下载需用户输入激活码后另行验收。云端语音已接入原版协议及设置，真实付费账号试听仍需用户密钥；Edge、Mac、Kokoro/MeloTTS 本机合成已验证，日用两本地模型试听成功。Kindle 双模式传书和其余完整对照表事项继续迁移。MOBI、FB2、漫画不在本版支持范围。分页页码随窗口和排版变化，不宣称全书稳定页码。AI 实际回答、真实 Anki 卡片与 Kindle 设备阅读分别未验收。
 
 若需回滚，重新安装此前已验证的包并重载 profile，先备份整个 `乔木阅读/`。旧版不认识新增的 Markdown/HTML 书籍及归档字段，不应用旧版执行书库修改。卸载插件时保留书库与浏览器缓存。
 
@@ -68,10 +74,10 @@ npm pack --pack-destination /tmp
 
 ## English
 
-Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.4.0 GitHub Release; no npm publication is provided.
+Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.5.0 GitHub Release; no npm publication is provided.
 
-Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and installed in the ordinary desktop profile with existing books preserved. Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Qiaomu Library activation/search/download is implemented and fixture-tested; real activated service downloads still require the user’s activation code. Kindle, additional TTS engines, MOBI/FB2/comics and stable whole-book pagination remain outside this release.
+Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and installed in the ordinary desktop profile with existing books preserved. Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Qiaomu Library activation/search/download is implemented and fixture-tested; real activated service downloads still require the user’s activation code. Speech providers and Kokoro/MeloTTS setup are implemented. Edge/Mac synthesis and both local-model auditions passed; paid provider accounts still require user keys. Kindle, MOBI/FB2/comics and stable whole-book pagination remain separate parity tasks.
 
-Books, notes and state are stored locally. Qiaomu Library optionally contacts ebook-mcp.qiaomu.ai; refresh credentials stay in permission-controlled Host files outside the book library. Reference covers use Open Library. Gutenberg search/download contacts Gutenberg; AI context goes to the configured Harness provider; explicit Anki export uses localhost port 8765. macOS speech uses the system `say` service. Uninstall the plugin through Harness while keeping its library files; back up the library before rollback. Licensed GPL-3.0-only.
+Books, notes and state are stored locally. Qiaomu Library optionally contacts ebook-mcp.qiaomu.ai; refresh credentials stay in permission-controlled Host files outside the book library. Reference covers use Open Library. Gutenberg search/download contacts Gutenberg; AI context goes to the configured Harness provider; explicit Anki export uses localhost port 8765. Mac speech uses AVFoundation with legacy say compatibility. Google receives only the selected lookup text. Online speech uses the selected provider; local models use an independently installed runtime outside the book library. Uninstall the plugin through Harness while keeping its library files; back up the library before rollback. Licensed GPL-3.0-only.
 
 本次 Harness rc.5 支持范围与实测边界见 [兼容验证记录](docs/RC5-COMPATIBILITY.md)。

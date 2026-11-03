@@ -665,6 +665,7 @@ export const UI_CSS = `
 .qmr-vocabulary-entry{padding-bottom:18px;border-bottom:1px solid var(--qmr-border);display:flex;flex-direction:column;gap:10px}
 .qmr-lookup-card{position:fixed;z-index:30;display:flex;flex-direction:column;width:min(420px,calc(100vw - 16px));max-height:min(560px,calc(100vh - 16px));background:var(--qmr-paper);color:var(--qmr-ink);border:1px solid var(--qmr-border);border-radius:8px;box-shadow:0 10px 40px #0002;overflow:auto}
 .qmr-lookup-chat{min-height:230px;flex:1;overflow:auto;border-top:1px solid var(--qmr-border)}
+.qmr-lookup-card{--dsw-alias-bg-base:var(--qmr-paper);--dsw-alias-bg-layer-1:var(--qmr-ui);--dsw-alias-bg-layer-2:var(--qmr-hover);--dsw-alias-label-primary:var(--qmr-ink);--dsw-alias-label-secondary:var(--qmr-muted);--dsw-alias-border-l1:var(--qmr-border);color:var(--qmr-ink)}
 .qmr-lookup-card .qmr-feature-panel>strong{max-height:70px;overflow:auto;font-size:14px}
 .qmr-panel-content{display:flex;flex-direction:column;min-height:0;height:100%}
 @media(max-width:600px){.qmr-reader-content>.qmr-topbar .qmr-title{font-size:13px}.qmr-reader-content>.qmr-topbar .qmr-subtitle{display:none}.qmr-reader-content>.qmr-topbar [aria-label="全屏"]{display:none}}

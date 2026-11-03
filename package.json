@@ -25,6 +25,8 @@
     "docs/qa/discovery-*.png",
     "docs/qa/parity-*.png",
     "docs/qa/ebook-*.png",
+    "docs/qa/speech-*.png",
+    "docs/qa/lookup-*.png",
     "docs/READER-ADAPTATION.md",
     "THIRD_PARTY_NOTICES.md",
     "licenses/*.txt",
