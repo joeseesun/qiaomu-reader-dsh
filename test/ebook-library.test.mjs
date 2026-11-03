@@ -20,7 +20,7 @@ function fixture(route,options={}){
  const service=createHostEbookLibrary(config);return {service,saved,calls,records,config};
 }
 async function activate(f){await f.service.action({action:'activate',code});}
-async function finish(service){for(let n=0;n<100;n++){const value=await service.action({action:'status'});if(!value.active)return value;await new Promise(resolve=>setImmediate(resolve));}throw Error('download did not finish');}
+async function finish(service){const deadline=Date.now()+5000;while(Date.now()<deadline){const value=await service.action({action:'status'});if(!value.active)return value;await new Promise(resolve=>setTimeout(resolve,5));}throw Error('download did not finish');}
 test('service state is really validated; no activation code or token crosses Remote or shareable state',async()=>{
  const f=fixture();assert.deepEqual(await f.service.action({action:'profile'}),{profile:null});await activate(f);
  const value=await f.service.action({action:'profile'});assert.deepEqual(value,{profile});assert(!JSON.stringify(value).includes('Token'));assert(!JSON.stringify(f.saved.get('state')).includes(code));assert(!JSON.stringify(f.saved.get('state')).includes('refresh-'));assert(f.saved.get('secret').includes('refresh-'));

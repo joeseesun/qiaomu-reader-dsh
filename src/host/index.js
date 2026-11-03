@@ -268,7 +268,6 @@ async function importBook(paths, input) {
     file: path.posix.join('books', storedName),
     bytes: bytes.byteLength,
     addedAt: typeof previous.addedAt === 'number' ? previous.addedAt : Date.now(),
-    source: input.source ?? previous.source ?? 'upload',
     language: previous.language || input.language || parsed?.language || '',
     chapterCount: parsed?.chapters.length ?? input.chapterCount ?? previous.chapterCount ?? 0,
     textLayout,
