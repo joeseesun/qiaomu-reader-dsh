@@ -1,3 +1,4 @@
+import {normalizePdfPoint} from './pdf-location.js';
 /**
  * 乔木阅读 · 核心状态模型（契约见 docs/ARCHITECTURE.md 4.5）
  *
@@ -126,6 +127,7 @@ function normalizeLocator(raw) {
     chapterHref: str(source.chapterHref),
     scroll: clamp01(source.scroll),
     textQuote: str(source.textQuote),
+    ...(source.pdfPoint !== undefined ? {pdfPoint:normalizePdfPoint(source.pdfPoint)} : {}),
   };
 }
 

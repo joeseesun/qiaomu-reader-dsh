@@ -2,6 +2,7 @@ import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { IconClose, IconPlus } from './icons.js';
 import { readQuickPrompts } from './quick-prompts.js';
+import { pdfContextText } from './pdf-context-locale.js';
 
 const h = React.createElement;
 
@@ -15,6 +16,10 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
   const [busy, setBusy] = React.useState(false);
   const [pageText, setPageText] = React.useState('');
   const [pageReady, setPageReady] = React.useState(false);
+  const [pageSource, setPageSource] = React.useState(null);
+  const [rawPdfContext, setPdfContext] = React.useState(null);
+  const pdfContext = rawPdfContext?.owner === engine ? rawPdfContext : null;
+  const isPdf = engine?.book?.format === 'pdf';
   const [attached, setAttached] = React.useState('');
   const promptLanguage = ui.t('prompts.language', 'zh');
   const [prompts, setPrompts] = React.useState(() => readQuickPrompts(promptLanguage));
@@ -39,10 +44,19 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
     let cancelled = false;
     setPageText('');
     setPageReady(false);
-    Promise.resolve(engine?.plainTextOf?.(chapterIndex)).then((text) => { if (!cancelled) { setPageText(String(text || '')); setPageReady(true); } }).catch(() => { if (!cancelled) setPageReady(true); });
+    Promise.resolve(engine?.plainTextOf?.(chapterIndex)).then((text) => { if (!cancelled) { setPageText(String(text || '')); setPageSource({engine,index:chapterIndex}); setPageReady(true); } }).catch(() => { if (!cancelled) {setPageSource({engine,index:chapterIndex});setPageReady(true);} });
     return () => { cancelled = true; };
   }, [engine, chapterIndex]);
   React.useEffect(() => () => { generation.current += 1; owned.current?.release(); owned.current = null; }, []);
+  React.useEffect(() => {
+    setPdfContext(null);
+    if (!isPdf) return undefined;
+    const controller = new AbortController();
+    Promise.resolve().then(() => engine.documentContext({signal:controller.signal}))
+      .then(data => { if (!controller.signal.aborted) setPdfContext({owner:engine,data}); })
+      .catch(error => { if (!controller.signal.aborted) setPdfContext({owner:engine,error}); });
+    return () => controller.abort();
+  }, [engine, isPdf]);
   React.useEffect(() => {
     const reload = () => setPrompts(readQuickPrompts(promptLanguage));
     reload();
@@ -84,15 +98,18 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
 
   React.useEffect(() => { if (workspaceId) void start(); }, [workspaceId, bookId, start]);
 
-  const contextKey = `${bookId}|${chapterIndex}|${selection?.text || ''}|${pageText}`;
+  const pdfData = pdfContext?.data;
+  const contextReady = pageReady && pageSource?.engine === engine && pageSource.index === chapterIndex && (!isPdf || !!pdfContext);
+  const contextKey = `${bookId}|${chapterIndex}|${selection?.text || ''}|${pageText}|${pdfData?.text || ''}|${pdfContext?.error ? 'page-fallback' : ''}`;
   const chatVisible = !!chat && chatBookId === bookId && (shownChat.current || attached === contextKey);
   React.useEffect(() => {
-    if (!chat || chatBookId !== bookId || !pageReady) return undefined;
+    if (!chat || chatBookId !== bookId || !contextReady) return undefined;
     let cancelled = false;
     setAttached('');
     const request = {
       sessionId: chat.sessionId, title: book?.title || '', author: book?.author || '',
       chapter, page: pageText, selection: selection?.text || '',
+      ...(pdfData ? {document:pdfData.text, documentInfo:{format:'pdf',totalPages:pdfData.totalPages,textPages:pdfData.textPages,includedPages:pdfData.includedPages,sourceChars:pdfData.sourceChars,truncated:pdfData.truncated,ocr:false}} : {}),
     };
     contextQueue.current = contextQueue.current.catch(() => {}).then(async () => {
       if (cancelled) return;
@@ -100,7 +117,7 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
       if (!cancelled) { setAttached(contextKey); setError(''); }
     }).catch((cause) => { if (!cancelled) setError(`阅读上下文未关联：${cause?.message || String(cause)}`); });
     return () => { cancelled = true; };
-  }, [chat, chatApi, chatBookId, contextKey, pageReady]);
+  }, [chat, chatApi, chatBookId, contextKey, contextReady]);
 
   React.useEffect(() => {
     if (!chatVisible || attached !== contextKey || !selection?.text || !selection.id) return;
@@ -154,6 +171,7 @@ export function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, Sess
       h('button', { type: 'button', className: 'qmr-icon-btn', title: '关闭伴读', 'aria-label': '关闭伴读', onClick: () => ui.setPanel(null) }, h(IconClose, { width: 16, height: 16 }))),
     error ? h('div', { className: 'qmr-companion-error', role: 'alert' }, error,
       h('button', { type: 'button', onClick: () => void start() }, '重试')) : null,
+    isPdf ? h('div', {className:'qmr-companion-context-status',role:pdfContext?.error?'alert':'status'}, pdfContext?.error ? pdfContextText(ui,'failed') : !pdfContext ? pdfContextText(ui,'extracting') : !pdfData?.text ? pdfContextText(ui,'empty') : pdfData.truncated ? pdfContextText(ui,'sampled',{included:pdfData.includedPages.length,total:pdfData.textPages}) : pdfContextText(ui,'full',{pages:pdfData.totalPages})) : null,
     !chatVisible && !error ? h('div', { className: 'qmr-busy' }, !workspaceId ? '正在连接默认工作区…' : !chat || chatBookId !== bookId ? '正在打开对话…' : '正在关联阅读上下文…') : null,
     chatVisible && SessionProvider && renderSlot
       ? h('div', { className: 'qmr-native-chat', ref: chatRoot }, h(SessionProvider, { session: chat.reference }, renderSlot('qiaomu-reader.chat', {})))

@@ -50,3 +50,7 @@ test('position reports clear one-time fragment targets before creating bookmarks
 test('appearance changes during chapter loading retain saved locator instead of stale DOM capture',async()=>{
  const h=harness();h.store.set({chapterBusy:true,states:{b:{...h.store.get().states.b,locator:{chapterIndex:0,scroll:0.3,textOffset:180,textQuote:'Saved book sentence'}}}});h.ui.updateSettings('b',{fontSize:32});assert.equal(h.store.get().restoreAnchor.textOffset,180);assert.equal(h.store.get().restoreAnchor.textQuote,'Saved book sentence');await h.ui.flushState('b');
 });
+
+test('PDF geometry survives position reports and bookmark jumps but clears on explicit chapter navigation',async()=>{
+ const h=harness();h.ui.reportPosition('b',{chapterIndex:1,scroll:0.5,pdfPoint:{x:0.4,y:0.7}});assert.deepEqual(JSON.parse(JSON.stringify(h.store.get().states.b.locator.pdfPoint)),{x:0.4,y:0.7});h.ui.goLocator({chapterIndex:1,pdfPoint:{x:0.4,y:0.7}});assert.equal(h.store.get().restoreAnchor.pdfPoint.y,0.7);h.ui.goChapter(0);assert.equal(h.store.get().states.b.locator.pdfPoint,null);await h.ui.flushState('b');
+});
