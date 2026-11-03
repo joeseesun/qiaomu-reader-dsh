@@ -114178,7 +114178,7 @@ var UI_CSS = `
 /* \u4F34\u8BFB\u59CB\u7EC8\u4F7F\u7528\u5DF2\u89E3\u6790\u7684\u5B57\u4F53/\u5B57\u53F7\u53D8\u91CF\uFF1A\u8DDF\u968F\u6B63\u6587\u4E0E\u72EC\u7ACB\u5916\u89C2\u5171\u7528\u540C\u4E00\u6E32\u67D3\u94FE\u8DEF\u3002 */
 .qmr-panel-companion .qmr-companion{font-family:var(--qmr-ai-font)}
 .qmr-panel-companion .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
-.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
+.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:var(--qmr-ai-font);font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
 .qmr-prompt-backdrop{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.35);padding:20px}
 .qmr-prompt-dialog{display:flex;flex-direction:column;width:min(620px,100%);max-height:min(820px,calc(100dvh - 40px));min-height:0;border:1px solid var(--qmr-border);border-radius:12px;background:var(--qmr-paper);color:var(--qmr-ink);box-shadow:0 18px 50px rgba(0,0,0,.2);overflow:hidden;font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 .qmr-prompt-dialog header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 16px;flex:none}

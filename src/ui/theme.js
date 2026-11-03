@@ -522,7 +522,7 @@ export const UI_CSS = `
 /* 伴读始终使用已解析的字体/字号变量：跟随正文与独立外观共用同一渲染链路。 */
 .qmr-panel-companion .qmr-companion{font-family:var(--qmr-ai-font)}
 .qmr-panel-companion .qmr-native-chat{font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
-.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:inherit;font-size:inherit;line-height:inherit}
+.qmr-panel-companion .qmr-native-chat :is(textarea,[contenteditable=true],[role=textbox]){font-family:var(--qmr-ai-font);font-size:var(--qmr-ai-size);line-height:var(--qmr-ai-line-height)}
 .qmr-prompt-backdrop{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.35);padding:20px}
 .qmr-prompt-dialog{display:flex;flex-direction:column;width:min(620px,100%);max-height:min(820px,calc(100dvh - 40px));min-height:0;border:1px solid var(--qmr-border);border-radius:12px;background:var(--qmr-paper);color:var(--qmr-ink);box-shadow:0 18px 50px rgba(0,0,0,.2);overflow:hidden;font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 .qmr-prompt-dialog header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 16px;flex:none}
