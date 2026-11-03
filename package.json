@@ -23,6 +23,7 @@
     "locale/*.json",
     "docs/qa/adaptation-*.png",
     "docs/qa/discovery-*.png",
+    "docs/qa/parity-*.png",
     "docs/READER-ADAPTATION.md",
     "THIRD_PARTY_NOTICES.md",
     "docs/RELEASE-VALIDATION.md"

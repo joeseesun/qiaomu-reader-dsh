@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.2.0：Hacker Books 书单、想读 / 读过、本地推荐；快捷提示词恢复内置与失败重试。[适配与验证范围](docs/READER-ADAPTATION.md)。
+> v1.3.0：恢复原版书源卡片、真实封面与详情；批量提示词编辑；修复搜索框高度，浏览书库并入主工具栏。[适配与验证范围](docs/READER-ADAPTATION.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -16,22 +16,22 @@
 - Gutenberg 搜索、EPUB 下载校验、已拥有提示；大书库窗口渲染。
 - 快捷提示词可恢复内置；默认文案跟随语言，保存失败保留草稿。
 
-![真实 DSH 中的 Hacker Books 英文书单](docs/qa/discovery-english.png)
+![真实 DSH 中的书源卡片与封面](docs/qa/parity-dsh-shelf.png)
 
-图：1.2.0 隔离 DSH 0.2.1-rc.3，书单、读过标记与既有书库共存。
+图：1.3.0 隔离 DSH 0.2.1-rc.5，原版尺寸的卡片、真实封面与详情；主书库保留 C 列表。
 
 ## 安装预构建发布包
 
-从 [v1.2.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.2.0) 下载 `qiaomu-reader-dsh-1.2.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
+从 [v1.3.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.3.0) 下载 `qiaomu-reader-dsh-1.3.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
 
 ```sh
 shasum -a 256 -c SHA256SUMS
-dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.2.0.tgz
+dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.3.0.tgz
 ```
 
 `YOUR_PROFILE` 需要替换为目标 profile。macOS 桌面版请使用应用自带 CLI：`/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh`。不要把隔离测试配置直接覆盖日用配置。
 
-实测环境：macOS、应用自带 DSH 0.2.1-rc.3、独立 Web profile。桌面日用 profile 使用本目录链接；该桌面进程尚未重载验收。其他系统、实体手机和平板未验收。详细记录在 [适配状态](docs/READER-ADAPTATION.md)。
+实测环境：macOS、应用自带 DSH 0.2.1-rc.5、独立 Web profile；日用桌面已安装预构建包并重启，原有六本书、进度与划线保留。其他系统、实体手机和平板未验收。详细记录在 [适配状态](docs/READER-ADAPTATION.md)。
 
 ## 使用
 
@@ -63,9 +63,9 @@ npm pack --pack-destination /tmp
 
 ## English
 
-Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.2.0 GitHub Release; no npm publication is provided.
+Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.3.0 GitHub Release; no npm publication is provided.
 
-Tested on macOS with bundled DSH 0.2.1-rc.3 in an isolated Web profile. The regular desktop process, Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Kindle, activated Qiaomu Library, additional TTS engines, MOBI/FB2/comics and stable whole-book pagination are outside this candidate.
+Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and installed in the ordinary desktop profile with existing books preserved. Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Kindle, activated Qiaomu Library, additional TTS engines, MOBI/FB2/comics and stable whole-book pagination are outside this candidate.
 
 Books, notes and state are stored locally. Gutenberg search/download contacts Gutenberg; AI context goes to the configured Harness provider; explicit Anki export uses localhost port 8765. macOS speech uses the system `say` service. Uninstall the plugin through Harness while keeping its library files; back up the library before rollback. Licensed GPL-3.0-only.
 
