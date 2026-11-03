@@ -5,10 +5,12 @@
 import * as React from 'react';
 import {
   READER_FONT_LABELS,
+  readerThemeLabel,
   READER_THEMES,
   READER_THEME_IDS,
   UI_SETTING_DEFAULTS,
 } from './theme.js';
+import { AppearanceOptions } from './settings-appearance.js';
 import { IconClose, IconSettings } from './icons.js';
 
 const h = React.createElement;
@@ -52,7 +54,7 @@ export function SettingsPanel({ ui }) {
           style: { background: theme.bg, color: theme.text },
           'aria-hidden': 'true',
         }, '文'),
-        h('span', null, id === 'white' ? ui.t('themeWhite', theme.label) : theme.label),
+        h('span', null, readerThemeLabel(id,ui.t('prompts.language','zh')==='en')),
       );
     }),
   );
@@ -89,8 +91,8 @@ export function SettingsPanel({ ui }) {
           h('input', {
             className: 'qmr-range',
             type: 'range',
-            min: 14,
-            max: 28,
+            min: 12,
+            max: 32,
             step: 1,
             value: settings.fontSize,
             'aria-label': '字号',
@@ -185,20 +187,7 @@ export function SettingsPanel({ ui }) {
             }),
             '双页（宽屏时左右并排）')),
       ),
-      h(
-        'div',
-        { className: 'qmr-field' },
-        h('span', { className: 'qmr-field-label' }, '对齐'),
-        h('span', { className: 'qmr-field-ctl' },
-          h('label', { className: 'qmr-switch' },
-            h('input', {
-              type: 'checkbox',
-              checked: settings.justify,
-              'aria-label': '两端对齐',
-              onChange: (event) => update({ justify: !!event.target.checked }),
-            }),
-            '两端对齐')),
-      ),
+      h(AppearanceOptions,{ui,settings,update}),
 
       h('div', { className: 'qmr-group-title' }, 'AI 伴读外观'),
       h(

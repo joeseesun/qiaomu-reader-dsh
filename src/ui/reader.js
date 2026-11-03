@@ -9,6 +9,7 @@ import {
   fontStackOf,
   readerThemeVars,
 } from './theme.js';
+import { verticalPageOffset } from '../core/appearance.js';
 import { readingPositionModel, positionForLocator } from '../core/reading-position.js';
 import { chapterIndexForHref, chapterLabelMap, formatPercent } from './format.js';
 import { useMediaQuery } from './hooks.js';
@@ -215,6 +216,16 @@ function clearFocusMarks(container) {
  * @param {object} props.ui 控制器
  * @returns {React.ReactElement}
  */
+function pageTransform(flow, meta, page, alignment) {
+  const offset=page*(meta.perPage||1)*((meta.columnWidth||320)+(meta.gap||COLUMN_GAP));
+  const from=offset,to=offset+(meta.perPage||1)*((meta.columnWidth||320)+(meta.gap||COLUMN_GAP));
+  const bounds=flow.getBoundingClientRect();let deepest=0;
+  if(alignment!=='top')for(const block of flow.querySelectorAll('p,h1,h2,h3,h4,figure,blockquote,pre,table'))for(const r of block.getClientRects()){
+    const x=r.left-bounds.left;if(x>=from-2&&x<to-2)deepest=Math.max(deepest,r.bottom-bounds.top);
+  }
+  return `translateX(${-offset}px) translateY(${verticalPageOffset(flow.clientHeight,deepest,alignment)}px)`;
+}
+
 export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const bookId = ui.useSel((state) => state.bookId);
   const chapterIndex = ui.useSel((state) => Number(state.chapterIndex) || 0);
@@ -252,7 +263,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const showChrome = React.useCallback(() => {
     setChromeVisible(true);
     clearTimeout(chromeTimerRef.current);
-    chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
+    if(liveRef.current?.settings?.immersive!==false&&!liveRef.current?.settings?.einkMode)chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
   }, []);
   React.useEffect(() => {
     showChrome();
@@ -270,7 +281,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const speechFocus = ui.useSel(state => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
   const settings = book?.format === 'pdf' ? { ...storedSettings, flow: 'scroll' } : storedSettings;
-  const themeVars = readerThemeVars(settings.theme);
+  const themeVars = readerThemeVars(settings.einkMode?'eink':settings.theme);
+  React.useEffect(()=>{showChrome();},[settings.immersive,settings.einkMode,showChrome]);
   /** 伴读独立外观（null = 跟随正文书籍设置，对照原版 4.5.10） */
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
   const companionLook = companionAppearance
@@ -406,7 +418,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       // Resize can leave the page count unchanged; always realign the current page.
       const currentPage = Math.min(liveRef.current.page || 0, pages - 1);
       flow.style.transition = 'none';
-      flow.style.transform = paginated ? `translateX(${-currentPage * perPage * (columnWidth + gap)}px)` : 'none';
+      flow.style.transform = paginated ? pageTransform(flow,measureRef.current,currentPage,settings.vAlign) : 'none';
       if (paginated) viewport.scrollLeft = 0;
       setPageCount(pages);
       setPage((value) => value);
@@ -414,7 +426,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     } catch (_error) {
       return measureRef.current;
     }
-  }, [settings.flow, settings.spread, setPage]);
+  }, [settings.flow, settings.spread, settings.vAlign, setPage]);
 
   /** 分页定位必须翻页，不能让浏览器横向滚动裁切容器。 */
   const revealNode = React.useCallback((node) => {
@@ -629,10 +641,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       return;
     }
     const meta = measureRef.current;
-    const offset = page * (meta.perPage || 1) * ((meta.columnWidth || 320) + (meta.gap || COLUMN_GAP));
-    flow.style.transform = `translateX(${-offset}px)`;
-    flow.style.transition = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'none' : 'transform .18s ease';
-  }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin]);
+    flow.style.transform = pageTransform(flow,meta,page,settings.vAlign);
+    flow.style.transition = (settings.einkMode||settings.pageTurnAnimation===false||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) ? 'none' : 'transform .18s ease';
+  }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin, settings.pageTurnAnimation,settings.einkMode,settings.vAlign]);
 
   // 尺寸变化重新测量
   React.useEffect(() => {
@@ -671,7 +682,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         }
       }
     };
-  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify]);
+  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify,settings.textAlign,settings.maxLineCh,settings.vAlign]);
 
   // ------------------------------------------------------------- 位置上报
 
@@ -891,7 +902,12 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           if (ui.goHref(href)) return;
           if (typeof index === 'number' && index >= 0) ui.goChapter(index);
           else ui.toast('无法定位这个链接', 'warn');
+          return;
         }
+      }
+      if(settings.navMode==='click'&&settings.flow!=='scroll'&&!window.getSelection()?.toString()&&!target?.closest?.('button,input,select,textarea,video,audio,summary')){
+        const bounds=viewportRef.current?.getBoundingClientRect();
+        if(bounds){const fraction=(event.clientX-bounds.left)/bounds.width;if(fraction<0.33)ui.turnPage(-1);else if(fraction>0.67)ui.turnPage(1);}
       }
     } catch (_error) {
       /* 忽略 */
@@ -993,13 +1009,13 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     ? { padding: `56px min(${settings.margin}px, 6vw) 48px` }
     : { padding: `64px min(${settings.margin}px, 6vw) 48px` };
   contentStyle.width = '100%';
-  contentStyle.maxWidth = settings.spread ? '1280px' : '860px';
+  contentStyle.maxWidth = settings.maxLineCh>0?`${settings.maxLineCh*(settings.spread?2:1)*settings.fontSize*0.6+Math.min(settings.margin,120)*2+(settings.spread?COLUMN_GAP:0)}px`:settings.spread ? '1280px' : '860px';
   contentStyle.marginInline = 'auto';
   const flowStyle = {
     fontFamily: fontStackOf(settings.fontFamily),
     fontSize: `${settings.fontSize}px`,
     lineHeight: settings.lineHeight,
-    textAlign: settings.justify ? 'justify' : 'left',
+    textAlign: settings.textAlign,
     color: 'var(--qmr-ink)',
   };
 
@@ -1132,7 +1148,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   return h(
     'div',
-    { className: 'qmr-reader', 'data-qmr-theme': settings.theme, style: themeVars },
+    { className: `qmr-reader qmr-page-buttons-${settings.pageButtonsVisibility}`, 'data-qmr-theme': settings.einkMode?'eink':settings.theme,'data-qmr-eink':settings.einkMode?'true':undefined, style: themeVars },
     h(
       'div',
       { className: `qmr-reader-main${panel === 'companion' ? ' qmr-has-companion' : ''}`, ref: workareaRef, style: { '--qmr-companion-width': `${companionWidth}%` } },
