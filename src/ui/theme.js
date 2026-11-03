@@ -414,6 +414,10 @@ export const UI_CSS = `
 .qmr-pdf-text-layer span{position:absolute;display:block;white-space:pre;color:transparent;line-height:1;user-select:text}
 .qmr-pdf-text-layer span::selection{background:var(--qmr-selection);color:transparent}
 .qmr-pdf-text-layer mark.qmr-hl,.qmr-pdf-text-layer mark.qm-hit{color:transparent;padding:0;mix-blend-mode:multiply}
+.qmr-pdf-destination{position:absolute;width:1px;height:1px;pointer-events:none}
+.qmr-pdf-sheet .qmr-pdf-link{position:absolute;display:block;margin:0;padding:0;background:transparent;border:0}
+.qmr-pdf-link:focus-visible{outline:2px solid var(--qmr-ink);outline-offset:1px}
+.qmr-companion-context-status{flex:0 0 auto;padding:6px 14px;color:var(--qmr-muted);font-size:12px;line-height:1.5;border-bottom:1px solid var(--qmr-border)}
 .qmr-txt-body{max-width:70ch;margin:0 auto}
 .qmr-md-preview h3{font-size:15px;margin:0 0 16px}.qmr-md-preview h4{font-size:13px;margin:18px 0 8px}
 .qmr-md-quote{padding:8px 0;border-bottom:1px solid var(--dsw-alias-border-l1)}

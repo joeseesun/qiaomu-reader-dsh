@@ -20503,8 +20503,8 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
                   if (!data.dataLen) {
                     return null;
                   }
-                  const copy = structuredClone(data);
-                  this.commonObjs.resolve(id, copy);
+                  const copy2 = structuredClone(data);
+                  this.commonObjs.resolve(id, copy2);
                   return data.dataLen;
                 }
               }
@@ -38062,7 +38062,7 @@ function getMeasurement(str2, def = "0") {
   if (!match) {
     return getMeasurement(def);
   }
-  const [, valueStr, unit] = match;
+  const [, valueStr, unit2] = match;
   const value = parseFloat(valueStr);
   if (isNaN(value)) {
     return getMeasurement(def);
@@ -38070,7 +38070,7 @@ function getMeasurement(str2, def = "0") {
   if (value === 0) {
     return 0;
   }
-  const conv = dimConverters[unit];
+  const conv = dimConverters[unit2];
   if (conv) {
     return conv(value);
   }
@@ -99570,6 +99570,48 @@ var init_pdf_resources = __esm({
   }
 });
 
+// src/core/pdf-context.js
+function createPdfContextCollector(limit = PDF_CONTEXT_LIMIT) {
+  limit = Math.max(1e3, Math.min(PDF_CONTEXT_LIMIT, Math.floor(Number(limit) || PDF_CONTEXT_LIMIT)));
+  const pages = [];
+  let sourceChars = 0, truncated = false, retainedChars = 0, headerChars = 0;
+  return {
+    add(page, value) {
+      const text = String(value || "").trim();
+      if (!text) return;
+      sourceChars += text.length;
+      pages.push({ page, text: text.slice(0, limit) });
+      retainedChars += Math.min(text.length, limit);
+      headerChars += `[\u7B2C ${page} \u9875]
+`.length + (pages.length > 1 ? 2 : 0);
+      if (text.length > limit) truncated = true;
+      if (retainedChars + headerChars > limit) {
+        truncated = true;
+        const quota = Math.max(32, Math.floor((limit - headerChars) / pages.length));
+        for (const p2 of pages) if (p2.text.length > quota) p2.text = quota > 1 ? `${p2.text.slice(0, quota - 1)}\u2026` : "";
+        retainedChars = pages.reduce((n, p2) => n + p2.text.length, 0);
+      }
+    },
+    finish(totalPages) {
+      let selected = pages;
+      if (retainedChars + headerChars > limit) {
+        truncated = true;
+        const count = Math.max(2, Math.floor(limit / 80));
+        const length = Math.min(count, pages.length);
+        selected = Array.from({ length }, (_2, i) => pages[Math.round(i * (pages.length - 1) / (length - 1))]);
+      }
+      return { text: selected.map((p2) => `[\u7B2C ${p2.page} \u9875]
+${p2.text}`).join("\n\n").slice(0, limit), totalPages, textPages: pages.length, includedPages: selected.map((p2) => p2.page), sourceChars, truncated };
+    }
+  };
+}
+var PDF_CONTEXT_LIMIT;
+var init_pdf_context = __esm({
+  "src/core/pdf-context.js"() {
+    PDF_CONTEXT_LIMIT = 18e4;
+  }
+});
+
 // src/client/pdf-book.js
 var pdf_book_exports = {};
 __export(pdf_book_exports, {
@@ -99594,11 +99636,28 @@ async function parsePdfBook(bytes, title = "PDF") {
     xhtml: ""
   }));
   const book = { title, author: "", format: "pdf", chapters, toc: chapters.map((chapter) => ({ href: chapter.href, label: chapter.label })) };
+  const destinations = /* @__PURE__ */ new Map(), destinationKeys = /* @__PURE__ */ new Map();
   const resolveDestination = async (destination) => {
     const target = typeof destination === "string" ? await document2.getDestination(destination) : destination;
     if (!Array.isArray(target) || !target.length) return null;
     const index = typeof target[0] === "number" ? target[0] : await document2.getPageIndex(target[0]);
-    return Number.isInteger(index) && index >= 0 && index < chapters.length ? chapters[index].href : null;
+    if (!Number.isInteger(index) || index < 0 || index >= chapters.length) return null;
+    const mode = target[1]?.name;
+    if (!["XYZ", "FitH", "FitBH", "FitV", "FitBV", "FitR"].includes(mode)) return chapters[index].href;
+    const page = await document2.getPage(index + 1), viewport = page.getViewport({ scale: 1 });
+    const finite = (value, fallback) => Number.isFinite(value) ? value : fallback;
+    const x = ["XYZ", "FitV", "FitBV", "FitR"].includes(mode) ? finite(target[2], page.view[0]) : page.view[0];
+    const y2 = mode === "XYZ" ? finite(target[3], page.view[3]) : mode === "FitR" ? finite(target[5], page.view[3]) : ["FitH", "FitBH"].includes(mode) ? finite(target[2], page.view[3]) : page.view[3];
+    const point = viewport.convertToViewportPoint(x, y2);
+    const key = JSON.stringify([index, x, y2]);
+    let id = destinationKeys.get(key);
+    if (!id) {
+      id = `qmr-pdf-dest-${destinationKeys.size}`;
+      destinationKeys.set(key, id);
+      if (!destinations.has(index)) destinations.set(index, []);
+      destinations.get(index).push({ id, x: Math.max(0, Math.min(100, point[0] / viewport.width * 100)), y: Math.max(0, Math.min(100, point[1] / viewport.height * 100)) });
+    }
+    return `${chapters[index].href}#${id}`;
   };
   const outlineItems = async (items) => {
     const result = [];
@@ -99619,6 +99678,7 @@ async function parsePdfBook(bytes, title = "PDF") {
   } catch {
   }
   const textCache = /* @__PURE__ */ new Map();
+  let contextCache, disposed = false;
   const engine = {
     book,
     chapterCount: () => chapters.length,
@@ -99629,7 +99689,26 @@ async function parsePdfBook(bytes, title = "PDF") {
       const content2 = await page.getTextContent();
       const text = content2.items.map((item) => item.str || "").join(" ");
       textCache.set(index, text);
+      while (textCache.size > 16 || [...textCache.values()].reduce((n, v2) => n + v2.length, 0) > 2e6) textCache.delete(textCache.keys().next().value);
       return text;
+    },
+    async documentContext({ signal } = {}) {
+      const check = () => {
+        if (disposed || signal?.aborted) throw Object.assign(new Error("Aborted"), { name: "AbortError" });
+      };
+      check();
+      if (contextCache) return contextCache;
+      if (chapters.length > 1e4) throw new Error("PDF \u8D85\u8FC7 10000 \u9875\uFF0C\u65E0\u6CD5\u81EA\u52A8\u63D0\u53D6\u5168\u6587");
+      const collector = createPdfContextCollector();
+      for (let index = 0; index < chapters.length; index++) {
+        check();
+        collector.add(index + 1, await this.plainTextOf(index));
+        check();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      check();
+      contextCache = collector.finish(chapters.length);
+      return contextCache;
     },
     async render(index, _resourceResolver, options = {}) {
       if (index < 0 || index >= chapters.length) return "";
@@ -99639,6 +99718,21 @@ async function parsePdfBook(bytes, title = "PDF") {
       const scale = Math.min(1.6, 1e3 / Math.max(1, base.width)) * zoom;
       const viewport = page.getViewport({ scale });
       const content2 = await page.getTextContent();
+      const links2 = [];
+      try {
+        for (const annotation of await page.getAnnotations({ intent: "display" })) {
+          if (annotation.subtype !== "Link" || !Array.isArray(annotation.rect)) continue;
+          let href = null;
+          try {
+            href = annotation.dest ? await resolveDestination(annotation.dest) : /^https?:\/\//i.test(annotation.url || "") ? annotation.url : null;
+          } catch {
+          }
+          if (!href) continue;
+          const rect = [...viewport.convertToViewportPoint(annotation.rect[0], annotation.rect[1]), ...viewport.convertToViewportPoint(annotation.rect[2], annotation.rect[3])];
+          links2.push(`<a class="qmr-pdf-link" href="${escapeAttr(href)}" aria-label="PDF link" style="left:${Math.min(rect[0], rect[2]) / viewport.width * 100}%;top:${Math.min(rect[1], rect[3]) / viewport.height * 100}%;width:${Math.abs(rect[2] - rect[0]) / viewport.width * 100}%;height:${Math.abs(rect[3] - rect[1]) / viewport.height * 100}%"></a>`);
+        }
+      } catch {
+      }
       let image = "";
       if (typeof globalThis.document?.createElement === "function") {
         const canvas = globalThis.document.createElement("canvas");
@@ -99655,14 +99749,16 @@ async function parsePdfBook(bytes, title = "PDF") {
         const top = matrix[5] - fontSize;
         return `<span style="left:${left / viewport.width * 100}%;top:${top / viewport.height * 100}%;font-size:${fontSize / viewport.width * 100}cqw;min-width:${Math.max(1, item.width * scale) / viewport.width * 100}%">${escapeHtml(item.str)}</span>`;
       }).join("");
-      return `<div class="qmr-pdf-sheet" style="width:${viewport.width}px;max-width:${zoom > 1 ? "none" : "100%"};aspect-ratio:${viewport.width}/${viewport.height}">${image ? `<img src="${escapeAttr(image)}" alt="\u7B2C ${index + 1} \u9875">` : ""}<div class="qmr-pdf-text-layer">${spans}</div></div>`;
+      const markers = (destinations.get(index) || []).map((p2) => `<span id="${p2.id}" class="qmr-pdf-destination" style="left:${p2.x}%;top:${p2.y}%"></span>`).join("");
+      return `<div class="qmr-pdf-sheet" style="width:${viewport.width}px;max-width:${zoom > 1 ? "none" : "100%"};aspect-ratio:${viewport.width}/${viewport.height}">${image ? `<img src="${escapeAttr(image)}" alt="\u7B2C ${index + 1} \u9875">` : ""}<div class="qmr-pdf-text-layer">${spans}</div>${markers}${links2.join("")}</div>`;
     },
     tocFor(index) {
       return index >= 0 && index < chapters.length ? [{ href: chapters[index].href, label: chapters[index].label }] : [];
     },
     resolveLink(_from, href) {
-      const index = chapters.findIndex((chapter) => chapter.href === href);
-      return index < 0 ? null : { chapterIndex: index, fragment: "" };
+      const [path, fragment = ""] = String(href).split("#");
+      const index = chapters.findIndex((chapter) => chapter.href === path);
+      return index < 0 ? null : { chapterIndex: index, fragment };
     },
     async search(query, options = {}) {
       const needle = String(query || "").trim().toLowerCase();
@@ -99679,7 +99775,12 @@ async function parsePdfBook(bytes, title = "PDF") {
       }
       return hits;
     },
-    dispose: () => task.destroy()
+    dispose: () => {
+      disposed = true;
+      contextCache = null;
+      textCache.clear();
+      return task.destroy();
+    }
   };
   return { book, engine, bytes };
 }
@@ -99689,6 +99790,7 @@ var init_pdf_book = __esm({
     init_pdf();
     init_pdf_worker();
     init_pdf_resources();
+    init_pdf_context();
     globalThis.pdfjsWorker = { WorkerMessageHandler };
     escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
     escapeAttr = escapeHtml;
@@ -112025,6 +112127,38 @@ function flatMessages(messages2, prefix = "") {
 // src/client/index.js
 var React25 = __toESM(require("react"), 1);
 
+// src/core/pdf-location.js
+var unit = (n) => Math.min(1, Math.max(0, n));
+function normalizePdfPoint(point) {
+  if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return null;
+  return {
+    x: unit(point.x),
+    y: unit(point.y),
+    ...Number.isFinite(point.viewportX) ? { viewportX: unit(point.viewportX) } : {},
+    ...Number.isFinite(point.viewportY) ? { viewportY: unit(point.viewportY) } : {}
+  };
+}
+function capturePdfPoint(sheet, viewport, textRects = []) {
+  if (!(sheet?.width > 0 && sheet?.height > 0 && viewport?.width > 0 && viewport?.height > 0)) return null;
+  const text = textRects.find((r) => r.bottom > viewport.top && r.top < viewport.bottom && r.right > viewport.left && r.left < viewport.right);
+  const x = text ? Math.max(viewport.left + 8, text.left) : viewport.left + viewport.width / 2;
+  const y2 = text ? Math.max(viewport.top + 8, text.top) : viewport.top + viewport.height / 2;
+  return normalizePdfPoint({
+    x: (x - sheet.left) / sheet.width,
+    y: (y2 - sheet.top) / sheet.height,
+    viewportX: (x - viewport.left) / viewport.width,
+    viewportY: (y2 - viewport.top) / viewport.height
+  });
+}
+function pdfPointScrollDelta(point, sheet, viewport) {
+  const p2 = normalizePdfPoint(point);
+  if (!p2) return null;
+  return {
+    left: sheet.left + p2.x * sheet.width - viewport.left - (p2.viewportX || 0) * viewport.width,
+    top: sheet.top + p2.y * sheet.height - viewport.top - (p2.viewportY || 0) * viewport.height
+  };
+}
+
 // src/core/state.js
 var DEFAULT_READER_SETTINGS = Object.freeze({
   theme: "paper",
@@ -112101,7 +112235,8 @@ function normalizeLocator(raw) {
     chapterIndex: chapterIndex > 0 ? Math.floor(chapterIndex) : 0,
     chapterHref: str(source.chapterHref),
     scroll: clamp01(source.scroll),
-    textQuote: str(source.textQuote)
+    textQuote: str(source.textQuote),
+    ...source.pdfPoint !== void 0 ? { pdfPoint: normalizePdfPoint(source.pdfPoint) } : {}
   };
 }
 function normalizeSettings(raw) {
@@ -114070,6 +114205,10 @@ var UI_CSS = `
 .qmr-pdf-text-layer span{position:absolute;display:block;white-space:pre;color:transparent;line-height:1;user-select:text}
 .qmr-pdf-text-layer span::selection{background:var(--qmr-selection);color:transparent}
 .qmr-pdf-text-layer mark.qmr-hl,.qmr-pdf-text-layer mark.qm-hit{color:transparent;padding:0;mix-blend-mode:multiply}
+.qmr-pdf-destination{position:absolute;width:1px;height:1px;pointer-events:none}
+.qmr-pdf-sheet .qmr-pdf-link{position:absolute;display:block;margin:0;padding:0;background:transparent;border:0}
+.qmr-pdf-link:focus-visible{outline:2px solid var(--qmr-ink);outline-offset:1px}
+.qmr-companion-context-status{flex:0 0 auto;padding:6px 14px;color:var(--qmr-muted);font-size:12px;line-height:1.5;border-bottom:1px solid var(--qmr-border)}
 .qmr-txt-body{max-width:70ch;margin:0 auto}
 .qmr-md-preview h3{font-size:15px;margin:0 0 16px}.qmr-md-preview h4{font-size:13px;margin:18px 0 8px}
 .qmr-md-quote{padding:8px 0;border-bottom:1px solid var(--dsw-alias-border-l1)}
@@ -114934,7 +115073,7 @@ function createController(getProps, store) {
     } catch (_error) {
     }
     uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null, restoreAnchor: null });
-    updateLocator(state.bookId, { chapterIndex: target, scroll: 0, textOffset: 0, textQuote: "", originalPage: "", chapterHref: engineOf(state.bookId)?.book?.chapters?.[target]?.href || "" });
+    updateLocator(state.bookId, { chapterIndex: target, scroll: 0, textOffset: 0, textQuote: "", pdfPoint: null, originalPage: "", chapterHref: engineOf(state.bookId)?.book?.chapters?.[target]?.href || "" });
   }
   function goPercent(fraction) {
     const state = uiStore.get();
@@ -114942,7 +115081,7 @@ function createController(getProps, store) {
     if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
     const location = percentLocation(fraction, count);
     uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, restoreAnchor: null, jumpToken: (state.jumpToken || 0) + 1 });
-    updateLocator(state.bookId, { ...location, textOffset: void 0, textQuote: "", originalPage: "" });
+    updateLocator(state.bookId, { ...location, textOffset: void 0, textQuote: "", pdfPoint: null, originalPage: "" });
   }
   function updateLocator(id, patch) {
     if (id == null) return;
@@ -114966,6 +115105,7 @@ function createController(getProps, store) {
       if (Number.isFinite(position.textOffset)) locator.textOffset = Math.max(0, Math.floor(position.textOffset));
       if (typeof position.originalPage === "string") locator.originalPage = position.originalPage;
       if (typeof position.contentFingerprint === "string") locator.contentFingerprint = position.contentFingerprint;
+      locator.pdfPoint = normalizePdfPoint(position.pdfPoint);
       patchState(id, { locator });
     });
   }
@@ -114973,7 +115113,7 @@ function createController(getProps, store) {
     const state = uiStore.get(), count = chapterCountOf(state.bookId) || 1;
     const chapterIndex = clampInt(locator.chapterIndex, 0, count - 1);
     if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
-    const target = { ...locator, chapterIndex, chapterHref: locator.chapterHref || engineOf(state.bookId)?.book?.chapters?.[chapterIndex]?.href || "", textOffset: Number.isFinite(locator.textOffset) ? Math.max(0, Math.floor(locator.textOffset)) : void 0, textQuote: locator.textQuote || "", originalPage: locator.originalPage || "", scroll: Math.min(1, Math.max(0, Number(locator.scroll) || 0)) };
+    const target = { ...locator, pdfPoint: locator.pdfPoint || null, chapterIndex, chapterHref: locator.chapterHref || engineOf(state.bookId)?.book?.chapters?.[chapterIndex]?.href || "", textOffset: Number.isFinite(locator.textOffset) ? Math.max(0, Math.floor(locator.textOffset)) : void 0, textQuote: locator.textQuote || "", originalPage: locator.originalPage || "", scroll: Math.min(1, Math.max(0, Number(locator.scroll) || 0)) };
     uiStore.set({ chapterIndex, page: 0, restoreScroll: target.scroll, restoreAnchor: target, jumpToken: (state.jumpToken || 0) + 1 });
     updateLocator(state.bookId, target);
   }
@@ -115292,7 +115432,7 @@ function createController(getProps, store) {
     if (result && typeof result.markdown === "string" && result.markdown.trim()) return result.markdown;
     return toMarkdown(stateOr(id), bookOf(id), engineOf(id));
   }
-  async function copy(value, label = "\u5DF2\u590D\u5236") {
+  async function copy2(value, label = "\u5DF2\u590D\u5236") {
     const ok = await copyText(value);
     toast(ok ? label : "\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u6587\u672C", ok ? "ok" : "error");
     return ok;
@@ -115406,7 +115546,7 @@ function createController(getProps, store) {
     removedBooks: () => props().data?.getLibrary()?.removedBooks || [],
     exportNotes,
     setCompanionAppearance,
-    copy,
+    copy: copy2,
     attachOverlay,
     toggleFullscreen,
     resourceResolver
@@ -116926,6 +117066,20 @@ function resetQuickPrompts() {
   window.dispatchEvent(new Event("qmr-prompts-changed"));
 }
 
+// src/ui/pdf-context-locale.js
+var copy = {
+  extracting: ["\u6B63\u5728\u63D0\u53D6 PDF \u5168\u6587\u2026", "Extracting PDF document\u2026"],
+  full: ["PDF \u5168\u6587 \xB7 {pages} \u9875", "Full PDF \xB7 {pages} pages"],
+  sampled: ["PDF \u5747\u5300\u6458\u53D6 \xB7 {included}/{total} \u4E2A\u6587\u5B57\u9875 \xB7 \u6700\u591A 180000 \u5B57\u7B26", "PDF evenly sampled \xB7 {included}/{total} text pages \xB7 up to 180000 characters"],
+  empty: ["PDF \u6CA1\u6709\u53EF\u63D0\u53D6\u6587\u5B57\uFF1B\u672A\u6267\u884C OCR\uFF0C\u53EF\u8BA8\u8BBA\u5F53\u524D\u9009\u6BB5\u3002", "No extractable PDF text. OCR was not performed; selected text is still available."],
+  failed: ["PDF \u5168\u6587\u63D0\u53D6\u5931\u8D25\uFF0C\u5F53\u524D\u4EC5\u5173\u8054\u672C\u9875\uFF1B\u91CD\u65B0\u6253\u5F00\u4F34\u8BFB\u53EF\u91CD\u8BD5\u3002", "PDF extraction failed. Only the current page is attached; reopen companion to retry."]
+};
+function pdfContextText(ui, key, values = {}) {
+  let value = copy[key]?.[ui.t("prompts.language", "zh") === "en" ? 1 : 0] || key;
+  for (const [name, replacement] of Object.entries(values)) value = value.replaceAll(`{${name}}`, String(replacement));
+  return value;
+}
+
 // src/ui/companion.js
 var h8 = React11.createElement;
 function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) {
@@ -116938,6 +117092,10 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
   const [busy, setBusy] = React11.useState(false);
   const [pageText, setPageText] = React11.useState("");
   const [pageReady, setPageReady] = React11.useState(false);
+  const [pageSource, setPageSource] = React11.useState(null);
+  const [rawPdfContext, setPdfContext] = React11.useState(null);
+  const pdfContext = rawPdfContext?.owner === engine ? rawPdfContext : null;
+  const isPdf = engine?.book?.format === "pdf";
   const [attached, setAttached] = React11.useState("");
   const promptLanguage = ui.t("prompts.language", "zh");
   const [prompts, setPrompts] = React11.useState(() => readQuickPrompts(promptLanguage));
@@ -116964,10 +117122,14 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
     Promise.resolve(engine?.plainTextOf?.(chapterIndex)).then((text) => {
       if (!cancelled) {
         setPageText(String(text || ""));
+        setPageSource({ engine, index: chapterIndex });
         setPageReady(true);
       }
     }).catch(() => {
-      if (!cancelled) setPageReady(true);
+      if (!cancelled) {
+        setPageSource({ engine, index: chapterIndex });
+        setPageReady(true);
+      }
     });
     return () => {
       cancelled = true;
@@ -116978,6 +117140,17 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
     owned.current?.release();
     owned.current = null;
   }, []);
+  React11.useEffect(() => {
+    setPdfContext(null);
+    if (!isPdf) return void 0;
+    const controller = new AbortController();
+    Promise.resolve().then(() => engine.documentContext({ signal: controller.signal })).then((data) => {
+      if (!controller.signal.aborted) setPdfContext({ owner: engine, data });
+    }).catch((error2) => {
+      if (!controller.signal.aborted) setPdfContext({ owner: engine, error: error2 });
+    });
+    return () => controller.abort();
+  }, [engine, isPdf]);
   React11.useEffect(() => {
     const reload = () => setPrompts(readQuickPrompts(promptLanguage));
     reload();
@@ -117024,10 +117197,12 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
   React11.useEffect(() => {
     if (workspaceId) void start();
   }, [workspaceId, bookId, start]);
-  const contextKey = `${bookId}|${chapterIndex}|${selection?.text || ""}|${pageText}`;
+  const pdfData = pdfContext?.data;
+  const contextReady = pageReady && pageSource?.engine === engine && pageSource.index === chapterIndex && (!isPdf || !!pdfContext);
+  const contextKey = `${bookId}|${chapterIndex}|${selection?.text || ""}|${pageText}|${pdfData?.text || ""}|${pdfContext?.error ? "page-fallback" : ""}`;
   const chatVisible = !!chat && chatBookId === bookId && (shownChat.current || attached === contextKey);
   React11.useEffect(() => {
-    if (!chat || chatBookId !== bookId || !pageReady) return void 0;
+    if (!chat || chatBookId !== bookId || !contextReady) return void 0;
     let cancelled = false;
     setAttached("");
     const request = {
@@ -117036,7 +117211,8 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
       author: book?.author || "",
       chapter,
       page: pageText,
-      selection: selection?.text || ""
+      selection: selection?.text || "",
+      ...pdfData ? { document: pdfData.text, documentInfo: { format: "pdf", totalPages: pdfData.totalPages, textPages: pdfData.textPages, includedPages: pdfData.includedPages, sourceChars: pdfData.sourceChars, truncated: pdfData.truncated, ocr: false } } : {}
     };
     contextQueue.current = contextQueue.current.catch(() => {
     }).then(async () => {
@@ -117052,7 +117228,7 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
     return () => {
       cancelled = true;
     };
-  }, [chat, chatApi, chatBookId, contextKey, pageReady]);
+  }, [chat, chatApi, chatBookId, contextKey, contextReady]);
   React11.useEffect(() => {
     if (!chatVisible || attached !== contextKey || !selection?.text || !selection.id) return;
     const id = `${chat.sessionId}:${selection.id}`;
@@ -117126,6 +117302,7 @@ function CompanionPanel({ ui, bookId, chapterIndex, engine, chatApi, SessionProv
       error,
       h8("button", { type: "button", onClick: () => void start() }, "\u91CD\u8BD5")
     ) : null,
+    isPdf ? h8("div", { className: "qmr-companion-context-status", role: pdfContext?.error ? "alert" : "status" }, pdfContext?.error ? pdfContextText(ui, "failed") : !pdfContext ? pdfContextText(ui, "extracting") : !pdfData?.text ? pdfContextText(ui, "empty") : pdfData.truncated ? pdfContextText(ui, "sampled", { included: pdfData.includedPages.length, total: pdfData.textPages }) : pdfContextText(ui, "full", { pages: pdfData.totalPages })) : null,
     !chatVisible && !error ? h8("div", { className: "qmr-busy" }, !workspaceId ? "\u6B63\u5728\u8FDE\u63A5\u9ED8\u8BA4\u5DE5\u4F5C\u533A\u2026" : !chat || chatBookId !== bookId ? "\u6B63\u5728\u6253\u5F00\u5BF9\u8BDD\u2026" : "\u6B63\u5728\u5173\u8054\u9605\u8BFB\u4E0A\u4E0B\u6587\u2026") : null,
     chatVisible && SessionProvider && renderSlot ? h8("div", { className: "qmr-native-chat", ref: chatRoot }, h8(SessionProvider, { session: chat.reference }, renderSlot("qiaomu-reader.chat", {}))) : null,
     promptMount ? (0, import_react_dom2.createPortal)(h8(
@@ -121984,6 +122161,8 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const index = textIndexRef.current ||= buildTextIndex(flow);
     let target = null;
     if (restoreAnchor.fragment) target = [...flow.querySelectorAll("[id],a[name]")].find((node) => node.id === restoreAnchor.fragment || node.getAttribute("name") === restoreAnchor.fragment);
+    const point = !target && engine?.book?.format === "pdf" && Number.isFinite(restoreAnchor.pdfPoint?.x) && Number.isFinite(restoreAnchor.pdfPoint?.y) ? restoreAnchor.pdfPoint : null;
+    if (point) target = flow.querySelector(".qmr-pdf-sheet");
     if (!target && Number.isFinite(restoreAnchor.textOffset)) {
       let at2 = Math.max(0, Math.min(index.map.length - 1, restoreAnchor.textOffset));
       if (restoreAnchor.textQuote) {
@@ -121991,11 +122170,11 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         matches.sort((a3, b) => Math.abs(a3.start - at2) - Math.abs(b.start - at2));
         if (matches[0]) at2 = matches[0].start;
       }
-      const point = index.map[at2];
-      if (point) {
+      const point2 = index.map[at2];
+      if (point2) {
         const range = document.createRange();
-        range.setStart(point.node, point.offset);
-        range.setEnd(point.node, Math.min(point.node.length, point.offset + 1));
+        range.setStart(point2.node, point2.offset);
+        range.setEnd(point2.node, Math.min(point2.node.length, point2.offset + 1));
         target = range;
       }
     }
@@ -122005,8 +122184,19 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       anchorAppliedRef.current = key;
       if (settings.flow === "scroll") {
         const viewport = viewportRef.current, rect = target.getBoundingClientRect();
-        if (viewport) viewport.scrollTop += rect.top - viewport.getBoundingClientRect().top - 8;
+        if (viewport) {
+          const bounds = viewport.getBoundingClientRect();
+          if (point) {
+            const delta = pdfPointScrollDelta(point, rect, bounds);
+            viewport.scrollTop += delta.top;
+            viewport.scrollLeft += delta.left;
+          } else {
+            viewport.scrollTop += rect.top - bounds.top - 8;
+            if (target.classList?.contains("qmr-pdf-destination")) viewport.scrollLeft += rect.left - bounds.left - 8;
+          }
+        }
       } else revealNode(target);
+      if (engine?.book?.format === "pdf") reportPosition();
     });
     return () => cancelAnimationFrame(frame);
   }, [html, chapterBusy, restoreAnchor, jumpToken, bookId, chapterIndex, settings.flow, engine, revealNode]);
@@ -122109,8 +122299,11 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const measureNow = () => {
       try {
         const live = liveRef.current, prior = measureRef.current, saved = { ...ui.stateOr(live.bookId).locator };
+        const state = ui.store.get();
+        const pendingAnchor = state.restoreAnchor && anchorAppliedRef.current !== `${live.bookId}:${live.chapterIndex}:${state.jumpToken}`;
         const next = measure();
-        if ((prior.viewportWidth !== next.viewportWidth || prior.viewportHeight !== next.viewportHeight || prior.pages !== next.pages) && saved.chapterIndex === live.chapterIndex && Number.isFinite(saved.textOffset) && saved.textQuote) {
+        if (state.chapterBusy || pendingAnchor) return;
+        if ((prior.viewportWidth !== next.viewportWidth || prior.viewportHeight !== next.viewportHeight || prior.pages !== next.pages) && saved.chapterIndex === live.chapterIndex && Number.isFinite(saved.textOffset) && (saved.textQuote || saved.pdfPoint)) {
           const current = ui.store.get();
           ui.store.set({ restoreAnchor: saved, restoreScroll: saved.scroll, jumpToken: (current.jumpToken || 0) + 1 });
         }
@@ -122192,7 +122385,12 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       }
     } catch {
     }
-    const locator = { chapterIndex: live.chapterIndex, chapterHref: chapterHrefOf(live.engine, live.chapterIndex), scroll: Math.min(1, Math.max(0, scroll)), textQuote, ...Number.isFinite(textOffset) ? { textOffset } : {}, originalPage, contentFingerprint: live.engine?.contentFingerprint || "" };
+    let pdfPoint = null;
+    if (live.engine?.book?.format === "pdf") {
+      const sheet = flowRef.current?.querySelector(".qmr-pdf-sheet"), viewport = viewportRef.current;
+      if (sheet && viewport) pdfPoint = capturePdfPoint(sheet.getBoundingClientRect(), viewport.getBoundingClientRect(), [...sheet.querySelectorAll(".qmr-pdf-text-layer > span")].map((node) => node.getBoundingClientRect()));
+    }
+    const locator = { chapterIndex: live.chapterIndex, chapterHref: chapterHrefOf(live.engine, live.chapterIndex), scroll: Math.min(1, Math.max(0, scroll)), textQuote, ...Number.isFinite(textOffset) ? { textOffset } : {}, pdfPoint, originalPage, contentFingerprint: live.engine?.contentFingerprint || "" };
     ui.reportPosition(live.bookId, locator);
     return locator;
   }, [ui]);

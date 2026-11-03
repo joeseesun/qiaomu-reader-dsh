@@ -1,3 +1,4 @@
+import {capturePdfPoint,pdfPointScrollDelta} from '../core/pdf-location.js';
 /**
  * 阅读器正文区：章节渲染、翻页（分页 / 连续滚动）、进度、键盘、选中菜单、搜索命中高亮。
  *
@@ -528,13 +529,27 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     if(restoreAnchor.contentFingerprint&&restoreAnchor.contentFingerprint!==engine?.contentFingerprint)return;
     const index=textIndexRef.current ||= buildTextIndex(flow);let target=null;
     if(restoreAnchor.fragment)target=[...flow.querySelectorAll('[id],a[name]')].find(node=>node.id===restoreAnchor.fragment||node.getAttribute('name')===restoreAnchor.fragment);
+    const point = !target && engine?.book?.format === 'pdf' && Number.isFinite(restoreAnchor.pdfPoint?.x) && Number.isFinite(restoreAnchor.pdfPoint?.y) ? restoreAnchor.pdfPoint : null;
+    if(point)target=flow.querySelector('.qmr-pdf-sheet');
     if(!target&&Number.isFinite(restoreAnchor.textOffset)){
       let at=Math.max(0,Math.min(index.map.length-1,restoreAnchor.textOffset));
       if(restoreAnchor.textQuote){const matches=findRanges(index.text,restoreAnchor.textQuote,1000);matches.sort((a,b)=>Math.abs(a.start-at)-Math.abs(b.start-at));if(matches[0])at=matches[0].start;}
       const point=index.map[at];if(point){const range=document.createRange();range.setStart(point.node,point.offset);range.setEnd(point.node,Math.min(point.node.length,point.offset+1));target=range;}
     }
     if(!target)return;
-    const frame=requestAnimationFrame(()=>{if(!flow.isConnected)return;anchorAppliedRef.current=key;if(settings.flow==='scroll'){const viewport=viewportRef.current,rect=target.getBoundingClientRect();if(viewport)viewport.scrollTop+=rect.top-viewport.getBoundingClientRect().top-8;}else revealNode(target);});
+    const frame=requestAnimationFrame(()=>{
+      if(!flow.isConnected)return;
+      anchorAppliedRef.current=key;
+      if(settings.flow==='scroll'){
+        const viewport=viewportRef.current,rect=target.getBoundingClientRect();
+        if(viewport){
+          const bounds=viewport.getBoundingClientRect();
+          if(point){const delta=pdfPointScrollDelta(point,rect,bounds);viewport.scrollTop+=delta.top;viewport.scrollLeft+=delta.left;}
+          else {viewport.scrollTop+=rect.top-bounds.top-8;if(target.classList?.contains('qmr-pdf-destination'))viewport.scrollLeft+=rect.left-bounds.left-8;}
+        }
+      }else revealNode(target);
+      if(engine?.book?.format==='pdf')reportPosition();
+    });
     return()=>cancelAnimationFrame(frame);
   },[html,chapterBusy,restoreAnchor,jumpToken,bookId,chapterIndex,settings.flow,engine,revealNode]);
 
@@ -654,8 +669,11 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const measureNow = () => {
       try {
         const live=liveRef.current,prior=measureRef.current,saved={...ui.stateOr(live.bookId).locator};
+        const state=ui.store.get();
+        const pendingAnchor=state.restoreAnchor&&anchorAppliedRef.current!==`${live.bookId}:${live.chapterIndex}:${state.jumpToken}`;
         const next=measure();
-        if((prior.viewportWidth!==next.viewportWidth||prior.viewportHeight!==next.viewportHeight||prior.pages!==next.pages)&&saved.chapterIndex===live.chapterIndex&&Number.isFinite(saved.textOffset)&&saved.textQuote){
+        if(state.chapterBusy||pendingAnchor)return;
+        if((prior.viewportWidth!==next.viewportWidth||prior.viewportHeight!==next.viewportHeight||prior.pages!==next.pages)&&saved.chapterIndex===live.chapterIndex&&Number.isFinite(saved.textOffset)&&(saved.textQuote||saved.pdfPoint)){
           const current=ui.store.get();ui.store.set({restoreAnchor:saved,restoreScroll:saved.scroll,jumpToken:(current.jumpToken||0)+1});
         }
       } catch (_error) {
@@ -716,7 +734,12 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         if(current&&live.positionModel?.pages?.length){for(const page of live.positionModel.pages){const chapter=chapterIndexForHref(live.engine,page.href);if(chapter<0)continue;if(chapter<live.chapterIndex){originalPage=page.label;continue;}if(chapter!==live.chapterIndex)continue;let fragment=page.href.split('#').slice(1).join('#');try{fragment=decodeURIComponent(fragment);}catch{}if(!fragment){originalPage=page.label;continue;}const marker=[...flow.querySelectorAll('[id],a[name]')].find(node=>node.id===fragment||node.getAttribute('name')===fragment);if(marker&&(marker.contains(current)||(marker.compareDocumentPosition(current)&Node.DOCUMENT_POSITION_FOLLOWING)))originalPage=page.label;}}
       }
     }catch{}
-    const locator={chapterIndex:live.chapterIndex,chapterHref:chapterHrefOf(live.engine,live.chapterIndex),scroll:Math.min(1,Math.max(0,scroll)),textQuote,...(Number.isFinite(textOffset)?{textOffset}:{}),originalPage,contentFingerprint:live.engine?.contentFingerprint||''};
+    let pdfPoint=null;
+    if(live.engine?.book?.format==='pdf'){
+      const sheet=flowRef.current?.querySelector('.qmr-pdf-sheet'),viewport=viewportRef.current;
+      if(sheet&&viewport)pdfPoint=capturePdfPoint(sheet.getBoundingClientRect(),viewport.getBoundingClientRect(),[...sheet.querySelectorAll('.qmr-pdf-text-layer > span')].map(node=>node.getBoundingClientRect()));
+    }
+    const locator={chapterIndex:live.chapterIndex,chapterHref:chapterHrefOf(live.engine,live.chapterIndex),scroll:Math.min(1,Math.max(0,scroll)),textQuote,...(Number.isFinite(textOffset)?{textOffset}:{}),pdfPoint,originalPage,contentFingerprint:live.engine?.contentFingerprint||''};
     ui.reportPosition(live.bookId,locator);return locator;
   }, [ui]);
 

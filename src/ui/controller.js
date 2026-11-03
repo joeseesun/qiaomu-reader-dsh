@@ -1,3 +1,4 @@
+import {normalizePdfPoint} from '../core/pdf-location.js';
 /**
  * UI 控制器：把 lead 注入的 props 包装成界面可直接调用的动作集合。
  *
@@ -662,7 +663,7 @@ export function createController(getProps, store) {
       /* 忽略 */
     }
     uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null, restoreAnchor:null });
-    updateLocator(state.bookId, {chapterIndex:target,scroll:0,textOffset:0,textQuote:'',originalPage:'',chapterHref:engineOf(state.bookId)?.book?.chapters?.[target]?.href||''});
+    updateLocator(state.bookId, {chapterIndex:target,scroll:0,textOffset:0,textQuote:'',pdfPoint:null,originalPage:'',chapterHref:engineOf(state.bookId)?.book?.chapters?.[target]?.href||''});
   }
 
   /** 跳到全书百分比位置 */
@@ -672,7 +673,7 @@ export function createController(getProps, store) {
     if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
     const location = percentLocation(fraction, count);
     uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, restoreAnchor:null, jumpToken: (state.jumpToken || 0) + 1 });
-    updateLocator(state.bookId, {...location,textOffset:undefined,textQuote:'',originalPage:''});
+    updateLocator(state.bookId, {...location,textOffset:undefined,textQuote:'',pdfPoint:null,originalPage:''});
   }
 
   /** 更新 locator 并持久化 */
@@ -700,6 +701,7 @@ export function createController(getProps, store) {
       if(Number.isFinite(position.textOffset))locator.textOffset=Math.max(0,Math.floor(position.textOffset));
       if(typeof position.originalPage==='string')locator.originalPage=position.originalPage;
       if(typeof position.contentFingerprint==='string')locator.contentFingerprint=position.contentFingerprint;
+      locator.pdfPoint = normalizePdfPoint(position.pdfPoint);
       patchState(id, { locator });
     });
   }
@@ -708,7 +710,7 @@ export function createController(getProps, store) {
     const state=uiStore.get(),count=chapterCountOf(state.bookId)||1;
     const chapterIndex=clampInt(locator.chapterIndex,0,count-1);
     if(!state.jumpReturn)uiStore.set({jumpReturn:{...stateOr(state.bookId).locator}});
-    const target={...locator,chapterIndex,chapterHref:locator.chapterHref||engineOf(state.bookId)?.book?.chapters?.[chapterIndex]?.href||'',textOffset:Number.isFinite(locator.textOffset)?Math.max(0,Math.floor(locator.textOffset)):undefined,textQuote:locator.textQuote||'',originalPage:locator.originalPage||'',scroll:Math.min(1,Math.max(0,Number(locator.scroll)||0))};
+    const target={...locator,pdfPoint:locator.pdfPoint||null,chapterIndex,chapterHref:locator.chapterHref||engineOf(state.bookId)?.book?.chapters?.[chapterIndex]?.href||'',textOffset:Number.isFinite(locator.textOffset)?Math.max(0,Math.floor(locator.textOffset)):undefined,textQuote:locator.textQuote||'',originalPage:locator.originalPage||'',scroll:Math.min(1,Math.max(0,Number(locator.scroll)||0))};
     uiStore.set({chapterIndex,page:0,restoreScroll:target.scroll,restoreAnchor:target,jumpToken:(state.jumpToken||0)+1});updateLocator(state.bookId,target);
   }
   function goHref(href) {
