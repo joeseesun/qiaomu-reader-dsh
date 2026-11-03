@@ -642,7 +642,13 @@ export const UI_CSS = `
   .qmr-reader-content>.qmr-topbar,.qmr-reader-content>.qmr-bottombar{transition:none}
 }
 .qmr-book-list-window .qmr-book-row{height:80px;min-height:80px;box-sizing:border-box}
-.qmr-discovery-entry{display:flex;margin:0 0 18px}.qmr-discovery-entry .qmr-btn{gap:7px}
+.qmr-library-search-group{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.qmr-library-search-group .qmr-library-search{margin:0;flex:1;min-width:120px}
+.qmr-discovery-entry{display:flex;flex:none;margin:0}
+.qmr-discovery-entry .qmr-btn{gap:7px;height:42px;min-height:42px;padding:0 14px;white-space:nowrap;border:1px solid var(--qmr-lib-line);background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary)}
+.qmr-library-tools{gap:8px}
+@media(max-width:700px){.qmr-library-tools{flex-wrap:wrap;justify-content:flex-end}.qmr-library-search-group{flex-basis:100%}.qmr-discovery-entry .qmr-btn{height:44px;min-height:44px}}
+
 .qmr-removed-books{margin:0 0 18px;font-size:13px}.qmr-removed-books summary{cursor:pointer;padding:10px 0;color:var(--qmr-lib-muted)}
 .qmr-feature-panel{display:flex;flex-direction:column;gap:14px;padding:14px;color:var(--qmr-ink)}
 .qmr-feature-panel label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}

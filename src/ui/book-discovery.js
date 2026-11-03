@@ -59,8 +59,8 @@ function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
   memory.current.source = source;
   const searchGutenberg = value => { setQuery(value); setSource('gutenberg'); if (scrollRef.current) scrollRef.current.scrollTop = 0; };
   return createPortal(h('div', { className: 'qmr-discovery-backdrop', onClick: event => { if (event.target === event.currentTarget) close(); } }, h('style', null, DISCOVERY_CSS),
-    h('section', { className: 'qmr-discovery-dialog', ref: dialog, role: 'dialog', 'aria-modal': 'true', 'aria-label': ui.t('discover.title', '找书'), onKeyDown: keyDown },
-      h('header', { className: 'qmr-discovery-header' }, h('h1', null, ui.t('discover.title', '找书')),
+    h('section', { className: 'qmr-discovery-dialog', ref: dialog, role: 'dialog', 'aria-modal': 'true', 'aria-label': ui.t('discover.title', '浏览书库'), onKeyDown: keyDown },
+      h('header', { className: 'qmr-discovery-header' }, h('h1', null, ui.t('discover.title', '浏览书库')),
         h('div', { className: 'qmr-discovery-source-nav', role: 'group', 'aria-label': ui.t('discover.sources', '书源') },
           h('button', { type: 'button', 'aria-pressed': source === 'shelf', onClick: () => setSource('shelf') }, ui.t('discover.publicSource', '公开书源')),
           h('button', { type: 'button', onClick: () => { close(); requestAnimationFrame(() => document.querySelector('.qmr-library-search input')?.focus()); } }, ui.t('discover.localSource', '本地书库')),
@@ -68,12 +68,11 @@ function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
         h('button', { className: 'qmr-discovery-icon', type: 'button', 'aria-label': ui.t('prompts.close', '关闭'), onClick: close }, h(IconClose, { width: 20, height: 20 }))),
       h('div', { className: 'qmr-discovery-scroll', ref: scrollRef }, source === 'shelf' ? h(BookShelf, { ui, scrollRef, memory, searchGutenberg }) : h(React.Fragment, null,
         query ? h('button', { type: 'button', className: 'qmr-discovery-text-button', onClick: () => setSource('shelf') }, h(IconArrowLeft, { width: 15, height: 15 }), ui.t('shelf.back', '返回书单')) : null,
-        h(Gutenberg, { ui, initialQuery: query, memory: gutenbergMemory }))),
-      h('footer', { className: 'qmr-discovery-footer' }, ui.t('discover.localHint', '书库和清单留在本地；公开目录仅提供找书线索。')))), document.body);
+        h(Gutenberg, { ui, initialQuery: query, memory: gutenbergMemory }))))), document.body);
 }
 export function BookDiscovery({ ui }) {
   const [open, setOpen] = React.useState(false);
   const memory = React.useRef({}), gutenbergMemory = React.useRef({});
-  return h('div', { className: 'qmr-discovery-entry' }, h('button', { className: 'qmr-btn', type: 'button', onClick: () => setOpen(true) }, h(IconSearch, { width: 16, height: 16 }), ui.t('discover.title', '找书')),
+  return h('div', { className: 'qmr-discovery-entry' }, h('button', { className: 'qmr-btn', type: 'button', onClick: () => setOpen(true) }, h(IconSearch, { width: 16, height: 16 }), ui.t('discover.title', '浏览书库')),
     open ? h(DiscoveryDialog, { ui, memory, gutenbergMemory, onClose: () => setOpen(false) }) : null);
 }

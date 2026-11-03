@@ -94,7 +94,7 @@
     "saveFailed": "无法保存原文位置"
   },
   "discover": {
-    "title": "找书",
+    "title": "浏览书库",
     "query": "书名或作者",
     "search": "搜索",
     "offline": "请连接宿主后再搜索书源",

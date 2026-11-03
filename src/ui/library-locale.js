@@ -236,7 +236,7 @@ for (const [language, index] of [['zh', 0], ['en', 1]]) {
   const messages = LIBRARY_MESSAGES[language];
   messages.shelf = Object.fromEntries(Object.entries(shelfMessages).map(([key, values]) => [key, values[index]]));
   messages.prompts = Object.fromEntries(Object.entries(promptMessages).map(([key, values]) => [key, values[index]]));
-  messages.discover.title = index ? 'Find books' : '找书';
+  messages.discover.title = index ? 'Browse library' : '浏览书库';
 }
 
 const DISCOVERY_MESSAGES = {

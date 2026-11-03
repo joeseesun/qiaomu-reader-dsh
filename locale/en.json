@@ -94,7 +94,7 @@
     "saveFailed": "Unable to save source position"
   },
   "discover": {
-    "title": "Find books",
+    "title": "Browse library",
     "query": "Title or author",
     "search": "Search",
     "offline": "Connect the host to search for books",
