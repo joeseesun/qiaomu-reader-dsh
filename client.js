@@ -486,13 +486,13 @@ function RGBToHSL(rgb, output) {
   output[2] = l;
 }
 function HSLToRGB(hsl, output) {
-  const h19 = hsl[0];
+  const h20 = hsl[0];
   const s = hsl[1];
   const l = hsl[2];
   const c2 = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c2 * (1 - Math.abs(h19 / 60 % 2 - 1));
+  const x = c2 * (1 - Math.abs(h20 / 60 % 2 - 1));
   const m2 = l - c2 / 2;
-  switch (Math.floor(h19 / 60)) {
+  switch (Math.floor(h20 / 60)) {
     case 0:
       output[0] = c2 + m2;
       output[1] = x + m2;
@@ -2584,9 +2584,9 @@ var init_pdf = __esm({
       5917(module2, __unused_webpack_exports, __webpack_require__3) {
         var DESCRIPTORS = __webpack_require__3(3724);
         var fails = __webpack_require__3(9039);
-        var createElement20 = __webpack_require__3(4055);
+        var createElement21 = __webpack_require__3(4055);
         module2.exports = !DESCRIPTORS && !fails(function() {
-          return Object.defineProperty(createElement20("div"), "a", {
+          return Object.defineProperty(createElement21("div"), "a", {
             get: function() {
               return 7;
             }
@@ -9225,35 +9225,35 @@ var init_pdf = __esm({
         let rotator;
         switch (textLayer.getAttribute("data-main-rotation")) {
           case "90":
-            rotator = (x, y2, w2, h19) => ({
+            rotator = (x, y2, w2, h20) => ({
               x: (y2 - layerY) / parentHeight,
               y: 1 - (x + w2 - layerX) / parentWidth,
-              width: h19 / parentHeight,
+              width: h20 / parentHeight,
               height: w2 / parentWidth
             });
             break;
           case "180":
-            rotator = (x, y2, w2, h19) => ({
+            rotator = (x, y2, w2, h20) => ({
               x: 1 - (x + w2 - layerX) / parentWidth,
-              y: 1 - (y2 + h19 - layerY) / parentHeight,
+              y: 1 - (y2 + h20 - layerY) / parentHeight,
               width: w2 / parentWidth,
-              height: h19 / parentHeight
+              height: h20 / parentHeight
             });
             break;
           case "270":
-            rotator = (x, y2, w2, h19) => ({
-              x: 1 - (y2 + h19 - layerY) / parentHeight,
+            rotator = (x, y2, w2, h20) => ({
+              x: 1 - (y2 + h20 - layerY) / parentHeight,
               y: (x - layerX) / parentWidth,
-              width: h19 / parentHeight,
+              width: h20 / parentHeight,
               height: w2 / parentWidth
             });
             break;
           default:
-            rotator = (x, y2, w2, h19) => ({
+            rotator = (x, y2, w2, h20) => ({
               x: (x - layerX) / parentWidth,
               y: (y2 - layerY) / parentHeight,
               width: w2 / parentWidth,
-              height: h19 / parentHeight
+              height: h20 / parentHeight
             });
             break;
         }
@@ -10623,41 +10623,41 @@ var init_pdf = __esm({
         switch (name) {
           case "topLeft":
             isDiagonal = true;
-            getPoint = (w2, h19) => [0, 0];
-            getOpposite = (w2, h19) => [w2, h19];
+            getPoint = (w2, h20) => [0, 0];
+            getOpposite = (w2, h20) => [w2, h20];
             break;
           case "topMiddle":
-            getPoint = (w2, h19) => [w2 / 2, 0];
-            getOpposite = (w2, h19) => [w2 / 2, h19];
+            getPoint = (w2, h20) => [w2 / 2, 0];
+            getOpposite = (w2, h20) => [w2 / 2, h20];
             break;
           case "topRight":
             isDiagonal = true;
-            getPoint = (w2, h19) => [w2, 0];
-            getOpposite = (w2, h19) => [0, h19];
+            getPoint = (w2, h20) => [w2, 0];
+            getOpposite = (w2, h20) => [0, h20];
             break;
           case "middleRight":
             isHorizontal = true;
-            getPoint = (w2, h19) => [w2, h19 / 2];
-            getOpposite = (w2, h19) => [0, h19 / 2];
+            getPoint = (w2, h20) => [w2, h20 / 2];
+            getOpposite = (w2, h20) => [0, h20 / 2];
             break;
           case "bottomRight":
             isDiagonal = true;
-            getPoint = (w2, h19) => [w2, h19];
-            getOpposite = (w2, h19) => [0, 0];
+            getPoint = (w2, h20) => [w2, h20];
+            getOpposite = (w2, h20) => [0, 0];
             break;
           case "bottomMiddle":
-            getPoint = (w2, h19) => [w2 / 2, h19];
-            getOpposite = (w2, h19) => [w2 / 2, 0];
+            getPoint = (w2, h20) => [w2 / 2, h20];
+            getOpposite = (w2, h20) => [w2 / 2, 0];
             break;
           case "bottomLeft":
             isDiagonal = true;
-            getPoint = (w2, h19) => [0, h19];
-            getOpposite = (w2, h19) => [w2, 0];
+            getPoint = (w2, h20) => [0, h20];
+            getOpposite = (w2, h20) => [w2, 0];
             break;
           case "middleLeft":
             isHorizontal = true;
-            getPoint = (w2, h19) => [0, h19 / 2];
-            getOpposite = (w2, h19) => [w2, h19 / 2];
+            getPoint = (w2, h20) => [0, h20 / 2];
+            getOpposite = (w2, h20) => [w2, h20 / 2];
             break;
         }
         const point = getPoint(savedWidth, savedHeight);
@@ -11980,9 +11980,9 @@ var init_pdf = __esm({
         }
         let hash = "";
         if (ids.length) {
-          const h19 = new MurmurHash3_64();
-          h19.update(ids.join(","));
-          hash = h19.hexdigest();
+          const h20 = new MurmurHash3_64();
+          h20.update(ids.join(","));
+          hash = h20.hexdigest();
         }
         return this.#modifiedIds = {
           ids: new Set(ids),
@@ -15714,22 +15714,22 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
         this.smaskPreparedOffsetY = offsetY;
         this.smaskPreparedOOBAlpha = !useLayerSize && filteredOOBAlpha !== 0 ? filteredOOBAlpha : null;
       }
-      _bakeSMaskCanvas(maskCanvas, drawX, drawY, w2, h19, backdrop, filterSpec) {
+      _bakeSMaskCanvas(maskCanvas, drawX, drawY, w2, h20, backdrop, filterSpec) {
         if (!backdrop && !filterSpec) {
           unreachable("_bakeSMaskCanvas with neither backdrop nor filter");
         }
-        const srcEntry = this.canvasFactory.create(w2, h19);
+        const srcEntry = this.canvasFactory.create(w2, h20);
         const sCtx = srcEntry.context;
         sCtx.drawImage(maskCanvas, drawX, drawY);
         if (backdrop) {
           sCtx.globalCompositeOperation = "destination-atop";
           sCtx.fillStyle = backdrop;
-          sCtx.fillRect(0, 0, w2, h19);
+          sCtx.fillRect(0, 0, w2, h20);
         }
         if (!filterSpec) {
           return srcEntry;
         }
-        const preparedEntry = this.canvasFactory.create(w2, h19);
+        const preparedEntry = this.canvasFactory.create(w2, h20);
         const pCtx = preparedEntry.context;
         pCtx.filter = filterSpec.url;
         const filterApplied = FeatureTest.isCanvasFilterSupported && pCtx.filter !== "none" && pCtx.filter !== "";
@@ -15738,7 +15738,7 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           pCtx.filter = "none";
         }
         if (!filterApplied) {
-          const img = pCtx.getImageData(0, 0, w2, h19);
+          const img = pCtx.getImageData(0, 0, w2, h20);
           const {
             data
           } = img;
@@ -17373,8 +17373,8 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           imgToPaint = imgData.bitmap;
         } else {
           const w2 = imgData.width;
-          const h19 = imgData.height;
-          const tmpCanvas = this.canvasFactory.create(w2, h19);
+          const h20 = imgData.height;
+          const tmpCanvas = this.canvasFactory.create(w2, h20);
           putBinaryImageData(tmpCanvas.context, imgData);
           imgToPaint = this.applyTransferMapsToCanvas(tmpCanvas.context);
           inlineImgCanvas = tmpCanvas;
@@ -31362,11 +31362,11 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
           let rotator = rotators.get(textLayer);
           if (!rotator) {
             const clientRect = textLayer.getBoundingClientRect();
-            rotator = (x, y2, w2, h19) => ({
+            rotator = (x, y2, w2, h20) => ({
               x: (x - clientRect.x) / clientRect.width,
               y: (y2 - clientRect.y) / clientRect.height,
               width: w2 / clientRect.width,
-              height: h19 / clientRect.height
+              height: h20 / clientRect.height
             });
             rotators.set(textLayer, rotator);
           }
@@ -33065,7 +33065,7 @@ function decodeScan(data, view, offset, frame, components, resetInterval, spectr
   }
   let mcu = 0, fileMarker;
   const mcuExpected = componentsLength === 1 ? components[0].blocksPerLine * components[0].blocksPerColumn : mcusPerLine * frame.mcusPerColumn;
-  let h19, v2;
+  let h20, v2;
   while (mcu <= mcuExpected) {
     const mcuToRead = resetInterval ? Math.min(mcuExpected - mcu, resetInterval) : mcuExpected;
     if (mcuToRead > 0) {
@@ -33083,10 +33083,10 @@ function decodeScan(data, view, offset, frame, components, resetInterval, spectr
         for (n = 0; n < mcuToRead; n++) {
           for (i = 0; i < componentsLength; i++) {
             component = components[i];
-            h19 = component.h;
+            h20 = component.h;
             v2 = component.v;
             for (j = 0; j < v2; j++) {
-              for (k = 0; k < h19; k++) {
+              for (k = 0; k < h20; k++) {
                 decodeMcu(component, decodeFn, mcu, j, k);
               }
             }
@@ -38821,11 +38821,11 @@ function flushHTML(node) {
 function addHTML(node, html, bbox) {
   const extra = node[$extra];
   const availableSpace = extra.availableSpace;
-  const [x, y2, w2, h19] = bbox;
+  const [x, y2, w2, h20] = bbox;
   switch (node.layout) {
     case "position": {
       extra.width = Math.max(extra.width, x + w2);
-      extra.height = Math.max(extra.height, y2 + h19);
+      extra.height = Math.max(extra.height, y2 + h20);
       extra.children.push(html);
       break;
     }
@@ -38840,11 +38840,11 @@ function addHTML(node, html, bbox) {
       extra.line.children.push(html);
       if (extra.attempt === 0) {
         extra.currentWidth += w2;
-        extra.height = Math.max(extra.height, extra.prevHeight + h19);
+        extra.height = Math.max(extra.height, extra.prevHeight + h20);
       } else {
         extra.currentWidth = w2;
         extra.prevHeight = extra.height;
-        extra.height += h19;
+        extra.height += h20;
         extra.attempt = 0;
       }
       extra.width = Math.max(extra.width, extra.currentWidth);
@@ -38853,7 +38853,7 @@ function addHTML(node, html, bbox) {
     case "row": {
       extra.children.push(html);
       extra.width += w2;
-      extra.height = Math.max(extra.height, h19);
+      extra.height = Math.max(extra.height, h20);
       const height = measureToString(extra.height);
       for (const child of extra.children) {
         child.attributes.style.height = height;
@@ -38862,13 +38862,13 @@ function addHTML(node, html, bbox) {
     }
     case "table": {
       extra.width = MathClamp2(w2, extra.width, availableSpace.width);
-      extra.height += h19;
+      extra.height += h20;
       extra.children.push(html);
       break;
     }
     case "tb": {
       extra.width = MathClamp2(w2, extra.width, availableSpace.width);
-      extra.height += h19;
+      extra.height += h20;
       extra.children.push(html);
       break;
     }
@@ -38911,26 +38911,26 @@ function getAvailableSpace(node) {
 }
 function getTransformedBBox(node) {
   let w2 = node.w === "" ? NaN : node.w;
-  let h19 = node.h === "" ? NaN : node.h;
+  let h20 = node.h === "" ? NaN : node.h;
   let [centerX, centerY] = [0, 0];
   switch (node.anchorType || "") {
     case "bottomCenter":
-      [centerX, centerY] = [w2 / 2, h19];
+      [centerX, centerY] = [w2 / 2, h20];
       break;
     case "bottomLeft":
-      [centerX, centerY] = [0, h19];
+      [centerX, centerY] = [0, h20];
       break;
     case "bottomRight":
-      [centerX, centerY] = [w2, h19];
+      [centerX, centerY] = [w2, h20];
       break;
     case "middleCenter":
-      [centerX, centerY] = [w2 / 2, h19 / 2];
+      [centerX, centerY] = [w2 / 2, h20 / 2];
       break;
     case "middleLeft":
-      [centerX, centerY] = [0, h19 / 2];
+      [centerX, centerY] = [0, h20 / 2];
       break;
     case "middleRight":
-      [centerX, centerY] = [w2, h19 / 2];
+      [centerX, centerY] = [w2, h20 / 2];
       break;
     case "topCenter":
       [centerX, centerY] = [w2 / 2, 0];
@@ -38946,18 +38946,18 @@ function getTransformedBBox(node) {
       break;
     case 90:
       [x, y2] = [-centerY, centerX];
-      [w2, h19] = [h19, -w2];
+      [w2, h20] = [h20, -w2];
       break;
     case 180:
       [x, y2] = [centerX, centerY];
-      [w2, h19] = [-w2, -h19];
+      [w2, h20] = [-w2, -h20];
       break;
     case 270:
       [x, y2] = [centerY, -centerX];
-      [w2, h19] = [-h19, w2];
+      [w2, h20] = [-h20, w2];
       break;
   }
-  return [node.x + x + Math.min(0, w2), node.y + y2 + Math.min(0, h19), Math.abs(w2), Math.abs(h19)];
+  return [node.x + x + Math.min(0, w2), node.y + y2 + Math.min(0, h20), Math.abs(w2), Math.abs(h20)];
 }
 function checkDimensions(node, space) {
   if (node[$getTemplateRoot]()[$extra].firstUnsplittable === null) {
@@ -38969,13 +38969,13 @@ function checkDimensions(node, space) {
   const ERROR = 2;
   const parent = node[$getSubformParent]();
   const attempt = parent[$extra]?.attempt || 0;
-  const [, y2, w2, h19] = getTransformedBBox(node);
+  const [, y2, w2, h20] = getTransformedBBox(node);
   switch (parent.layout) {
     case "lr-tb":
     case "rl-tb":
       if (attempt === 0) {
         if (!node[$getTemplateRoot]()[$extra].noLayoutFailure) {
-          if (node.h !== "" && Math.round(h19 - space.height) > ERROR) {
+          if (node.h !== "" && Math.round(h20 - space.height) > ERROR) {
             return false;
           }
           if (node.w !== "") {
@@ -38997,7 +38997,7 @@ function checkDimensions(node, space) {
       if (node[$getTemplateRoot]()[$extra].noLayoutFailure) {
         return true;
       }
-      if (node.h !== "" && Math.round(h19 - space.height) > ERROR) {
+      if (node.h !== "" && Math.round(h20 - space.height) > ERROR) {
         return false;
       }
       if (node.w === "" || Math.round(w2 - space.width) <= ERROR) {
@@ -39013,7 +39013,7 @@ function checkDimensions(node, space) {
         return true;
       }
       if (node.h !== "" && !node[$isSplittable]()) {
-        return Math.round(h19 - space.height) <= ERROR;
+        return Math.round(h20 - space.height) <= ERROR;
       }
       if (node.w === "" || Math.round(w2 - space.width) <= ERROR) {
         return space.height > ERROR;
@@ -39026,18 +39026,18 @@ function checkDimensions(node, space) {
       if (node[$getTemplateRoot]()[$extra].noLayoutFailure) {
         return true;
       }
-      if (node.h === "" || Math.round(h19 + y2 - space.height) <= ERROR) {
+      if (node.h === "" || Math.round(h20 + y2 - space.height) <= ERROR) {
         return true;
       }
       const area = node[$getTemplateRoot]()[$extra].currentContentArea;
-      return h19 + y2 > area.h;
+      return h20 + y2 > area.h;
     case "rl-row":
     case "row":
       if (node[$getTemplateRoot]()[$extra].noLayoutFailure) {
         return true;
       }
       if (node.h !== "") {
-        return Math.round(h19 - space.height) <= ERROR;
+        return Math.round(h20 - space.height) <= ERROR;
       }
       return true;
     default:
@@ -39539,7 +39539,7 @@ function calculateSHA512(data, offset, length, mode384 = false) {
   } = calculate_sha_other_PARAMS;
   let a3 = new Word64(0, 0), b = new Word64(0, 0), c2 = new Word64(0, 0);
   let d = new Word64(0, 0), e = new Word64(0, 0), f = new Word64(0, 0);
-  let g = new Word64(0, 0), h19 = new Word64(0, 0);
+  let g = new Word64(0, 0), h20 = new Word64(0, 0);
   const t1 = new Word64(0, 0), t2 = new Word64(0, 0);
   const tmp1 = new Word64(0, 0), tmp2 = new Word64(0, 0);
   let tmp3;
@@ -39564,9 +39564,9 @@ function calculateSHA512(data, offset, length, mode384 = false) {
     e.assign(h42);
     f.assign(h52);
     g.assign(h62);
-    h19.assign(h72);
+    h20.assign(h72);
     for (j = 0; j < 80; ++j) {
-      t1.assign(h19);
+      t1.assign(h20);
       sigmaPrime(tmp1, e, tmp2);
       t1.add(tmp1);
       ch(tmp1, e, f, g, tmp2);
@@ -39576,8 +39576,8 @@ function calculateSHA512(data, offset, length, mode384 = false) {
       sigma(t2, a3, tmp2);
       maj(tmp1, a3, b, c2, tmp2);
       t2.add(tmp1);
-      tmp3 = h19;
-      h19 = g;
+      tmp3 = h20;
+      h20 = g;
       g = f;
       f = e;
       d.add(t1);
@@ -39596,7 +39596,7 @@ function calculateSHA512(data, offset, length, mode384 = false) {
     h42.add(e);
     h52.add(f);
     h62.add(g);
-    h72.add(h19);
+    h72.add(h20);
   }
   let result;
   if (!mode384) {
@@ -39675,11 +39675,11 @@ function calculateSHA256(data, offset, length) {
     for (j = 16; j < 64; ++j) {
       w2[j] = calculate_sha256_littleSigmaPrime(w2[j - 2]) + w2[j - 7] + calculate_sha256_littleSigma(w2[j - 15]) + w2[j - 16] | 0;
     }
-    let a3 = h0, b = h1, c2 = h22, d = h32, e = h42, f = h52, g = h62, h19 = h72, t1, t2;
+    let a3 = h0, b = h1, c2 = h22, d = h32, e = h42, f = h52, g = h62, h20 = h72, t1, t2;
     for (j = 0; j < 64; ++j) {
-      t1 = h19 + calculate_sha256_sigmaPrime(e) + calculate_sha256_ch(e, f, g) + k[j] + w2[j];
+      t1 = h20 + calculate_sha256_sigmaPrime(e) + calculate_sha256_ch(e, f, g) + k[j] + w2[j];
       t2 = calculate_sha256_sigma(a3) + calculate_sha256_maj(a3, b, c2);
-      h19 = g;
+      h20 = g;
       g = f;
       f = e;
       e = d + t1 | 0;
@@ -39695,7 +39695,7 @@ function calculateSHA256(data, offset, length) {
     h42 = h42 + e | 0;
     h52 = h52 + f | 0;
     h62 = h62 + g | 0;
-    h72 = h72 + h19 | 0;
+    h72 = h72 + h20 | 0;
   }
   return new Uint8Array([h0 >> 24 & 255, h0 >> 16 & 255, h0 >> 8 & 255, h0 & 255, h1 >> 24 & 255, h1 >> 16 & 255, h1 >> 8 & 255, h1 & 255, h22 >> 24 & 255, h22 >> 16 & 255, h22 >> 8 & 255, h22 & 255, h32 >> 24 & 255, h32 >> 16 & 255, h32 >> 8 & 255, h32 & 255, h42 >> 24 & 255, h42 >> 16 & 255, h42 >> 8 & 255, h42 & 255, h52 >> 24 & 255, h52 >> 16 & 255, h52 >> 8 & 255, h52 & 255, h62 >> 24 & 255, h62 >> 16 & 255, h62 >> 8 & 255, h62 & 255, h72 >> 24 & 255, h72 >> 16 & 255, h72 >> 8 & 255, h72 & 255]);
 }
@@ -41133,9 +41133,9 @@ var init_pdf_worker = __esm({
       5917(module2, __unused_webpack_exports, __webpack_require__3) {
         var DESCRIPTORS = __webpack_require__3(3724);
         var fails = __webpack_require__3(9039);
-        var createElement20 = __webpack_require__3(4055);
+        var createElement21 = __webpack_require__3(4055);
         module2.exports = !DESCRIPTORS && !fails(function() {
-          return Object.defineProperty(createElement20("div"), "a", {
+          return Object.defineProperty(createElement21("div"), "a", {
             get: function() {
               return 7;
             }
@@ -46348,7 +46348,7 @@ var init_pdf_worker = __esm({
         const step = Math.ceil(height / maxHeight);
         const remainder = height % maxHeight === 0 ? height : height % maxHeight;
         for (let k = 0; k < step; k++) {
-          const h19 = k < step - 1 ? maxHeight : remainder;
+          const h20 = k < step - 1 ? maxHeight : remainder;
           ({
             srcPos
           } = convertToRGBA({
@@ -46356,11 +46356,11 @@ var init_pdf_worker = __esm({
             src: data,
             dest: src32,
             width,
-            height: h19,
+            height: h20,
             inverseDecode: this._isMask,
             srcPos
           }));
-          for (let i = 0, ii = h19 >> K2; i < ii; i++) {
+          for (let i = 0, ii = h20 >> K2; i < ii; i++) {
             const buf = src32.subarray((i << K2) * width);
             for (let j = 0; j < newWidth; j++) {
               dest32[newIndex++] = buf[j << K2];
@@ -47124,17 +47124,17 @@ var init_pdf_worker = __esm({
               let maxH = 0, maxV = 0;
               for (i = 0; i < componentsCount; i++) {
                 const componentId = data[offset];
-                const h19 = data[offset + 1] >> 4;
+                const h20 = data[offset + 1] >> 4;
                 const v2 = data[offset + 1] & 15;
-                if (maxH < h19) {
-                  maxH = h19;
+                if (maxH < h20) {
+                  maxH = h20;
                 }
                 if (maxV < v2) {
                   maxV = v2;
                 }
                 const qId = data[offset + 2];
                 l = frame.components.push({
-                  h: h19,
+                  h: h20,
                   v: v2,
                   quantizationId: qId,
                   quantizationTable: null
@@ -71823,12 +71823,12 @@ var init_pdf_worker = __esm({
         } = image;
         const imageRef = dict.objId;
         const w2 = dict.get("W", "Width");
-        const h19 = dict.get("H", "Height");
-        if (!(w2 && typeof w2 === "number") || !(h19 && typeof h19 === "number")) {
+        const h20 = dict.get("H", "Height");
+        if (!(w2 && typeof w2 === "number") || !(h20 && typeof h20 === "number")) {
           warn2("Image dimensions are missing, or not numbers.");
           return;
         }
-        if (maxImageSize !== -1 && w2 * h19 > maxImageSize) {
+        if (maxImageSize !== -1 && w2 * h20 > maxImageSize) {
           const msg = "Image exceeded maximum allowed size and was removed.";
           if (!ignoreErrors) {
             throw new Error(msg);
@@ -71903,7 +71903,7 @@ var init_pdf_worker = __esm({
         }
         const SMALL_IMAGE_DIMENSIONS = 200;
         const hasMask = dict.has("SMask") || dict.has("Mask");
-        if (isInline && w2 + h19 < SMALL_IMAGE_DIMENSIONS && !hasMask) {
+        if (isInline && w2 + h20 < SMALL_IMAGE_DIMENSIONS && !hasMask) {
           try {
             const imageObj = new PDFImage({
               xref: this.xref,
@@ -71937,7 +71937,7 @@ var init_pdf_worker = __esm({
         }
         operatorList.addDependency(objId);
         fn = OPS2.paintImageXObject;
-        args = [objId, w2, h19];
+        args = [objId, w2, h20];
         operatorList.addImageOps(fn, args, optionalContent, hasMask);
         if (cacheGlobally) {
           globalCacheData = {
@@ -71953,7 +71953,7 @@ var init_pdf_worker = __esm({
             this._sendImgData(objId, null, cacheGlobally);
             return;
           }
-          if (w2 * h19 > 25e4 || hasMask) {
+          if (w2 * h20 > 25e4 || hasMask) {
             const localLength = await this.handler.sendWithPromise("commonobj", [objId, "CopyLocalImage", {
               imageRef
             }]);
@@ -75798,9 +75798,9 @@ var init_pdf_worker = __esm({
       static getFirstPositionInfo(rect, rotation, fontSize) {
         const [x1, y1, x2, y2] = rect;
         let w2 = x2 - x1;
-        let h19 = y2 - y1;
+        let h20 = y2 - y1;
         if (rotation % 180 !== 0) {
-          [w2, h19] = [h19, w2];
+          [w2, h20] = [h20, w2];
         }
         const lineHeight = (
           /* inlined export .LINE_FACTOR */
@@ -75811,9 +75811,9 @@ var init_pdf_worker = __esm({
           0.35 * fontSize
         );
         return {
-          coords: [0, h19 + lineDescent - lineHeight],
-          bbox: [0, 0, w2, h19],
-          matrix: rotation !== 0 ? getRotationMatrix(rotation, h19, lineHeight) : void 0
+          coords: [0, h20 + lineDescent - lineHeight],
+          bbox: [0, 0, w2, h20],
+          matrix: rotation !== 0 ? getRotationMatrix(rotation, h20, lineHeight) : void 0
         };
       }
       createAppearance(text, rect, rotation, fontSize, bgColor, strokeAlpha) {
@@ -75839,9 +75839,9 @@ var init_pdf_worker = __esm({
         maxWidth *= fontSize / 1e3;
         const [x1, y1, x2, y2] = rect;
         let w2 = x2 - x1;
-        let h19 = y2 - y1;
+        let h20 = y2 - y1;
         if (rotation % 180 !== 0) {
-          [w2, h19] = [h19, w2];
+          [w2, h20] = [h20, w2];
         }
         const hscale = maxWidth > w2 ? w2 / maxWidth : 1;
         let vscale = 1;
@@ -75854,12 +75854,12 @@ var init_pdf_worker = __esm({
           0.35 * fontSize
         );
         const maxHeight = lineHeight * lines.length;
-        if (maxHeight > h19) {
-          vscale = h19 / maxHeight;
+        if (maxHeight > h20) {
+          vscale = h20 / maxHeight;
         }
         const fscale = Math.min(hscale, vscale);
         const newFontSize = fontSize * fscale;
-        const buffer = ["q", `0 0 ${numberToString(w2)} ${numberToString(h19)} re W n`, `BT`, `1 0 0 1 0 ${numberToString(h19 + lineDescent)} Tm 0 Tc ${getPdfColor(bgColor, true)}`, `/${this.fontName.name} ${numberToString(newFontSize)} Tf`];
+        const buffer = ["q", `0 0 ${numberToString(w2)} ${numberToString(h20)} re W n`, `BT`, `1 0 0 1 0 ${numberToString(h20 + lineDescent)} Tm 0 Tc ${getPdfColor(bgColor, true)}`, `/${this.fontName.name} ${numberToString(newFontSize)} Tf`];
         const {
           resources
         } = this;
@@ -75883,11 +75883,11 @@ var init_pdf_worker = __esm({
         const appearanceStreamDict = new Dict(this.xref);
         appearanceStreamDict.setIfName("Subtype", "Form");
         appearanceStreamDict.setIfName("Type", "XObject");
-        appearanceStreamDict.set("BBox", [0, 0, w2, h19]);
+        appearanceStreamDict.set("BBox", [0, 0, w2, h20]);
         appearanceStreamDict.set("Length", appearance.length);
         appearanceStreamDict.set("Resources", resources);
         if (rotation) {
-          const matrix = getRotationMatrix(rotation, w2, h19);
+          const matrix = getRotationMatrix(rotation, w2, h20);
           appearanceStreamDict.set("Matrix", matrix);
         }
         return new StringStream(appearance, appearanceStreamDict);
@@ -80564,9 +80564,9 @@ var init_pdf_worker = __esm({
         return true;
       }
       [$addHTML](html, bbox) {
-        const [x, y2, w2, h19] = bbox;
+        const [x, y2, w2, h20] = bbox;
         this[$extra].width = Math.max(this[$extra].width, x + w2);
-        this[$extra].height = Math.max(this[$extra].height, y2 + h19);
+        this[$extra].height = Math.max(this[$extra].height, y2 + h20);
         this[$extra].children.push(html);
       }
       [$getAvailableSpace]() {
@@ -80987,7 +80987,7 @@ var init_pdf_worker = __esm({
         if (this.reserve <= 0) {
           const {
             w: w2,
-            h: h19
+            h: h20
           } = this[$getExtra](availableSpace);
           switch (this.placement) {
             case "left":
@@ -80997,7 +80997,7 @@ var init_pdf_worker = __esm({
               break;
             case "top":
             case "bottom":
-              this.reserve = h19;
+              this.reserve = h20;
               break;
           }
         }
@@ -81535,7 +81535,7 @@ var init_pdf_worker = __esm({
         const savedH = this.h;
         const {
           w: w2,
-          h: h19,
+          h: h20,
           isBroken
         } = layoutNode(this, availableSpace);
         if (w2 && this.w === "") {
@@ -81545,8 +81545,8 @@ var init_pdf_worker = __esm({
           }
           this.w = w2;
         }
-        if (h19 && this.h === "") {
-          this.h = h19;
+        if (h20 && this.h === "") {
+          this.h = h20;
         }
         setFirstUnsplittable(this);
         if (!checkDimensions(this, availableSpace)) {
@@ -82149,11 +82149,11 @@ var init_pdf_worker = __esm({
           } else {
             const {
               w: w2,
-              h: h19
+              h: h20
             } = layoutNode(this, availableSpace);
             if (w2 !== null) {
               uiW = w2;
-              uiH = h19;
+              uiH = h20;
             } else {
               uiH = fonts_getMetrics(this.font, true).lineNoGap;
             }
@@ -82164,7 +82164,7 @@ var init_pdf_worker = __esm({
           if (this.caption) {
             const {
               w: w2,
-              h: h19,
+              h: h20,
               isBroken
             } = this.caption[$getExtra](availableSpace);
             if (isBroken && this[$getSubformParent]()[$isThereMoreWidth]()) {
@@ -82172,7 +82172,7 @@ var init_pdf_worker = __esm({
               return HTMLResult.FAILURE;
             }
             width = w2;
-            height = h19;
+            height = h20;
             switch (this.caption.placement) {
               case "left":
               case "right":
@@ -90956,9 +90956,9 @@ var init_pdf_worker = __esm({
         }, resources);
         const [x1, y1, x2, y2] = rect;
         let w2 = x2 - x1;
-        let h19 = y2 - y1;
+        let h20 = y2 - y1;
         if (rotation % 180 !== 0) {
-          [w2, h19] = [h19, w2];
+          [w2, h20] = [h20, w2];
         }
         const lines = value.split("\n");
         const scale = fontSize / 1e3;
@@ -90990,8 +90990,8 @@ var init_pdf_worker = __esm({
           0.35) * fontSize
         );
         const totalHeight = lineHeight * lines.length;
-        if (totalHeight > h19) {
-          vscale = h19 / totalHeight;
+        if (totalHeight > h20) {
+          vscale = h20 / totalHeight;
         }
         const fscale = Math.min(hscale, vscale);
         const newFontSize = fontSize * fscale;
@@ -90999,22 +90999,22 @@ var init_pdf_worker = __esm({
         switch (rotation) {
           case 0:
             matrix = [1, 0, 0, 1];
-            clipBox = [rect[0], rect[1], w2, h19];
+            clipBox = [rect[0], rect[1], w2, h20];
             firstPoint = [rect[0], rect[3] - lineAscent];
             break;
           case 90:
             matrix = [0, 1, -1, 0];
-            clipBox = [rect[1], -rect[2], w2, h19];
+            clipBox = [rect[1], -rect[2], w2, h20];
             firstPoint = [rect[1], -rect[0] - lineAscent];
             break;
           case 180:
             matrix = [-1, 0, 0, -1];
-            clipBox = [-rect[2], -rect[3], w2, h19];
+            clipBox = [-rect[2], -rect[3], w2, h20];
             firstPoint = [-rect[2], -rect[1] - lineAscent];
             break;
           case 270:
             matrix = [0, -1, 1, 0];
-            clipBox = [-rect[3], rect[0], w2, h19];
+            clipBox = [-rect[3], rect[0], w2, h20];
             firstPoint = [-rect[3], rect[2] - lineAscent];
             break;
         }
@@ -92208,8 +92208,8 @@ var init_pdf_worker = __esm({
           const iMin = this.#getGridIndex(intersector.minX, intersector.minY);
           const iMax = this.#getGridIndex(intersector.maxX, intersector.maxY);
           const w2 = (iMax - iMin) % STEPS;
-          const h19 = Math.floor((iMax - iMin) / STEPS);
-          for (let i = iMin; i <= iMin + h19 * STEPS; i += STEPS) {
+          const h20 = Math.floor((iMax - iMin) / STEPS);
+          for (let i = iMin; i <= iMin + h20 * STEPS; i += STEPS) {
             for (let j = 0; j <= w2; j++) {
               (this.#grid[i + j] ??= []).push(intersector);
             }
@@ -99594,6 +99594,30 @@ async function parsePdfBook(bytes, title = "PDF") {
     xhtml: ""
   }));
   const book = { title, author: "", format: "pdf", chapters, toc: chapters.map((chapter) => ({ href: chapter.href, label: chapter.label })) };
+  const resolveDestination = async (destination) => {
+    const target = typeof destination === "string" ? await document2.getDestination(destination) : destination;
+    if (!Array.isArray(target) || !target.length) return null;
+    const index = typeof target[0] === "number" ? target[0] : await document2.getPageIndex(target[0]);
+    return Number.isInteger(index) && index >= 0 && index < chapters.length ? chapters[index].href : null;
+  };
+  const outlineItems = async (items) => {
+    const result = [];
+    for (const item of items || []) {
+      let href = null;
+      try {
+        href = await resolveDestination(item.dest);
+      } catch {
+      }
+      const children = await outlineItems(item.items);
+      if (href || children.length) result.push({ label: item.title || "PDF", href: href || children[0].href, children });
+    }
+    return result;
+  };
+  try {
+    const outline = await outlineItems(await document2.getOutline());
+    if (outline.length) book.toc = outline;
+  } catch {
+  }
   const textCache = /* @__PURE__ */ new Map();
   const engine = {
     book,
@@ -99607,11 +99631,12 @@ async function parsePdfBook(bytes, title = "PDF") {
       textCache.set(index, text);
       return text;
     },
-    async render(index) {
+    async render(index, _resourceResolver, options = {}) {
       if (index < 0 || index >= chapters.length) return "";
       const page = await document2.getPage(index + 1);
       const base = page.getViewport({ scale: 1 });
-      const scale = Math.min(1.6, 1e3 / Math.max(1, base.width));
+      const zoom = Math.min(3, Math.max(0.5, Number(options.zoom) || 1));
+      const scale = Math.min(1.6, 1e3 / Math.max(1, base.width)) * zoom;
       const viewport = page.getViewport({ scale });
       const content2 = await page.getTextContent();
       let image = "";
@@ -99630,10 +99655,10 @@ async function parsePdfBook(bytes, title = "PDF") {
         const top = matrix[5] - fontSize;
         return `<span style="left:${left / viewport.width * 100}%;top:${top / viewport.height * 100}%;font-size:${fontSize / viewport.width * 100}cqw;min-width:${Math.max(1, item.width * scale) / viewport.width * 100}%">${escapeHtml(item.str)}</span>`;
       }).join("");
-      return `<div class="qmr-pdf-sheet" style="width:${viewport.width}px;aspect-ratio:${viewport.width}/${viewport.height}">${image ? `<img src="${escapeAttr(image)}" alt="\u7B2C ${index + 1} \u9875">` : ""}<div class="qmr-pdf-text-layer">${spans}</div></div>`;
+      return `<div class="qmr-pdf-sheet" style="width:${viewport.width}px;max-width:${zoom > 1 ? "none" : "100%"};aspect-ratio:${viewport.width}/${viewport.height}">${image ? `<img src="${escapeAttr(image)}" alt="\u7B2C ${index + 1} \u9875">` : ""}<div class="qmr-pdf-text-layer">${spans}</div></div>`;
     },
     tocFor(index) {
-      return index >= 0 && index < chapters.length ? [book.toc[index]] : [];
+      return index >= 0 && index < chapters.length ? [{ href: chapters[index].href, label: chapters[index].label }] : [];
     },
     resolveLink(_from, href) {
       const index = chapters.findIndex((chapter) => chapter.href === href);
@@ -99646,8 +99671,11 @@ async function parsePdfBook(bytes, title = "PDF") {
       const limit = typeof options === "number" ? options : options?.limit;
       for (let index = 0; index < chapters.length && hits.length < (limit || 80); index += 1) {
         const text = await this.plainTextOf(index);
-        const at2 = text.toLowerCase().indexOf(needle);
-        if (at2 >= 0) hits.push({ chapterIndex: index, chapterHref: chapters[index].href, snippet: text.slice(Math.max(0, at2 - 35), at2 + needle.length + 45), percent: index / chapters.length });
+        let at2 = 0;
+        while (hits.length < (limit || 80) && (at2 = text.toLowerCase().indexOf(needle, at2)) >= 0) {
+          hits.push({ chapterIndex: index, chapterHref: chapters[index].href, textOffset: at2, snippet: text.slice(Math.max(0, at2 - 35), at2 + needle.length + 45), percent: index / chapters.length });
+          at2 += needle.length;
+        }
       }
       return hits;
     },
@@ -99759,10 +99787,10 @@ function V(a3, e = 0) {
   return n;
 }
 function _e(a3, e, t, n, s) {
-  let r = e.href, o = e.title || null, i = a3[1].replace(s.other.outputLinkReplace, "$1"), l = a3[0].charAt(0) === "!", u = n.state.inLink, h19 = n.state.linkEmitted, p2 = n.state.inRawBlock;
+  let r = e.href, o = e.title || null, i = a3[1].replace(s.other.outputLinkReplace, "$1"), l = a3[0].charAt(0) === "!", u = n.state.inLink, h20 = n.state.linkEmitted, p2 = n.state.inRawBlock;
   n.state.inLink = true, n.state.linkEmitted = false;
   let d = n.inlineTokens(i), g = n.state.linkEmitted;
-  if (n.state.linkEmitted = h19, n.state.inLink = u, !l) {
+  if (n.state.linkEmitted = h20, n.state.inLink = u, !l) {
     if (g) {
       n.state.inRawBlock = p2;
       return;
@@ -99963,11 +99991,11 @@ var init_marked_esm = __esm({
             else if (!i) l.push(n[u]);
             else break;
             n = n.slice(u);
-            let h19 = l.join(`
-`), p2 = h19.replace(this.rules.other.blockquoteMarkerWhitespace, (k, b, x) => b + V(x, b.length)).replace(this.rules.other.blockquoteSetextReplace, `
+            let h20 = l.join(`
+`), p2 = h20.replace(this.rules.other.blockquoteMarkerWhitespace, (k, b, x) => b + V(x, b.length)).replace(this.rules.other.blockquoteSetextReplace, `
     $1`).replace(this.rules.other.blockquoteSetextReplace2, "");
             s = s ? `${s}
-${h19}` : h19, r = r ? `${r}
+${h20}` : h20, r = r ? `${r}
 ${p2}` : p2;
             let d = this.lexer.state.top;
             if (this.lexer.state.top = true, this.lexer.blockTokens(p2, o, true), this.lexer.state.top = d, n.length === 0) break;
@@ -100040,8 +100068,8 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
             let C = n.slice(g, s());
             i.loose || (u ? i.loose = true : this.rules.other.doubleBlankLine.test(C) && (u = true)), i.items.push({ type: "list_item", raw: C, task: !!this.options.gfm && this.rules.other.listIsTask.test(d), loose: false, text: d, tokens: [] });
           }
-          let h19 = i.items.at(-1);
-          if (h19) h19.raw = h19.raw.trimEnd(), h19.text = h19.text.trimEnd();
+          let h20 = i.items.at(-1);
+          if (h20) h20.raw = h20.raw.trimEnd(), h20.text = h20.text.trimEnd();
           else return;
           i.raw = n.slice(0, s()).trimEnd();
           for (let p2 of i.items) if (this.lexer.state.top = false, p2.tokens = this.lexer.blockTokens(p2.text, []), !i.loose) {
@@ -100172,13 +100200,13 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
         if (!s || !s[1] && !s[2] && !s[3] && !s[4]) return;
         let r = s[0][0], o = n === r, i = t.length - e.length, l = i;
         for (; !this.options.pedantic && l > 0 && t[l - 1] === r; ) l--;
-        let u = [...t.slice(Math.max(0, l - 2), l)].at(-1) ?? "", h19 = u === "*" || u === "_" || !!this.rules.inline.punctuation.exec(u);
+        let u = [...t.slice(Math.max(0, l - 2), l)].at(-1) ?? "", h20 = u === "*" || u === "_" || !!this.rules.inline.punctuation.exec(u);
         l < i && (n = u);
-        let p2 = l < i ? h19 : !!this.rules.inline.punctuation.exec(n);
+        let p2 = l < i ? h20 : !!this.rules.inline.punctuation.exec(n);
         if (s[4] && n.match(this.rules.other.unicodeAlphaNumeric)) return;
         let d = s[1] || s[3] || "";
         if (!d || !n || p2) {
-          let g = [...s[0]].length - 1, k, b, x = g, f = 0, S = i - l + g, R = !this.options.pedantic && !!u.trim() && (!!d || r === "*" && !h19), C = r === "*" ? this.rules.inline.emStrongRDelimAst : this.rules.inline.emStrongRDelimUnd;
+          let g = [...s[0]].length - 1, k, b, x = g, f = 0, S = i - l + g, R = !this.options.pedantic && !!u.trim() && (!!d || r === "*" && !h20), C = r === "*" ? this.rules.inline.emStrongRDelimAst : this.rules.inline.emStrongRDelimUnd;
           for (C.lastIndex = 0, t = t.slice(-1 * e.length + g); (s = C.exec(t)) !== null; ) {
             if (k = s[1] || s[2] || s[3] || s[4] || s[5] || s[6], !k) continue;
             if (b = [...k].length, s[3] || s[4]) {
@@ -100218,8 +100246,8 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
         let s = this.rules.inline.delLDelim.exec(e);
         if (!s) return;
         if (!(s[1] || "") || !n || this.rules.inline.punctuation.exec(n)) {
-          let o = [...s[0]].length - 1, i, l, u = o, h19 = this.rules.inline.delRDelim;
-          for (h19.lastIndex = 0, t = t.slice(-1 * e.length + o); (s = h19.exec(t)) !== null; ) {
+          let o = [...s[0]].length - 1, i, l, u = o, h20 = this.rules.inline.delRDelim;
+          for (h20.lastIndex = 0, t = t.slice(-1 * e.length + o); (s = h20.exec(t)) !== null; ) {
             if (i = s[1] || s[2] || s[3] || s[4] || s[5] || s[6], !i || (l = [...i].length, l !== o)) continue;
             if (s[3] || s[4]) {
               u += l;
@@ -100362,8 +100390,8 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
           let o = e;
           if (this.options.extensions?.startBlock) {
             let i = 1 / 0, l = e.slice(1), u;
-            this.options.extensions.startBlock.forEach((h19) => {
-              u = h19.call({ lexer: this }, l), typeof u == "number" && u >= 0 && (i = Math.min(i, u));
+            this.options.extensions.startBlock.forEach((h20) => {
+              u = h20.call({ lexer: this }, l), typeof u == "number" && u >= 0 && (i = Math.min(i, u));
             }), i < 1 / 0 && i >= 0 && (o = e.substring(0, i + 1));
           }
           if (this.state.top && (r = this.tokenizer.paragraph(o))) {
@@ -100468,9 +100496,9 @@ ${f}`) ? `    ${Z.replace(/^ {0,3}/, "")}` : f;
           }
           let l = e;
           if (this.options.extensions?.startInline) {
-            let u = 1 / 0, h19 = e.slice(1), p2;
+            let u = 1 / 0, h20 = e.slice(1), p2;
             this.options.extensions.startInline.forEach((d) => {
-              p2 = d.call({ lexer: this }, h19), typeof p2 == "number" && p2 >= 0 && (u = Math.min(u, p2));
+              p2 = d.call({ lexer: this }, h20), typeof p2 == "number" && p2 >= 0 && (u = Math.min(u, p2));
             }), u < 1 / 0 && u >= 0 && (l = e.substring(0, u + 1));
           }
           if (i = this.tokenizer.inlineText(l)) {
@@ -100904,9 +100932,9 @@ ${e}</tr>
               if (!(o in r)) throw new Error(`renderer '${o}' does not exist`);
               if (["options", "parser"].includes(o)) continue;
               let i = o, l = n.renderer[i], u = r[i];
-              r[i] = (...h19) => {
-                let p2 = l.apply(r, h19);
-                return p2 === false && (p2 = u.apply(r, h19)), p2 || "";
+              r[i] = (...h20) => {
+                let p2 = l.apply(r, h20);
+                return p2 === false && (p2 = u.apply(r, h20)), p2 || "";
               };
             }
             s.renderer = r;
@@ -100917,9 +100945,9 @@ ${e}</tr>
               if (!(o in r)) throw new Error(`tokenizer '${o}' does not exist`);
               if (["options", "rules", "lexer"].includes(o)) continue;
               let i = o, l = n.tokenizer[i], u = r[i];
-              r[i] = (...h19) => {
-                let p2 = l.apply(r, h19);
-                return p2 === false && (p2 = u.apply(r, h19)), p2;
+              r[i] = (...h20) => {
+                let p2 = l.apply(r, h20);
+                return p2 === false && (p2 = u.apply(r, h20)), p2;
               };
             }
             s.tokenizer = r;
@@ -100930,20 +100958,20 @@ ${e}</tr>
               if (!(o in r)) throw new Error(`hook '${o}' does not exist`);
               if (["options", "block"].includes(o)) continue;
               let i = o, l = n.hooks[i], u = r[i];
-              A2.passThroughHooks.has(o) ? r[i] = (h19) => {
+              A2.passThroughHooks.has(o) ? r[i] = (h20) => {
                 if (r.options.async && A2.passThroughHooksRespectAsync.has(o)) return (async () => {
-                  let d = await l.call(r, h19);
+                  let d = await l.call(r, h20);
                   return u.call(r, d);
                 })();
-                let p2 = l.call(r, h19);
+                let p2 = l.call(r, h20);
                 return u.call(r, p2);
-              } : r[i] = (...h19) => {
+              } : r[i] = (...h20) => {
                 if (r.options.async) return (async () => {
-                  let d = await l.apply(r, h19);
-                  return d === false && (d = await u.apply(r, h19)), d;
+                  let d = await l.apply(r, h20);
+                  return d === false && (d = await u.apply(r, h20)), d;
                 })();
-                let p2 = l.apply(r, h19);
-                return p2 === false && (p2 = u.apply(r, h19)), p2;
+                let p2 = l.apply(r, h20);
+                return p2 === false && (p2 = u.apply(r, h20)), p2;
               };
             }
             s.hooks = r;
@@ -100974,7 +101002,7 @@ ${e}</tr>
           if (typeof n > "u" || n === null) return i(new Error("marked(): input parameter is undefined or null"));
           if (typeof n != "string") return i(new Error("marked(): input parameter is of type " + Object.prototype.toString.call(n) + ", string expected"));
           if (o.hooks && (o.hooks.options = o, o.hooks.block = e), o.async) return (async () => {
-            let l = o.hooks ? await o.hooks.preprocess(n) : n, h19 = await (o.hooks ? await o.hooks.provideLexer(e) : e ? O.lex : O.lexInline)(l, o), p2 = o.hooks ? await o.hooks.processAllTokens(h19) : h19;
+            let l = o.hooks ? await o.hooks.preprocess(n) : n, h20 = await (o.hooks ? await o.hooks.provideLexer(e) : e ? O.lex : O.lexInline)(l, o), p2 = o.hooks ? await o.hooks.processAllTokens(h20) : h20;
             o.walkTokens && await Promise.all(this.walkTokens(p2, o.walkTokens));
             let g = await (o.hooks ? await o.hooks.provideParser(e) : e ? w.parse : w.parseInline)(p2, o);
             return o.hooks ? await o.hooks.postprocess(g) : g;
@@ -110593,11 +110621,13 @@ function chapterLabel(xhtml) {
   }
   return "";
 }
-function parseNavDoc(text, navPath) {
+function parseNavDoc(text, navPath, kind = "toc") {
   const doc = parseMarkup(text);
   const navs = descendantsNamed(doc, "nav");
-  let target = navs.find((node) => String(attr2(node, "type") || "").toLowerCase() === "toc") || null;
-  if (!target) target = navs[0] || null;
+  let target = navs.find((node) => String(attr2(node, "type") || "").toLowerCase().split(/\s+/).includes(kind)) || null;
+  if (kind !== "toc" && !target) return [];
+  if (!target) target = navs.find((node) => !String(attr2(node, "type") || "").trim()) || null;
+  if (!target && navs.length) return [];
   if (!target) {
     const ol2 = firstDescendant(doc, "ol");
     return ol2 ? navListItems(ol2, navPath) : [];
@@ -110717,17 +110747,28 @@ async function parseEpub(bytes) {
     });
   }
   if (!chapters.length) throw new Error("EPUB \u89E3\u6790\u5931\u8D25\uFF1Aspine \u91CC\u6CA1\u6709\u53EF\u8BFB\u53D6\u7684\u7AE0\u8282\u6587\u4EF6");
-  let toc = [];
+  let toc = [], pageList = [];
   const navItem = items.find((item) => /\bnav\b/.test(item.properties));
   if (navItem) {
     const navText = await zip.readText(navItem.href);
-    if (navText) toc = parseNavDoc(navText, navItem.href);
+    if (navText) {
+      toc = parseNavDoc(navText, navItem.href);
+      pageList = parseNavDoc(navText, navItem.href, "page-list");
+    }
   }
-  if (!toc.length) {
-    const ncxItem = items.find((item) => item.mediaType === "application/x-dtbncx+xml") || items.find((item) => /\.ncx$/i.test(item.href)) || byId.get(attr2(spineNode, "toc") || "");
-    if (ncxItem) {
-      const ncxText = await zip.readText(ncxItem.href);
-      if (ncxText) toc = parseNcxDoc(ncxText, ncxItem.href);
+  const ncxItem = items.find((item) => item.mediaType === "application/x-dtbncx+xml") || items.find((item) => /\.ncx$/i.test(item.href)) || byId.get(attr2(spineNode, "toc") || "");
+  if (ncxItem && (!toc.length || !pageList.length)) {
+    const ncxText = await zip.readText(ncxItem.href);
+    if (ncxText) {
+      if (!toc.length) toc = parseNcxDoc(ncxText, ncxItem.href);
+      if (!pageList.length) {
+        const doc = parseMarkup(ncxText);
+        pageList = descendantsNamed(doc, "pageTarget").map((point) => {
+          const label = cleanTextOf(firstDescendant(point, "navLabel"));
+          const src = attr2(firstDescendant(point, "content"), "src");
+          return { label, href: src ? resolveFrom2(dirOf3(ncxItem.href), src) : "" };
+        }).filter((page) => page.label && page.href);
+      }
     }
   }
   if (!toc.length) {
@@ -110747,6 +110788,7 @@ async function parseEpub(bytes) {
     identifier,
     chapters,
     toc,
+    pageList,
     resources,
     coverHref,
     rootDir,
@@ -110815,6 +110857,151 @@ __export(client_entry_exports, {
   inject: () => inject
 });
 module.exports = __toCommonJS(client_entry_exports);
+
+// src/ui/navigation-locale.js
+var NAVIGATION_COPY = {
+  "waitForPage": ["\u8BF7\u7B49\u5F85\u5F53\u524D\u9875\u9762\u52A0\u8F7D\u5B8C\u6210", "Wait for the current page to finish loading"],
+  "currentPosition": [
+    "\u5F53\u524D\u4F4D\u7F6E",
+    "Current position"
+  ],
+  "bookmarkSaved": [
+    "\u4E66\u7B7E\u5DF2\u4FDD\u5B58",
+    "Bookmark saved"
+  ],
+  "bookmarkName": [
+    "\u4E66\u7B7E\u540D\u79F0",
+    "Bookmark name"
+  ],
+  "retrySave": [
+    "\u91CD\u65B0\u4FDD\u5B58",
+    "Retry saving"
+  ],
+  "addBookmark": [
+    "\u6DFB\u52A0\u5F53\u524D\u4F4D\u7F6E",
+    "Bookmark current position"
+  ],
+  "noBookmarks": [
+    "\u8FD8\u6CA1\u6709\u4E66\u7B7E\u3002\u4FDD\u5B58\u5F53\u524D\u4F4D\u7F6E\uFF0C\u4E0B\u6B21\u76F4\u63A5\u56DE\u6765\u3002",
+    "No bookmarks yet. Save a position to return later."
+  ],
+  "newName": [
+    "\u4E66\u7B7E\u65B0\u540D\u79F0",
+    "New bookmark name"
+  ],
+  "save": [
+    "\u4FDD\u5B58",
+    "Save"
+  ],
+  "cancel": [
+    "\u53D6\u6D88",
+    "Cancel"
+  ],
+  "rename": [
+    "\u91CD\u547D\u540D\u4E66\u7B7E",
+    "Rename bookmark"
+  ],
+  "delete": [
+    "\u5220\u9664\u4E66\u7B7E",
+    "Delete bookmark"
+  ],
+  "buildingPositions": [
+    "\u6B63\u5728\u6574\u7406\u7A33\u5B9A\u4F4D\u7F6E\u2026",
+    "Building stable locations\u2026"
+  ],
+  "originalPage": [
+    "\u539F\u4E66\u9875\u7801",
+    "Printed page"
+  ],
+  "pdfPage": [
+    "\u9875\u7801",
+    "Page"
+  ],
+  "percent": [
+    "\u767E\u5206\u6BD4",
+    "Percentage"
+  ],
+  "location": [
+    "\u4F4D\u7F6E",
+    "Location"
+  ],
+  "invalidPosition": [
+    "\u8BF7\u8F93\u5165\u6709\u6548\u7684\u9875\u7801\u3001\u4F4D\u7F6E\u62160\u2013100%",
+    "Enter a valid page, location, or 0\u2013100%"
+  ],
+  "pageUnavailable": [
+    "\u65E0\u6CD5\u5B9A\u4F4D\u8FD9\u4E2A\u539F\u4E66\u9875\u7801",
+    "This printed page could not be located"
+  ],
+  "originalHint": [
+    "\u4F7F\u7528\u4E66\u5185\u51FA\u7248\u9875\u7801\uFF0C\u652F\u6301\u7F57\u9A6C\u6570\u5B57\u7B49\u6807\u8BB0\u3002",
+    "Uses the publication\u2019s page labels, including Roman numerals."
+  ],
+  "pdfPageHint": [
+    "\u9875\u7801\u5BF9\u5E94PDF\u539F\u59CB\u9875\u9762\u3002",
+    "Pages match the original PDF."
+  ],
+  "locationHint": [
+    "\u6BCF1500\u4E2A\u5F52\u4E00\u5316\u6587\u672C\u5B57\u7B26\u4E3A\u4E00\u4E2A\u4F4D\u7F6E\uFF0C\u4E0D\u968F\u5B57\u53F7\u6216\u7A97\u53E3\u53D8\u5316\u3002",
+    "Each location contains 1,500 normalized text characters and stays independent of font size and window size."
+  ],
+  "pdfZoom": [
+    "PDF\u7F29\u653E",
+    "PDF zoom"
+  ],
+  "fitPage": [
+    "\u9002\u5E94\u9875\u9762",
+    "Fit page"
+  ],
+  "current": [
+    "\u5F53\u524D",
+    "Current"
+  ],
+  "jumpBy": [
+    "\u6309\u6B64\u65B9\u5F0F\u8DF3\u8F6C",
+    "Jump by"
+  ],
+  "jump": [
+    "\u8DF3\u8F6C",
+    "Go"
+  ],
+  "toc": [
+    "\u76EE\u5F55",
+    "Contents"
+  ],
+  "bookmarks": [
+    "\u4E66\u7B7E",
+    "Bookmarks"
+  ],
+  "positionJump": [
+    "\u4F4D\u7F6E\u8DF3\u8F6C",
+    "Go to position"
+  ],
+  "navigation": [
+    "\u76EE\u5F55\u4E0E\u4E66\u7B7E",
+    "Contents and bookmarks"
+  ],
+  "close": [
+    "\u5173\u95ED\u5BFC\u822A",
+    "Close navigation"
+  ],
+  "chapterCount": [
+    "\u7B2C {current} / {total} \u7AE0",
+    "Chapter {current} / {total}"
+  ],
+  "bookChanged": [
+    "\u4E66\u7C4D\u5DF2\u5207\u6362\uFF0C\u8BF7\u91CD\u8BD5",
+    "The book changed. Try again."
+  ],
+  "bookmarkNameRequired": [
+    "\u8BF7\u586B\u5199\u4E66\u7B7E\u540D\u79F0",
+    "Enter a bookmark name"
+  ],
+  "bookmarkMissing": [
+    "\u627E\u4E0D\u5230\u8FD9\u6761\u4E66\u7B7E",
+    "This bookmark could not be found"
+  ]
+};
 
 // src/ui/speech-locale.js
 var SPEECH_COPY = {
@@ -111640,6 +111827,7 @@ var EBOOK_MESSAGES = {
 };
 for (const [language, index] of [["zh", 0], ["en", 1]]) LIBRARY_MESSAGES[language].ebook = Object.fromEntries(Object.entries(EBOOK_MESSAGES).map(([key, values]) => [key, values[index]]));
 for (const [language, index] of [["zh", 0], ["en", 1]]) Object.assign(LIBRARY_MESSAGES[language].speech, Object.fromEntries(Object.entries(SPEECH_COPY).map(([key, values]) => [key, values[index]])));
+for (const [language, index] of [["zh", 0], ["en", 1]]) LIBRARY_MESSAGES[language].nav = Object.fromEntries(Object.entries(NAVIGATION_COPY).map(([key, values]) => [key, values[index]]));
 function flatMessages(messages2, prefix = "") {
   return Object.fromEntries(Object.entries(messages2).flatMap(([key, value]) => {
     const name = prefix ? `${prefix}.${key}` : key;
@@ -111648,7 +111836,7 @@ function flatMessages(messages2, prefix = "") {
 }
 
 // src/client/index.js
-var React21 = __toESM(require("react"), 1);
+var React22 = __toESM(require("react"), 1);
 
 // src/core/state.js
 var DEFAULT_READER_SETTINGS = Object.freeze({
@@ -111920,7 +112108,8 @@ function addBookmark(state, input) {
     chapterHref,
     percent,
     label,
-    createdAt
+    createdAt,
+    ...isObject(source.locator) ? { locator: normalizeLocator(source.locator) } : {}
   };
   return {
     state: {
@@ -112239,14 +112428,14 @@ function chapterLabelMap(engine) {
 function chapterIndexForHref(engine, href) {
   try {
     const chapters = engine && engine.book && engine.book.chapters || [];
-    const target = String(href || "");
+    const target = String(href || "").split("#")[0];
     if (!target) return -1;
     for (let i = 0; i < chapters.length; i += 1) {
-      if (chapters[i] && chapters[i].href === target) return i;
+      if (chapters[i] && String(chapters[i].href || "").split("#")[0] === target) return i;
     }
     const base = target.split("/").pop();
     for (let i = 0; i < chapters.length; i += 1) {
-      const chapterHref = String(chapters[i] && chapters[i].href || "");
+      const chapterHref = String(chapters[i] && chapters[i].href || "").split("#")[0];
       if (chapterHref.split("/").pop() === base) return i;
     }
   } catch (_error) {
@@ -113115,7 +113304,7 @@ __export(shell_exports, {
   ReaderOverlay: () => ReaderOverlay,
   default: () => shell_default
 });
-var React20 = __toESM(require("react"), 1);
+var React21 = __toESM(require("react"), 1);
 
 // src/ui/hooks.js
 var React = __toESM(require("react"), 1);
@@ -113546,6 +113735,7 @@ var UI_CSS = `
 .qmr-paper-body h1,.qmr-paper-body h2,.qmr-paper-body h3,.qmr-paper-body h4{margin:1.1em 0 .6em;line-height:1.35;font-weight:600}
 .qmr-paper-body h1{font-size:1.5em}.qmr-paper-body h2{font-size:1.3em}.qmr-paper-body h3{font-size:1.15em}
 .qmr-paper-body img{max-width:100%;height:auto;border-radius:6px;margin:.6em 0}
+.qmr-format-pdf.qmr-flow-scroll .qmr-page-viewport{overflow:auto}
 .qmr-pdf-sheet{position:relative;container-type:inline-size;max-width:100%;height:auto;margin:0 auto 20px;
   background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12)}
 .qmr-pdf-sheet img{display:block;width:100%;height:100%;max-width:none;object-fit:fill;margin:0;border-radius:0}
@@ -113597,6 +113787,7 @@ var UI_CSS = `
 .qmr-track{position:relative;display:flex;align-items:center;flex:1 1 auto;height:16px;cursor:pointer;touch-action:none}
 .qmr-track-rail{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:var(--qmr-border)}
 .qmr-track-fill{position:absolute;left:0;height:4px;border-radius:2px;background:var(--qmr-accent)}
+.qmr-position-trigger{border:0;background:none;color:var(--qmr-muted);padding:3px 4px;font:inherit;cursor:pointer;white-space:nowrap}.qmr-position-trigger:focus-visible{outline:1px solid var(--qmr-muted);outline-offset:1px}
 .qmr-track-knob{position:absolute;width:12px;height:12px;border-radius:50%;transform:translateX(-50%);
   background:var(--qmr-accent);box-shadow:0 0 0 2px var(--qmr-ui)}
 .qmr-panel{display:flex;flex-direction:column;flex:0 0 340px;width:340px;min-height:0;
@@ -114122,8 +114313,14 @@ function createController(getProps, store) {
   function updateSettings(id, patch) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
+      const preservePosition = id === uiStore.get().bookId && ["fontSize", "fontFamily", "lineHeight", "margin", "flow", "spread", "justify", "pdfZoom"].some((key) => Object.hasOwn(patch || {}, key));
+      const anchor = preservePosition ? pager.capture?.() || state.locator : null;
       const merged = { ...state.settings || {}, ...patch || {} };
       patchState(id, { settings: merged });
+      if (anchor && Number.isFinite(anchor.textOffset)) {
+        const current = uiStore.get();
+        uiStore.set({ restoreAnchor: anchor, restoreScroll: anchor.scroll, jumpToken: (current.jumpToken || 0) + 1 });
+      }
     });
   }
   function chapterCountOf(id) {
@@ -114319,6 +114516,7 @@ function createController(getProps, store) {
         focusHighlightId: null,
         editingHighlightId: null,
         restoreScroll: Math.min(1, Math.max(0, Number(locator.scroll) || 0)),
+        restoreAnchor: Number.isFinite(locator.textOffset) ? { ...locator } : null,
         engineVersion: (uiStore.get().engineVersion || 0) + 1,
         imagesVersion: 0,
         busyBookId: null,
@@ -114351,6 +114549,7 @@ function createController(getProps, store) {
       if (typeof next.prev === "function") pager.prev = next.prev;
       if (typeof next.goChapter === "function") pager.goChapter = next.goChapter;
       if (typeof next.jump === "function") pager.jump = next.jump;
+      if (typeof next.capture === "function") pager.capture = next.capture;
     } catch (_error) {
     }
   }
@@ -114374,16 +114573,16 @@ function createController(getProps, store) {
       pager.goChapter(target);
     } catch (_error) {
     }
-    uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null });
-    updateLocator(state.bookId, { chapterIndex: target, scroll: 0 });
+    uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null, restoreAnchor: null });
+    updateLocator(state.bookId, { chapterIndex: target, scroll: 0, textOffset: 0, textQuote: "", originalPage: "", chapterHref: engineOf(state.bookId)?.book?.chapters?.[target]?.href || "" });
   }
   function goPercent(fraction) {
     const state = uiStore.get();
     const count = Number(state.chapterCount) || chapterCountOf(state.bookId) || 1;
     if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
     const location = percentLocation(fraction, count);
-    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, jumpToken: (state.jumpToken || 0) + 1 });
-    updateLocator(state.bookId, location);
+    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, restoreAnchor: null, jumpToken: (state.jumpToken || 0) + 1 });
+    updateLocator(state.bookId, { ...location, textOffset: void 0, textQuote: "", originalPage: "" });
   }
   function updateLocator(id, patch) {
     if (id == null) return;
@@ -114399,12 +114598,84 @@ function createController(getProps, store) {
       const locator = {
         ...state.locator || {},
         chapterIndex: clampInt(position.chapterIndex, 0, 1e5),
+        fragment: "",
         scroll: Math.min(1, Math.max(0, Number(position.scroll) || 0))
       };
       if (position.chapterHref) locator.chapterHref = String(position.chapterHref);
-      if (position.textQuote) locator.textQuote = String(position.textQuote).slice(0, 200);
+      if (typeof position.textQuote === "string") locator.textQuote = position.textQuote.slice(0, 200);
+      if (Number.isFinite(position.textOffset)) locator.textOffset = Math.max(0, Math.floor(position.textOffset));
+      if (typeof position.originalPage === "string") locator.originalPage = position.originalPage;
+      if (typeof position.contentFingerprint === "string") locator.contentFingerprint = position.contentFingerprint;
       patchState(id, { locator });
     });
+  }
+  function goLocator(locator) {
+    const state = uiStore.get(), count = chapterCountOf(state.bookId) || 1;
+    const chapterIndex = clampInt(locator.chapterIndex, 0, count - 1);
+    if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
+    const target = { ...locator, chapterIndex, chapterHref: locator.chapterHref || engineOf(state.bookId)?.book?.chapters?.[chapterIndex]?.href || "", textOffset: Number.isFinite(locator.textOffset) ? Math.max(0, Math.floor(locator.textOffset)) : void 0, textQuote: locator.textQuote || "", originalPage: locator.originalPage || "", scroll: Math.min(1, Math.max(0, Number(locator.scroll) || 0)) };
+    uiStore.set({ chapterIndex, page: 0, restoreScroll: target.scroll, restoreAnchor: target, jumpToken: (state.jumpToken || 0) + 1 });
+    updateLocator(state.bookId, target);
+  }
+  function goHref(href) {
+    const state = uiStore.get(), engine = engineOf(state.bookId);
+    let resolved = engine?.resolveLink?.(state.chapterIndex, href);
+    const chapterIndex = typeof resolved === "number" ? resolved : resolved?.chapterIndex ?? chapterIndexForHref(engine, href);
+    if (!(chapterIndex >= 0)) return false;
+    let fragment = String(href).split("#").slice(1).join("#");
+    try {
+      fragment = decodeURIComponent(fragment);
+    } catch {
+    }
+    goLocator({ chapterIndex, chapterHref: engine.book?.chapters?.[chapterIndex]?.href || "", fragment, scroll: 0 });
+    return true;
+  }
+  async function saveBookmark(input = {}) {
+    const id = uiStore.get().bookId;
+    if (!id) throw Error("\u6CA1\u6709\u6253\u5F00\u7684\u4E66\u7C4D");
+    if (!input.id && uiStore.get().chapterBusy) throw Error(t("nav.waitForPage", "\u8BF7\u7B49\u5F85\u5F53\u524D\u9875\u9762\u52A0\u8F7D\u5B8C\u6210"));
+    const capturedLocator = input.locator || pager.capture?.() || stateOr(id).locator;
+    await loadState(id);
+    if (uiStore.get().bookId !== id) throw Error(t("nav.bookChanged", "\u4E66\u7C4D\u5DF2\u5207\u6362\uFF0C\u8BF7\u91CD\u8BD5"));
+    const label = String(input.label || "").trim().slice(0, 120);
+    if (!label) throw Error(t("nav.bookmarkNameRequired", "\u8BF7\u586B\u5199\u4E66\u7B7E\u540D\u79F0"));
+    const state = stateOr(id);
+    let bookmark, next;
+    if (input.id) {
+      bookmark = state.bookmarks.find((b) => b.id === input.id);
+      if (!bookmark) throw Error(t("nav.bookmarkMissing", "\u627E\u4E0D\u5230\u8FD9\u6761\u4E66\u7B7E"));
+      bookmark = { ...bookmark, label };
+      next = { ...state, bookmarks: state.bookmarks.map((b) => b.id === input.id ? bookmark : b) };
+    } else {
+      const locator = capturedLocator;
+      const result2 = addBookmark(state, { label, chapterHref: locator.chapterHref, percent: ((Number(locator.chapterIndex) || 0) + (Number(locator.scroll) || 0)) / Math.max(1, chapterCountOf(id)), locator });
+      next = result2.state;
+      bookmark = result2.bookmark;
+    }
+    replaceState(id, next);
+    clearTimeout(saveTimers.get(id));
+    saveTimers.delete(id);
+    const result = await callAction("saveState", id, stateOr(id));
+    if (result?.ok === false) throw Object.assign(Error(result.error), { bookmarkId: bookmark.id });
+    return bookmark;
+  }
+  async function deleteBookmark(bookmarkId) {
+    const id = uiStore.get().bookId;
+    await loadState(id);
+    if (uiStore.get().bookId !== id) throw Error(t("nav.bookChanged", "\u4E66\u7C4D\u5DF2\u5207\u6362\uFF0C\u8BF7\u91CD\u8BD5"));
+    const prior = stateOr(id).bookmarks;
+    replaceState(id, removeBookmark(stateOr(id), bookmarkId));
+    clearTimeout(saveTimers.get(id));
+    saveTimers.delete(id);
+    const result = await callAction("saveState", id, stateOr(id));
+    if (result?.ok === false) {
+      patchState(id, { bookmarks: prior });
+      throw Error(result.error);
+    }
+  }
+  function openBookmark(bookmark) {
+    if (bookmark.locator) goLocator(bookmark.locator);
+    else goPercent(bookmark.percent);
   }
   function setPanel(panel) {
     const current = uiStore.get().panel;
@@ -114742,10 +115013,16 @@ function createController(getProps, store) {
     turnPage,
     goChapter,
     goPercent,
+    goLocator,
+    goHref,
+    saveBookmark,
+    deleteBookmark,
+    openBookmark,
+    captureLocator: () => pager.capture?.() || stateOr(uiStore.get().bookId).locator,
     returnFromJump() {
       const state = uiStore.get();
       if (!state.jumpReturn) return;
-      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
+      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, restoreAnchor: { ...state.jumpReturn }, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
       updateLocator(state.bookId, state.jumpReturn);
     },
     updateLocator,
@@ -116163,7 +116440,69 @@ function LibraryView({ ui }) {
 }
 
 // src/ui/reader.js
-var React19 = __toESM(require("react"), 1);
+var React20 = __toESM(require("react"), 1);
+
+// src/core/reading-position.js
+var READING_LOCATION_SIZE = 1500;
+function flattenPageList(items = []) {
+  return Array.isArray(items) ? items.flatMap((item) => [...typeof item?.href === "string" && String(item.label || "").trim() ? [{ label: String(item.label).trim(), href: item.href }] : [], ...flattenPageList(item?.children || item?.subitems || [])]) : [];
+}
+var models = /* @__PURE__ */ new WeakMap();
+function readingPositionModel(engine) {
+  if (!engine || typeof engine.chapterCount !== "function") return Promise.reject(Error("Reading engine unavailable"));
+  if (models.has(engine)) return models.get(engine);
+  const promise = (async () => {
+    const count = engine.chapterCount(), pages = flattenPageList(engine.book?.pageList);
+    if (engine.book?.format === "pdf") return { kind: "page", total: count, chapterCount: count, pages: [], size: count, lengths: Array(count).fill(1), starts: Array.from({ length: count }, (_2, i) => i) };
+    const lengths = [], starts = [];
+    let size = 0;
+    for (let index = 0; index < count; index++) {
+      starts.push(size);
+      const text = String(await engine.plainTextOf(index)).replace(/\s+/g, " ").trim();
+      lengths.push(text.length);
+      size += text.length;
+      if (index % 16 === 15) await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    if (!size && !pages.length) return { kind: "page", total: count, chapterCount: count, pages: [], size: count, lengths: Array(count).fill(1), starts: Array.from({ length: count }, (_2, i) => i) };
+    return { kind: pages.length ? "original" : "location", pages, size, lengths, starts, chapterCount: count, total: pages.length || Math.max(1, Math.ceil(size / READING_LOCATION_SIZE)) };
+  })();
+  models.set(engine, promise);
+  void promise.catch(() => models.delete(engine));
+  return promise;
+}
+function positionForLocator(model, locator = {}) {
+  const chapter = Math.max(0, Math.min(model.chapterCount - 1, Math.floor(Number(locator.chapterIndex) || 0)));
+  if (model.kind === "page") return { current: chapter + 1, total: model.total, kind: "page" };
+  const offset = Number.isFinite(locator.textOffset) ? locator.textOffset : Math.round((model.lengths[chapter] || 0) * Math.min(1, Math.max(0, Number(locator.scroll) || 0)));
+  const absolute = Math.min(model.size, Math.max(0, (model.starts[chapter] || 0) + Math.max(0, offset)));
+  const location = Math.min(Math.max(1, Math.ceil(model.size / READING_LOCATION_SIZE)), Math.floor(absolute / READING_LOCATION_SIZE) + 1);
+  if (model.kind === "original") return { kind: "original", current: locator.originalPage || "", total: model.total, location };
+  return { kind: "location", current: location, total: Math.max(1, Math.ceil(model.size / READING_LOCATION_SIZE)) };
+}
+function parseReadingPosition(raw, model, mode = model.kind) {
+  const value = String(raw || "").trim();
+  if (mode === "percent" || value.endsWith("%")) {
+    const text = value.replace(/%$/, "");
+    const number2 = Number(text);
+    return /^(?:\d+(?:\.\d+)?|\.\d+)$/.test(text) && number2 >= 0 && number2 <= 100 ? { fraction: number2 / 100 } : null;
+  }
+  if (mode === "original") {
+    const matches = model.pages.filter((p2) => p2.label.toLocaleLowerCase() === value.toLocaleLowerCase());
+    return matches.length === 1 ? { href: matches[0].href } : null;
+  }
+  if (!/^\d+$/.test(value)) return null;
+  const number = Number(value), total = mode === "page" ? model.chapterCount : Math.max(1, Math.ceil(model.size / READING_LOCATION_SIZE));
+  if (!Number.isSafeInteger(number) || number < 1 || number > total) return null;
+  if (mode === "page") return { chapterIndex: number - 1, scroll: 0 };
+  const absolute = (number - 1) * READING_LOCATION_SIZE;
+  let chapter = model.chapterCount - 1;
+  for (let index = 0; index < model.chapterCount; index++) if (absolute < (model.starts[index] || 0) + (model.lengths[index] || 0)) {
+    chapter = index;
+    break;
+  }
+  const offset = Math.max(0, absolute - (model.starts[chapter] || 0));
+  return { chapterIndex: chapter, textOffset: offset, scroll: model.lengths[chapter] ? offset / model.lengths[chapter] : 0 };
+}
 
 // src/ui/companion.js
 var React10 = __toESM(require("react"), 1);
@@ -119235,7 +119574,7 @@ function SpeechConfiguration({ speech }) {
       if (isCurrent()) setBusy(false);
     }
   };
-  const models = id === "doubao" ? TTS_MODELS.doubao : [...TTS_MODELS[id] || [], ...speech.catalog[id]?.models || []], keyName = modelKey(draft), links2 = speechServiceLinks(draft);
+  const models2 = id === "doubao" ? TTS_MODELS.doubao : [...TTS_MODELS[id] || [], ...speech.catalog[id]?.models || []], keyName = modelKey(draft), links2 = speechServiceLinks(draft);
   const field = (name, label, list, type = "text") => h10("label", { key: name }, label, h10("input", { type, value: draft[name] || "", list: list ? "qmr-speech-" + name : void 0, autoComplete: "off", onChange: (e) => setDraft((old) => name === keyName ? changeSpeechModel(old, e.target.value, speech.catalog[id]) : { ...old, [name]: e.target.value }) }), list ? h10("datalist", { id: "qmr-speech-" + name }, list.map((value) => h10("option", { key: value.id, value: value.id }, value.label))) : null);
   return h10(
     "details",
@@ -119253,7 +119592,7 @@ function SpeechConfiguration({ speech }) {
           }
         });
       } },
-      field(keyName, id === "doubao" ? t("resource", "\u8BED\u97F3\u8D44\u6E90 ID") : t("model", "\u6A21\u578B"), models),
+      field(keyName, id === "doubao" ? t("resource", "\u8BED\u97F3\u8D44\u6E90 ID") : t("model", "\u6A21\u578B"), models2),
       field("voice", t("customVoice", "\u586B\u5199\u97F3\u8272 ID"), voiceChoices(draft, speech.catalog[id])),
       id === "azure" ? field("region", t("region", "Azure \u533A\u57DF")) : field("baseUrl", t("baseUrl", "\u670D\u52A1\u5730\u5740")),
       h10("label", null, t("apiKey", "API \u5BC6\u94A5"), h10("input", { type: "password", value: key, autoComplete: "off", placeholder: config.profiles[id]?.hasKey ? t("keySaved", "\u5DF2\u4FDD\u5B58\u5BC6\u94A5\uFF1B\u7559\u7A7A\u4FDD\u7559") : "", onChange: (e) => setKey(e.target.value) })),
@@ -119727,26 +120066,146 @@ function VocabularyPanel({ ui, bookId }) {
 }
 
 // src/ui/toc.js
+var React15 = __toESM(require("react"), 1);
+
+// src/ui/navigation-panel.js
 var React14 = __toESM(require("react"), 1);
 var h12 = React14.createElement;
+function BookmarkList({ ui, bookId }) {
+  const state = ui.useSel((value) => value.states?.[bookId]);
+  const chapterBusy = ui.useSel((value) => value.chapterBusy);
+  const [label, setLabel] = React14.useState(""), [createId, setCreateId] = React14.useState(null), [editing, setEditing] = React14.useState(null), [editLabel, setEditLabel] = React14.useState(""), [busy, setBusy] = React14.useState(false), [error, setError] = React14.useState(""), [status, setStatus] = React14.useState("");
+  const alive = React14.useRef(true);
+  React14.useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, [bookId]);
+  const t = (key, fallback) => ui.t(`nav.${key}`, fallback);
+  const run = async (fn) => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    setStatus("");
+    try {
+      await fn();
+    } catch (cause) {
+      if (alive.current) setError(cause.message);
+    } finally {
+      if (alive.current) setBusy(false);
+    }
+  };
+  const create = (event) => {
+    event.preventDefault();
+    void run(async () => {
+      try {
+        await ui.saveBookmark({ id: createId, label: label.trim() || t("currentPosition", "\u5F53\u524D\u4F4D\u7F6E") });
+        if (alive.current) {
+          setLabel("");
+          setCreateId(null);
+          setStatus(t("bookmarkSaved", "\u4E66\u7B7E\u5DF2\u4FDD\u5B58"));
+        }
+      } catch (cause) {
+        if (alive.current && cause.bookmarkId) setCreateId(cause.bookmarkId);
+        throw cause;
+      }
+    });
+  };
+  return h12(
+    "div",
+    { className: "qmr-navigation-body" },
+    h12("form", { onSubmit: create, className: "qmr-bookmark-create" }, h12("label", null, t("bookmarkName", "\u4E66\u7B7E\u540D\u79F0"), h12("input", { maxLength: 120, value: label, disabled: busy, placeholder: t("currentPosition", "\u5F53\u524D\u4F4D\u7F6E"), onChange: (event) => setLabel(event.target.value) })), h12("button", { className: "qmr-btn", disabled: busy || chapterBusy }, createId ? t("retrySave", "\u91CD\u65B0\u4FDD\u5B58") : t("addBookmark", "\u6DFB\u52A0\u5F53\u524D\u4F4D\u7F6E"))),
+    error ? h12("p", { role: "alert", className: "qmr-error" }, error) : null,
+    status ? h12("p", { role: "status" }, status) : null,
+    !(state?.bookmarks || []).length ? h12("p", { className: "qmr-muted" }, t("noBookmarks", "\u8FD8\u6CA1\u6709\u4E66\u7B7E\u3002\u4FDD\u5B58\u5F53\u524D\u4F4D\u7F6E\uFF0C\u4E0B\u6B21\u76F4\u63A5\u56DE\u6765\u3002")) : null,
+    h12("ul", { className: "qmr-bookmark-list" }, (state?.bookmarks || []).map((bookmark) => h12("li", { key: bookmark.id }, editing === bookmark.id ? h12("form", { onSubmit: (event) => {
+      event.preventDefault();
+      void run(async () => {
+        await ui.saveBookmark({ id: bookmark.id, label: editLabel });
+        if (alive.current) setEditing(null);
+      });
+    } }, h12("input", { "aria-label": t("newName", "\u4E66\u7B7E\u65B0\u540D\u79F0"), maxLength: 120, value: editLabel, disabled: busy, onChange: (event) => setEditLabel(event.target.value) }), h12("div", { className: "qmr-feature-actions" }, h12("button", { className: "qmr-btn", disabled: busy || !editLabel.trim() }, t("save", "\u4FDD\u5B58")), h12("button", { type: "button", className: "qmr-btn", disabled: busy, onClick: () => setEditing(null) }, t("cancel", "\u53D6\u6D88")))) : h12(React14.Fragment, null, h12("button", { className: "qmr-bookmark-jump", type: "button", onClick: () => ui.openBookmark(bookmark) }, h12("strong", null, bookmark.label), h12("span", { className: "qmr-muted" }, `${Math.round((bookmark.percent || 0) * 100)}%`)), h12("button", { className: "qmr-icon-btn", type: "button", "aria-label": t("rename", "\u91CD\u547D\u540D\u4E66\u7B7E") + " \xB7 " + bookmark.label, disabled: busy, onClick: () => {
+      setEditing(bookmark.id);
+      setEditLabel(bookmark.label);
+      setError("");
+    } }, h12(IconEdit, { width: 15, height: 15 })), h12("button", { className: "qmr-icon-btn", type: "button", "aria-label": t("delete", "\u5220\u9664\u4E66\u7B7E") + " \xB7 " + bookmark.label, disabled: busy, onClick: () => void run(() => ui.deleteBookmark(bookmark.id)) }, h12(IconTrash, { width: 15, height: 15 }))))))
+  );
+}
+function PositionInput({ ui, engine, bookId }) {
+  const [model, setModel] = React14.useState(null), [mode, setMode] = React14.useState("location"), [value, setValue] = React14.useState(""), [error, setError] = React14.useState("");
+  const locator = ui.useSel((state) => state.states?.[bookId]?.locator);
+  const pdfZoom = ui.useSel((state) => state.states?.[bookId]?.settings?.pdfZoom) || 1;
+  const t = (key, fallback) => ui.t(`nav.${key}`, fallback);
+  React14.useEffect(() => {
+    let active = true;
+    setModel(null);
+    setError("");
+    readingPositionModel(engine).then((next) => {
+      if (active) {
+        setModel(next);
+        setMode(next.kind);
+      }
+    }, (cause) => {
+      if (active) setError(cause.message);
+    });
+    return () => {
+      active = false;
+    };
+  }, [engine]);
+  if (!model) return h12("p", { role: error ? "alert" : "status" }, error || t("buildingPositions", "\u6B63\u5728\u6574\u7406\u7A33\u5B9A\u4F4D\u7F6E\u2026"));
+  const current = positionForLocator(model, locator), label = mode === "original" ? t("originalPage", "\u539F\u4E66\u9875\u7801") : mode === "page" ? t("pdfPage", "\u9875\u7801") : mode === "percent" ? t("percent", "\u767E\u5206\u6BD4") : t("location", "\u4F4D\u7F6E");
+  return h12(
+    "form",
+    { className: "qmr-position-form", onSubmit: (event) => {
+      event.preventDefault();
+      const target = parseReadingPosition(value, model, mode);
+      if (!target) {
+        setError(t("invalidPosition", "\u8BF7\u8F93\u5165\u6709\u6548\u7684\u9875\u7801\u3001\u4F4D\u7F6E\u62160\u2013100%"));
+        return;
+      }
+      setError("");
+      if (target.href) {
+        if (!ui.goHref(target.href)) setError(t("pageUnavailable", "\u65E0\u6CD5\u5B9A\u4F4D\u8FD9\u4E2A\u539F\u4E66\u9875\u7801"));
+      } else if (target.fraction !== void 0) ui.goPercent(target.fraction);
+      else ui.goLocator({ ...target, contentFingerprint: engine.contentFingerprint });
+    } },
+    h12("p", { className: "qmr-muted" }, current.kind === "original" ? t("originalHint", "\u4F7F\u7528\u4E66\u5185\u51FA\u7248\u9875\u7801\uFF0C\u652F\u6301\u7F57\u9A6C\u6570\u5B57\u7B49\u6807\u8BB0\u3002") : current.kind === "page" ? t("pdfPageHint", "\u9875\u7801\u5BF9\u5E94PDF\u539F\u59CB\u9875\u9762\u3002") : t("locationHint", "\u6BCF1500\u4E2A\u5F52\u4E00\u5316\u6587\u672C\u5B57\u7B26\u4E3A\u4E00\u4E2A\u4F4D\u7F6E\uFF0C\u4E0D\u968F\u5B57\u53F7\u6216\u7A97\u53E3\u53D8\u5316\u3002")),
+    model.kind === "page" ? h12("label", null, t("pdfZoom", "PDF\u7F29\u653E"), h12("select", { value: pdfZoom, onChange: (event) => ui.updateSettings(bookId, { pdfZoom: Number(event.target.value) }) }, [0.5, 0.75, 1, 1.25, 1.5, 2, 3].map((zoom) => h12("option", { key: zoom, value: zoom }, zoom === 1 ? t("fitPage", "\u9002\u5E94\u9875\u9762") : Math.round(zoom * 100) + "%")))) : null,
+    h12("p", null, t("current", "\u5F53\u524D") + " \xB7 " + (current.current || "\u2014") + " / " + current.total),
+    h12("label", null, t("jumpBy", "\u6309\u6B64\u65B9\u5F0F\u8DF3\u8F6C"), h12("select", { value: mode, onChange: (event) => {
+      setMode(event.target.value);
+      setError("");
+    } }, model.kind === "original" ? h12("option", { value: "original" }, t("originalPage", "\u539F\u4E66\u9875\u7801")) : null, model.kind === "page" ? h12("option", { value: "page" }, t("pdfPage", "\u9875\u7801")) : h12("option", { value: "location" }, t("location", "\u4F4D\u7F6E")), h12("option", { value: "percent" }, t("percent", "\u767E\u5206\u6BD4")))),
+    h12("label", null, label, h12("input", { value, maxLength: 40, inputMode: mode === "original" ? "text" : "decimal", "aria-label": label, onChange: (event) => setValue(event.target.value) })),
+    h12("button", { className: "qmr-btn", disabled: !value.trim() }, t("jump", "\u8DF3\u8F6C")),
+    error ? h12("p", { role: "alert", className: "qmr-error" }, error) : null
+  );
+}
+var NAVIGATION_CSS = `.qmr-navigation-tabs{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--qmr-border)}.qmr-navigation-tabs button{flex:1;padding:7px;border:0;border-radius:5px;background:transparent;color:var(--qmr-muted);font:inherit;cursor:pointer}.qmr-navigation-tabs button[aria-selected=true]{color:var(--qmr-ink);background:var(--qmr-ui);font-weight:600}.qmr-navigation-body,.qmr-position-form{display:flex;flex-direction:column;gap:14px}.qmr-navigation-body form,.qmr-position-form label{display:flex;flex-direction:column;gap:8px}.qmr-navigation-body label{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-navigation-body input,.qmr-position-form input,.qmr-position-form select{width:100%;min-width:0;height:40px;padding:8px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}.qmr-bookmark-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}.qmr-bookmark-list li{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--qmr-border)}.qmr-bookmark-list li form{width:100%}.qmr-bookmark-jump{display:flex;flex:1;min-width:0;text-align:left;flex-direction:column;gap:3px;padding:0;border:0;color:var(--qmr-ink);background:none;cursor:pointer}.qmr-bookmark-jump strong{overflow-wrap:anywhere;font-size:13px}.qmr-bookmark-jump span{font-size:12px}`;
+
+// src/ui/toc.js
+var h13 = React15.createElement;
 function TocPanel({ ui }) {
   const bookId = ui.useSel((state) => state.bookId);
+  const tab = ui.useSel((state) => state.navigationTab || "toc");
+  const t = (key, fallback) => ui.t(`nav.${key}`, fallback);
   const chapterIndex = ui.useSel((state) => state.chapterIndex);
   const chapterCount = ui.useSel((state) => state.chapterCount);
   ui.useSel((state) => state.engineVersion);
-  const [collapsed, setCollapsed] = React14.useState({});
+  const [collapsed, setCollapsed] = React15.useState({});
   const engine = ui.engineOf(bookId);
-  const labels = React14.useMemo(() => chapterLabelMap(engine), [engine]);
-  const entries2 = React14.useMemo(() => {
+  const labels = React15.useMemo(() => chapterLabelMap(engine), [engine]);
+  const entries2 = React15.useMemo(() => {
     const toc = engine && engine.book && Array.isArray(engine.book.toc) ? engine.book.toc : [];
     return toc;
   }, [engine]);
-  const indexOfHref = React14.useCallback((href) => {
+  const indexOfHref = React15.useCallback((href) => {
     const direct = chapterIndexForHref(engine, href);
     if (direct >= 0) return direct;
     try {
       const resolved = engine && engine.resolveLink ? engine.resolveLink(chapterIndex, href) : null;
-      return typeof resolved === "number" ? resolved : -1;
+      return typeof resolved === "number" ? resolved : resolved?.chapterIndex ?? -1;
     } catch (_error) {
       return -1;
     }
@@ -119754,7 +120213,7 @@ function TocPanel({ ui }) {
   const jump = (href) => {
     const index = indexOfHref(href);
     if (index >= 0) {
-      ui.goChapter(index);
+      if (!ui.goHref(href)) ui.goChapter(index);
     } else {
       ui.toast("\u65E0\u6CD5\u5B9A\u4F4D\u8BE5\u76EE\u5F55\u9879", "warn");
     }
@@ -119762,7 +120221,7 @@ function TocPanel({ ui }) {
   const toggle = (key) => setCollapsed((previous) => ({ ...previous, [key]: !previous[key] }));
   const renderEntries = (list, depth) => {
     if (!Array.isArray(list) || !list.length) return null;
-    return h12("div", { className: "qmr-toc-tree" }, list.map((entry, i) => {
+    return h13("div", { className: "qmr-toc-tree" }, list.map((entry, i) => {
       if (!entry) return null;
       const href = String(entry.href || "");
       const key = `${depth}-${i}-${href}`;
@@ -119770,68 +120229,64 @@ function TocPanel({ ui }) {
       const isOpen = !collapsed[key];
       const index = indexOfHref(href);
       const isCurrent = index >= 0 && index === chapterIndex;
-      return h12(
+      return h13(
         "div",
         { key },
-        h12(
+        h13(
           "div",
           { className: "qmr-toc-row" },
-          children.length ? h12("button", {
+          children.length ? h13("button", {
             type: "button",
             className: `qmr-toc-toggle${isOpen ? " is-open" : ""}`,
             "aria-label": isOpen ? "\u6298\u53E0" : "\u5C55\u5F00",
             "aria-expanded": isOpen,
             onClick: () => toggle(key)
-          }, h12(IconNext, { width: 14, height: 14 })) : h12("span", { className: "qmr-toc-toggle", "aria-hidden": "true" }),
-          h12("button", {
+          }, h13(IconNext, { width: 14, height: 14 })) : h13("span", { className: "qmr-toc-toggle", "aria-hidden": "true" }),
+          h13("button", {
             type: "button",
             className: `qmr-toc-item${isCurrent ? " is-current" : ""}`,
             "aria-current": isCurrent ? "true" : void 0,
             onClick: () => jump(href)
           }, stripTags(entry.label) || href || "\u672A\u547D\u540D")
         ),
-        children.length && isOpen ? h12("div", { className: "qmr-toc-children" }, renderEntries(children, depth + 1)) : null
+        children.length && isOpen ? h13("div", { className: "qmr-toc-children" }, renderEntries(children, depth + 1)) : null
       );
     }));
   };
   const chapterLabel2 = labels.get(chapterIndex) || `\u7B2C ${chapterIndex + 1} \u7AE0`;
-  return h12(
-    React14.Fragment,
+  const tabs = [["toc", t("toc", "\u76EE\u5F55")], ["bookmarks", t("bookmarks", "\u4E66\u7B7E")], ["position", t("positionJump", "\u4F4D\u7F6E\u8DF3\u8F6C")]];
+  return h13(
+    React15.Fragment,
     null,
-    h12(
+    h13("style", null, NAVIGATION_CSS),
+    h13("div", { className: "qmr-panel-head" }, h13(IconToc, { width: 16, height: 16 }), h13("span", { className: "qmr-panel-title" }, t("navigation", "\u76EE\u5F55\u4E0E\u4E66\u7B7E")), h13("button", { type: "button", className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED\u5BFC\u822A"), onClick: () => ui.setPanel(null) }, h13(IconClose, { width: 16, height: 16 }))),
+    h13("div", { className: "qmr-navigation-tabs", role: "tablist", "aria-label": t("navigation", "\u76EE\u5F55\u4E0E\u4E66\u7B7E") }, tabs.map(([id, label], index) => h13("button", { type: "button", key: id, id: "qmr-nav-tab-" + id, role: "tab", "aria-selected": tab === id, tabIndex: tab === id ? 0 : -1, "aria-controls": "qmr-navigation-panel", onClick: () => ui.store.set({ navigationTab: id }), onKeyDown: (event) => {
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      ui.store.set({ navigationTab: tabs[next][0] });
+      event.currentTarget.parentNode.querySelectorAll("button")[next].focus();
+    } }, label))),
+    h13(
       "div",
-      { className: "qmr-panel-head" },
-      h12(IconToc, { width: 16, height: 16 }),
-      h12("span", { className: "qmr-panel-title" }, "\u76EE\u5F55"),
-      h12("button", {
-        type: "button",
-        className: "qmr-icon-btn",
-        "aria-label": "\u5173\u95ED\u76EE\u5F55",
-        onClick: () => ui.setPanel(null)
-      }, h12(IconClose, { width: 16, height: 16 }))
-    ),
-    h12(
-      "div",
-      { className: "qmr-panel-body" },
-      h12(
-        "div",
-        { className: "qmr-group-title" },
-        `\u7B2C ${chapterIndex + 1} / ${chapterCount || "?"} \u7AE0`,
-        h12("span", { className: "qmr-muted" }, chapterLabel2)
-      ),
-      entries2.length ? renderEntries(entries2, 0) : h12(
-        "div",
-        { className: "qmr-empty" },
-        h12("div", { className: "qmr-empty-title" }, "\u8FD9\u672C\u4E66\u6CA1\u6709\u76EE\u5F55"),
-        h12("p", null, "\u53EF\u4EE5\u76F4\u63A5\u7528\u5E95\u90E8\u8FDB\u5EA6\u6761\u6216\u5DE6\u53F3\u7FFB\u9875\u6D4F\u89C8\u3002")
+      { className: "qmr-panel-body", id: "qmr-navigation-panel", role: "tabpanel", "aria-labelledby": "qmr-nav-tab-" + tab },
+      tab === "bookmarks" ? h13(BookmarkList, { key: bookId, ui, bookId }) : tab === "position" ? h13(PositionInput, { key: bookId, ui, engine, bookId }) : h13(
+        React15.Fragment,
+        null,
+        h13("div", { className: "qmr-group-title" }, t("chapterCount", "\u7B2C {current} / {total} \u7AE0").replace("{current}", chapterIndex + 1).replace("{total}", chapterCount || "?"), h13("span", { className: "qmr-muted" }, chapterLabel2)),
+        entries2.length ? renderEntries(entries2, 0) : h13("div", { className: "qmr-empty" }, h13("div", { className: "qmr-empty-title" }, t("noToc", "\u8FD9\u672C\u4E66\u6CA1\u6709\u76EE\u5F55")), h13("p", null, t("noTocHint", "\u53EF\u4EE5\u7528\u5E95\u90E8\u8FDB\u5EA6\u6216\u4F4D\u7F6E\u8F93\u5165\u8DF3\u8F6C\u3002")))
       )
     )
   );
 }
 
 // src/ui/panel-highlights.js
-var React15 = __toESM(require("react"), 1);
-var h13 = React15.createElement;
+var React16 = __toESM(require("react"), 1);
+var h14 = React16.createElement;
 function percentOfHighlight(highlight) {
   return formatPercent(highlight && highlight.percent);
 }
@@ -119850,11 +120305,11 @@ function groupByChapter(highlights, engine) {
   }));
 }
 function HighlightItem({ ui, highlight, bookId, editing }) {
-  const [draft, setDraft] = React15.useState(String(highlight.note || ""));
-  React15.useEffect(() => {
+  const [draft, setDraft] = React16.useState(String(highlight.note || ""));
+  React16.useEffect(() => {
     setDraft(String(highlight.note || ""));
   }, [highlight.id, highlight.note, editing]);
-  const swatches = HIGHLIGHT_COLORS2.map((color) => h13("button", {
+  const swatches = HIGHLIGHT_COLORS2.map((color) => h14("button", {
     key: color,
     type: "button",
     className: `qmr-swatch${highlight.color === color ? " is-active" : ""}`,
@@ -119874,14 +120329,14 @@ ${truncate(highlight.text, 60)}`);
     }
     if (confirmed) ui.removeHighlight(bookId, highlight.id);
   };
-  return h13(
+  return h14(
     "div",
     { className: "qmr-hl-item" },
-    h13(
+    h14(
       "div",
       { className: "qmr-hl-top" },
-      h13("span", { className: `qmr-dot qmr-dot-${highlight.color || "yellow"}`, "aria-hidden": "true" }),
-      h13("div", {
+      h14("span", { className: `qmr-dot qmr-dot-${highlight.color || "yellow"}`, "aria-hidden": "true" }),
+      h14("div", {
         className: "qmr-hl-quote",
         role: "button",
         tabIndex: 0,
@@ -119891,21 +120346,21 @@ ${truncate(highlight.text, 60)}`);
         }
       }, highlight.text || "\uFF08\u7A7A\u5F15\u6587\uFF09")
     ),
-    highlight.note && !editing ? h13("div", { className: "qmr-hl-note" }, highlight.note) : null,
-    editing ? h13(
+    highlight.note && !editing ? h14("div", { className: "qmr-hl-note" }, highlight.note) : null,
+    editing ? h14(
       "div",
       { style: { marginTop: 8 } },
-      h13("textarea", {
+      h14("textarea", {
         className: "qmr-textarea",
         value: draft,
         placeholder: "\u5199\u70B9\u4EC0\u4E48\u2026",
         "aria-label": "\u6279\u6CE8\u5185\u5BB9",
         onChange: (event) => setDraft(event.target.value)
       }),
-      h13(
+      h14(
         "div",
         { className: "qmr-hl-tools" },
-        h13("button", {
+        h14("button", {
           type: "button",
           className: "qmr-btn qmr-btn-sm qmr-btn-primary",
           onClick: () => {
@@ -119913,28 +120368,28 @@ ${truncate(highlight.text, 60)}`);
             ui.store.set({ editingHighlightId: null });
           }
         }, "\u4FDD\u5B58\u6279\u6CE8"),
-        h13("button", {
+        h14("button", {
           type: "button",
           className: "qmr-btn qmr-btn-sm",
           onClick: () => ui.store.set({ editingHighlightId: null })
         }, "\u53D6\u6D88")
       )
-    ) : h13(
+    ) : h14(
       "div",
       { className: "qmr-hl-tools" },
-      h13("span", { className: "qmr-swatches", "aria-label": "\u6539\u989C\u8272" }, swatches),
-      h13("button", {
+      h14("span", { className: "qmr-swatches", "aria-label": "\u6539\u989C\u8272" }, swatches),
+      h14("button", {
         type: "button",
         className: "qmr-btn qmr-btn-sm",
         onClick: () => ui.store.set({ editingHighlightId: highlight.id })
       }, highlight.note ? "\u7F16\u8F91\u6279\u6CE8" : "\u5199\u6279\u6CE8"),
-      h13("button", {
+      h14("button", {
         type: "button",
         className: "qmr-btn qmr-btn-sm",
         "aria-label": "\u5220\u9664\u5212\u7EBF",
         onClick: requestDelete
-      }, h13(IconTrash, { width: 14, height: 14 })),
-      h13("span", { className: "qmr-muted qmr-small" }, percentOfHighlight(highlight))
+      }, h14(IconTrash, { width: 14, height: 14 })),
+      h14("span", { className: "qmr-muted qmr-small" }, percentOfHighlight(highlight))
     )
   );
 }
@@ -119946,17 +120401,17 @@ function HighlightsPanel({ ui }) {
   const engineVersion = ui.useSel((state) => state.engineVersion);
   const engine = ui.engineOf(bookId);
   const book = ui.bookOf(bookId);
-  React15.useEffect(() => {
+  React16.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
   }, [bookId, ui]);
   const highlights = bookState && bookState.highlights || [];
-  const highlightsRef = React15.useRef(highlights);
+  const highlightsRef = React16.useRef(highlights);
   highlightsRef.current = highlights;
-  const engineRef = React15.useRef(engine);
+  const engineRef = React16.useRef(engine);
   engineRef.current = engine;
-  const labels = React15.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
-  const groups = React15.useMemo(() => groupByChapter(highlights, engine), [highlights, engine]);
-  const markdown2 = React15.useMemo(
+  const labels = React16.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
+  const groups = React16.useMemo(() => groupByChapter(highlights, engine), [highlights, engine]);
+  const markdown2 = React16.useMemo(
     () => toMarkdown(bookState || {}, book, engine),
     [bookState, book, engine]
   );
@@ -119974,101 +120429,101 @@ function HighlightsPanel({ ui }) {
       ui.toast("\u5BFC\u51FA\u5931\u8D25", "error");
     }
   };
-  return h13(
-    React15.Fragment,
+  return h14(
+    React16.Fragment,
     null,
-    h13(
+    h14(
       "div",
       { className: "qmr-panel-head" },
-      h13(IconHighlight, { width: 16, height: 16 }),
-      h13("span", { className: "qmr-panel-title" }, "\u5212\u7EBF\u4E0E\u7B14\u8BB0"),
-      h13(
+      h14(IconHighlight, { width: 16, height: 16 }),
+      h14("span", { className: "qmr-panel-title" }, "\u5212\u7EBF\u4E0E\u7B14\u8BB0"),
+      h14(
         "span",
         { className: "qmr-seg", role: "group", "aria-label": "\u9762\u677F\u89C6\u56FE" },
-        h13("button", {
+        h14("button", {
           type: "button",
           className: mode === "list" ? "is-active" : "",
           "aria-pressed": mode === "list",
           onClick: () => ui.store.set({ notesMode: "list" })
         }, "\u5212\u7EBF"),
-        h13("button", {
+        h14("button", {
           type: "button",
           className: mode === "notes" ? "is-active" : "",
           "aria-pressed": mode === "notes",
           onClick: () => ui.store.set({ notesMode: "notes" })
         }, "\u9605\u8BFB\u7B14\u8BB0")
       ),
-      h13("button", {
+      h14("button", {
         type: "button",
         className: "qmr-icon-btn",
         "aria-label": "\u5BFC\u51FA Markdown",
         onClick: exportMarkdown
-      }, h13(IconExport, { width: 16, height: 16 })),
-      h13("button", {
+      }, h14(IconExport, { width: 16, height: 16 })),
+      h14("button", {
         type: "button",
         className: "qmr-icon-btn",
         "aria-label": "\u5173\u95ED\u9762\u677F",
         onClick: () => ui.setPanel(null)
-      }, h13(IconClose, { width: 16, height: 16 }))
+      }, h14(IconClose, { width: 16, height: 16 }))
     ),
-    h13(
+    h14(
       "div",
       { className: "qmr-panel-body" },
-      mode === "notes" ? h13(
-        React15.Fragment,
+      mode === "notes" ? h14(
+        React16.Fragment,
         null,
-        h13(
+        h14(
           "div",
           { className: "qmr-hl-tools", style: { marginBottom: 8 } },
-          h13(
+          h14(
             "button",
             { type: "button", className: "qmr-btn qmr-btn-sm", onClick: copyMarkdown },
-            h13(IconCopy, { width: 14, height: 14 }),
+            h14(IconCopy, { width: 14, height: 14 }),
             "\u590D\u5236 Markdown"
           ),
-          h13(
+          h14(
             "button",
             { type: "button", className: "qmr-btn qmr-btn-sm", onClick: exportMarkdown },
-            h13(IconExport, { width: 14, height: 14 }),
+            h14(IconExport, { width: 14, height: 14 }),
             "\u5BFC\u51FA .md"
           )
         ),
-        h13(
+        h14(
           "div",
           { className: "qmr-md-preview" },
-          h13("h3", null, `\u300A${book?.title || "\u672A\u547D\u540D"}\u300B\u9605\u8BFB\u7B14\u8BB0`),
-          highlights.length ? groups.map((group) => h13(
+          h14("h3", null, `\u300A${book?.title || "\u672A\u547D\u540D"}\u300B\u9605\u8BFB\u7B14\u8BB0`),
+          highlights.length ? groups.map((group) => h14(
             "section",
             { key: String(group.index) },
-            h13("h4", null, group.index === Number.MAX_SAFE_INTEGER ? "\u5176\u4ED6\u4F4D\u7F6E" : labels.get(group.index) || `\u7B2C ${group.index + 1} \u7AE0`),
+            h14("h4", null, group.index === Number.MAX_SAFE_INTEGER ? "\u5176\u4ED6\u4F4D\u7F6E" : labels.get(group.index) || `\u7B2C ${group.index + 1} \u7AE0`),
             group.items.map(
-              (highlight) => h13(
+              (highlight) => h14(
                 "div",
                 { key: highlight.id, className: "qmr-md-quote" },
-                h13("blockquote", null, highlight.text),
-                highlight.note ? h13("p", null, highlight.note) : null,
-                h13("a", { href: highlightLink(bookId, highlight.id), className: "qmr-md-backlink" }, "\u21A9 \u56DE\u5230\u539F\u6587")
+                h14("blockquote", null, highlight.text),
+                highlight.note ? h14("p", null, highlight.note) : null,
+                h14("a", { href: highlightLink(bookId, highlight.id), className: "qmr-md-backlink" }, "\u21A9 \u56DE\u5230\u539F\u6587")
               )
             )
-          )) : h13("p", null, "\u6682\u65E0\u5212\u7EBF\u3002")
+          )) : h14("p", null, "\u6682\u65E0\u5212\u7EBF\u3002")
         )
-      ) : highlights.length ? h13(
-        React15.Fragment,
+      ) : highlights.length ? h14(
+        React16.Fragment,
         null,
-        h13(
+        h14(
           "div",
           { className: "qmr-group-title" },
           `\u5171 ${highlights.length} \u6761\u5212\u7EBF \xB7 ${noteCount} \u6761\u6279\u6CE8`
         ),
-        groups.map((group) => h13(
+        groups.map((group) => h14(
           "div",
           { key: String(group.index) },
-          h13(
+          h14(
             "div",
             { className: "qmr-group-title" },
             group.index === Number.MAX_SAFE_INTEGER ? "\u5176\u4ED6\u4F4D\u7F6E" : labels.get(group.index) || `\u7B2C ${group.index + 1} \u7AE0`
           ),
-          group.items.map((highlight) => h13(HighlightItem, {
+          group.items.map((highlight) => h14(HighlightItem, {
             key: highlight.id,
             ui,
             highlight,
@@ -120076,19 +120531,19 @@ function HighlightsPanel({ ui }) {
             editing: editingId === highlight.id
           }))
         ))
-      ) : h13(
+      ) : h14(
         "div",
         { className: "qmr-empty" },
-        h13("div", { className: "qmr-empty-title" }, "\u8FD8\u6CA1\u6709\u5212\u7EBF"),
-        h13("p", null, "\u5728\u6B63\u6587\u91CC\u9009\u4E2D\u6587\u5B57\uFF0C\u70B9\u300C\u5212\u7EBF\u300D\u6216\u300C\u5199\u6279\u6CE8\u300D\uFF0C\u8FD9\u91CC\u5C31\u4F1A\u6C47\u603B\u3002")
+        h14("div", { className: "qmr-empty-title" }, "\u8FD8\u6CA1\u6709\u5212\u7EBF"),
+        h14("p", null, "\u5728\u6B63\u6587\u91CC\u9009\u4E2D\u6587\u5B57\uFF0C\u70B9\u300C\u5212\u7EBF\u300D\u6216\u300C\u5199\u6279\u6CE8\u300D\uFF0C\u8FD9\u91CC\u5C31\u4F1A\u6C47\u603B\u3002")
       )
     )
   );
 }
 
 // src/ui/panel-search.js
-var React16 = __toESM(require("react"), 1);
-var h14 = React16.createElement;
+var React17 = __toESM(require("react"), 1);
+var h15 = React17.createElement;
 function renderSnippet(snippet, query) {
   const text = String(snippet || "");
   const needle = String(query || "").trim();
@@ -120102,7 +120557,7 @@ function renderSnippet(snippet, query) {
     const at2 = lowerText.indexOf(lowerNeedle, cursor);
     if (at2 < 0 || !lowerNeedle) break;
     if (at2 > cursor) parts.push(text.slice(cursor, at2));
-    parts.push(h14("mark", { className: "qm-hit", key: `m${key++}` }, text.slice(at2, at2 + needle.length)));
+    parts.push(h15("mark", { className: "qm-hit", key: `m${key++}` }, text.slice(at2, at2 + needle.length)));
     cursor = at2 + needle.length;
     if (key > 40) break;
   }
@@ -120116,17 +120571,17 @@ function SearchPanel({ ui }) {
   const current = ui.useSel((state) => state.searchIndex);
   const busy = ui.useSel((state) => state.searchBusy);
   const error = ui.useSel((state) => state.searchError);
-  const [text, setText] = React16.useState(String(storeQuery || ""));
-  const inputRef = React16.useRef(null);
-  const listRef = React16.useRef(null);
+  const [text, setText] = React17.useState(String(storeQuery || ""));
+  const inputRef = React17.useRef(null);
+  const listRef = React17.useRef(null);
   const debouncedSearch = useDebounced((value) => ui.search(bookId, value), 250);
-  React16.useEffect(() => {
+  React17.useEffect(() => {
     try {
       if (inputRef.current) inputRef.current.focus();
     } catch (_error) {
     }
   }, []);
-  React16.useEffect(() => {
+  React17.useEffect(() => {
     const element = listRef.current;
     if (!element || current < 0) return;
     try {
@@ -120161,25 +120616,25 @@ function SearchPanel({ ui }) {
       ui.closeSearch();
     }
   };
-  return h14(
-    React16.Fragment,
+  return h15(
+    React17.Fragment,
     null,
-    h14(
+    h15(
       "div",
       { className: "qmr-panel-head" },
-      h14(IconSearch, { width: 16, height: 16 }),
-      h14("span", { className: "qmr-panel-title" }, "\u4E66\u5185\u641C\u7D22"),
-      h14("button", {
+      h15(IconSearch, { width: 16, height: 16 }),
+      h15("span", { className: "qmr-panel-title" }, "\u4E66\u5185\u641C\u7D22"),
+      h15("button", {
         type: "button",
         className: "qmr-icon-btn",
         "aria-label": "\u5173\u95ED\u641C\u7D22",
         onClick: () => ui.closeSearch()
-      }, h14(IconClose, { width: 16, height: 16 }))
+      }, h15(IconClose, { width: 16, height: 16 }))
     ),
-    h14(
+    h15(
       "div",
       { className: "qmr-panel-body" },
-      h14("input", {
+      h15("input", {
         ref: inputRef,
         className: "qmr-input",
         style: { width: "100%" },
@@ -120190,36 +120645,36 @@ function SearchPanel({ ui }) {
         onChange,
         onKeyDown
       }),
-      h14(
+      h15(
         "div",
         { className: "qmr-hl-tools", style: { marginTop: 8 } },
-        h14("button", {
+        h15("button", {
           type: "button",
           className: "qmr-btn qmr-btn-sm",
           disabled: !results.length,
           onClick: () => ui.searchNext(-1)
-        }, h14(IconPrev, { width: 14, height: 14 }), "\u4E0A\u4E00\u4E2A"),
-        h14("button", {
+        }, h15(IconPrev, { width: 14, height: 14 }), "\u4E0A\u4E00\u4E2A"),
+        h15("button", {
           type: "button",
           className: "qmr-btn qmr-btn-sm",
           disabled: !results.length,
           onClick: () => ui.searchNext(1)
-        }, h14(IconNext, { width: 14, height: 14 }), "\u4E0B\u4E00\u4E2A"),
-        h14(
+        }, h15(IconNext, { width: 14, height: 14 }), "\u4E0B\u4E00\u4E2A"),
+        h15(
           "span",
           { className: "qmr-muted qmr-small" },
           results.length ? `${Math.max(1, current + 1)} / ${results.length}` : ""
         )
       ),
-      busy ? h14("div", { className: "qmr-busy" }, "\u641C\u7D22\u4E2D\u2026") : null,
-      error ? h14("div", { className: "qmr-errorbox-text", style: { marginTop: 8 } }, error) : null,
-      !busy && !results.length ? h14(
+      busy ? h15("div", { className: "qmr-busy" }, "\u641C\u7D22\u4E2D\u2026") : null,
+      error ? h15("div", { className: "qmr-errorbox-text", style: { marginTop: 8 } }, error) : null,
+      !busy && !results.length ? h15(
         "div",
         { className: "qmr-empty" },
-        h14("div", { className: "qmr-empty-title" }, text.trim() ? "\u6CA1\u6709\u627E\u5230\u5339\u914D" : "\u8F93\u5165\u5173\u952E\u8BCD\u5F00\u59CB\u641C\u7D22"),
-        h14("p", null, "\u652F\u6301\u4E2D\u6587\u5355\u5B57\u4E0E\u82F1\u6587\u5B50\u4E32\uFF1BEnter \u4E0B\u4E00\u4E2A\uFF0CShift+Enter \u4E0A\u4E00\u4E2A\u3002")
+        h15("div", { className: "qmr-empty-title" }, text.trim() ? "\u6CA1\u6709\u627E\u5230\u5339\u914D" : "\u8F93\u5165\u5173\u952E\u8BCD\u5F00\u59CB\u641C\u7D22"),
+        h15("p", null, "\u652F\u6301\u4E2D\u6587\u5355\u5B57\u4E0E\u82F1\u6587\u5B50\u4E32\uFF1BEnter \u4E0B\u4E00\u4E2A\uFF0CShift+Enter \u4E0A\u4E00\u4E2A\u3002")
       ) : null,
-      h14("div", { ref: listRef, style: { marginTop: 8 } }, results.map((hit, index) => h14(
+      h15("div", { ref: listRef, style: { marginTop: 8 } }, results.map((hit, index) => h15(
         "button",
         {
           key: `${hit.chapterIndex}-${hit.offset}-${index}`,
@@ -120227,36 +120682,36 @@ function SearchPanel({ ui }) {
           className: `qmr-search-item${index === current ? " is-current" : ""}`,
           onClick: () => ui.focusSearchHit(index, true)
         },
-        h14(
+        h15(
           "div",
           { className: "qmr-search-chapter" },
           `${hit.chapterLabel || `\u7B2C ${Number(hit.chapterIndex) + 1} \u7AE0`} \xB7 ${Math.round(Number(hit.percent || 0) > 1 ? Number(hit.percent) : Number(hit.percent || 0) * 100)}%`
         ),
-        h14("div", { className: "qmr-search-snippet" }, renderSnippet(hit.snippet, storeQuery))
+        h15("div", { className: "qmr-search-snippet" }, renderSnippet(hit.snippet, storeQuery))
       )))
     )
   );
 }
 
 // src/ui/panel-settings.js
-var React17 = __toESM(require("react"), 1);
-var h15 = React17.createElement;
+var React18 = __toESM(require("react"), 1);
+var h16 = React18.createElement;
 function SettingsPanel({ ui }) {
   const bookId = ui.useSel((state) => state.bookId);
   ui.useSel((state) => (state.states || {})[bookId] || null);
   const isLoaded = !!ui.useSel((state) => (state.states || {})[bookId] ? 1 : 0);
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
-  React17.useEffect(() => {
+  React18.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
   }, [bookId, ui]);
   const settings = ui.settingsOf(bookId);
   const update = (patch) => ui.updateSettings(bookId, patch);
-  const themeCardGrid = (activeId, onSelect) => h15(
+  const themeCardGrid = (activeId, onSelect) => h16(
     "div",
     { className: "qmr-theme-grid" },
     READER_THEME_IDS.map((id) => {
       const theme = READER_THEMES[id];
-      return h15(
+      return h16(
         "button",
         {
           key: id,
@@ -120265,45 +120720,45 @@ function SettingsPanel({ ui }) {
           "aria-pressed": activeId === id,
           onClick: () => onSelect(id)
         },
-        h15("span", {
+        h16("span", {
           className: "qmr-theme-swatch",
           style: { background: theme.bg, color: theme.text },
           "aria-hidden": "true"
         }, "\u6587"),
-        h15("span", null, id === "white" ? ui.t("themeWhite", theme.label) : theme.label)
+        h16("span", null, id === "white" ? ui.t("themeWhite", theme.label) : theme.label)
       );
     })
   );
-  return h15(
-    React17.Fragment,
+  return h16(
+    React18.Fragment,
     null,
-    h15(
+    h16(
       "div",
       { className: "qmr-panel-head" },
-      h15(IconSettings, { width: 16, height: 16 }),
-      h15("span", { className: "qmr-panel-title" }, "\u9605\u8BFB\u8BBE\u7F6E"),
-      h15("button", {
+      h16(IconSettings, { width: 16, height: 16 }),
+      h16("span", { className: "qmr-panel-title" }, "\u9605\u8BFB\u8BBE\u7F6E"),
+      h16("button", {
         type: "button",
         className: "qmr-icon-btn",
         "aria-label": "\u5173\u95ED\u8BBE\u7F6E",
         onClick: () => ui.setPanel(null)
-      }, h15(IconClose, { width: 16, height: 16 }))
+      }, h16(IconClose, { width: 16, height: 16 }))
     ),
-    h15(
+    h16(
       "div",
       { className: "qmr-panel-body" },
-      !isLoaded ? h15("div", { className: "qmr-muted qmr-small", style: { marginBottom: 8 } }, "\u6B63\u5728\u8BFB\u53D6\u5DF2\u4FDD\u5B58\u7684\u8BBE\u7F6E\u2026") : null,
-      h15("div", { className: "qmr-group-title" }, "\u4E3B\u9898"),
+      !isLoaded ? h16("div", { className: "qmr-muted qmr-small", style: { marginBottom: 8 } }, "\u6B63\u5728\u8BFB\u53D6\u5DF2\u4FDD\u5B58\u7684\u8BBE\u7F6E\u2026") : null,
+      h16("div", { className: "qmr-group-title" }, "\u4E3B\u9898"),
       themeCardGrid(settings.theme, (id) => update({ theme: id })),
-      h15("div", { className: "qmr-group-title" }, "\u6392\u7248"),
-      h15(
+      h16("div", { className: "qmr-group-title" }, "\u6392\u7248"),
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15("input", {
+          h16("input", {
             className: "qmr-range",
             type: "range",
             min: 14,
@@ -120314,16 +120769,16 @@ function SettingsPanel({ ui }) {
             onChange: (event) => update({ fontSize: Number(event.target.value) })
           })
         ),
-        h15("span", { className: "qmr-field-value" }, `${settings.fontSize}px`)
+        h16("span", { className: "qmr-field-value" }, `${settings.fontSize}px`)
       ),
-      h15(
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15("input", {
+          h16("input", {
             className: "qmr-range",
             type: "range",
             min: 1.4,
@@ -120334,32 +120789,32 @@ function SettingsPanel({ ui }) {
             onChange: (event) => update({ lineHeight: Number(event.target.value) })
           })
         ),
-        h15("span", { className: "qmr-field-value" }, Number(settings.lineHeight).toFixed(2))
+        h16("span", { className: "qmr-field-value" }, Number(settings.lineHeight).toFixed(2))
       ),
-      h15(
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u5B57\u4F53"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u5B57\u4F53"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15("select", {
+          h16("select", {
             className: "qmr-select",
             style: { flex: "1 1 auto" },
             value: settings.fontFamily,
             "aria-label": "\u5B57\u4F53",
             onChange: (event) => update({ fontFamily: event.target.value })
-          }, Object.keys(READER_FONT_LABELS).map((key) => h15("option", { key, value: key }, READER_FONT_LABELS[key])))
+          }, Object.keys(READER_FONT_LABELS).map((key) => h16("option", { key, value: key }, READER_FONT_LABELS[key])))
         )
       ),
-      h15(
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u9875\u8FB9\u8DDD"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u9875\u8FB9\u8DDD"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15("input", {
+          h16("input", {
             className: "qmr-range",
             type: "range",
             min: 32,
@@ -120370,26 +120825,26 @@ function SettingsPanel({ ui }) {
             onChange: (event) => update({ margin: Number(event.target.value) })
           })
         ),
-        h15("span", { className: "qmr-field-value" }, `${settings.margin}px`)
+        h16("span", { className: "qmr-field-value" }, `${settings.margin}px`)
       ),
-      h15("div", { className: "qmr-group-title" }, "\u7FFB\u9875"),
-      h15(
+      h16("div", { className: "qmr-group-title" }, "\u7FFB\u9875"),
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u65B9\u5F0F"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u65B9\u5F0F"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15(
+          h16(
             "span",
             { className: "qmr-seg", role: "group", "aria-label": "\u7FFB\u9875\u65B9\u5F0F" },
-            h15("button", {
+            h16("button", {
               type: "button",
               className: settings.flow === "paginated" ? "is-active" : "",
               "aria-pressed": settings.flow === "paginated",
               onClick: () => update({ flow: "paginated" })
             }, "\u5206\u9875"),
-            h15("button", {
+            h16("button", {
               type: "button",
               className: settings.flow === "scroll" ? "is-active" : "",
               "aria-pressed": settings.flow === "scroll",
@@ -120398,17 +120853,17 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      h15(
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u7248\u5F0F"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u7248\u5F0F"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15(
+          h16(
             "label",
             { className: "qmr-switch" },
-            h15("input", {
+            h16("input", {
               type: "checkbox",
               checked: settings.spread,
               disabled: settings.flow !== "paginated",
@@ -120419,17 +120874,17 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      h15(
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u5BF9\u9F50"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u5BF9\u9F50"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15(
+          h16(
             "label",
             { className: "qmr-switch" },
-            h15("input", {
+            h16("input", {
               type: "checkbox",
               checked: settings.justify,
               "aria-label": "\u4E24\u7AEF\u5BF9\u9F50",
@@ -120439,18 +120894,18 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      h15("div", { className: "qmr-group-title" }, "AI \u4F34\u8BFB\u5916\u89C2"),
-      h15(
+      h16("div", { className: "qmr-group-title" }, "AI \u4F34\u8BFB\u5916\u89C2"),
+      h16(
         "div",
         { className: "qmr-field" },
-        h15("span", { className: "qmr-field-label" }, "\u8DDF\u968F"),
-        h15(
+        h16("span", { className: "qmr-field-label" }, "\u8DDF\u968F"),
+        h16(
           "span",
           { className: "qmr-field-ctl" },
-          h15(
+          h16(
             "label",
             { className: "qmr-switch" },
-            h15("input", {
+            h16("input", {
               type: "checkbox",
               checked: !companionAppearance,
               "aria-label": "\u4F34\u8BFB\u8DDF\u968F\u6B63\u6587\u5916\u89C2",
@@ -120471,18 +120926,18 @@ function SettingsPanel({ ui }) {
           )
         )
       ),
-      companionAppearance ? h15(
-        React17.Fragment,
+      companionAppearance ? h16(
+        React18.Fragment,
         null,
         themeCardGrid(companionAppearance.theme, (id) => ui.setCompanionAppearance({ ...companionAppearance, theme: id })),
-        h15(
+        h16(
           "div",
           { className: "qmr-field", style: { marginTop: 10 } },
-          h15("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
-          h15(
+          h16("span", { className: "qmr-field-label" }, "\u5B57\u53F7"),
+          h16(
             "span",
             { className: "qmr-field-ctl" },
-            h15("input", {
+            h16("input", {
               className: "qmr-range",
               type: "range",
               min: 12,
@@ -120493,16 +120948,16 @@ function SettingsPanel({ ui }) {
               onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontSize: Number(event.target.value) })
             })
           ),
-          h15("span", { className: "qmr-field-value" }, `${companionAppearance.fontSize}px`)
+          h16("span", { className: "qmr-field-value" }, `${companionAppearance.fontSize}px`)
         ),
-        h15(
+        h16(
           "div",
           { className: "qmr-field" },
-          h15("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
-          h15(
+          h16("span", { className: "qmr-field-label" }, "\u884C\u9AD8"),
+          h16(
             "span",
             { className: "qmr-field-ctl" },
-            h15("input", {
+            h16("input", {
               className: "qmr-range",
               type: "range",
               min: 1.4,
@@ -120513,41 +120968,41 @@ function SettingsPanel({ ui }) {
               onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, lineHeight: Number(event.target.value) })
             })
           ),
-          h15("span", { className: "qmr-field-value" }, Number(companionAppearance.lineHeight).toFixed(2))
+          h16("span", { className: "qmr-field-value" }, Number(companionAppearance.lineHeight).toFixed(2))
         ),
-        h15(
+        h16(
           "div",
           { className: "qmr-field" },
-          h15("span", { className: "qmr-field-label" }, "\u5B57\u4F53"),
-          h15(
+          h16("span", { className: "qmr-field-label" }, "\u5B57\u4F53"),
+          h16(
             "span",
             { className: "qmr-field-ctl" },
-            h15("select", {
+            h16("select", {
               className: "qmr-select",
               style: { flex: "1 1 auto" },
               value: companionAppearance.fontFamily,
               "aria-label": "\u4F34\u8BFB\u5B57\u4F53",
               onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontFamily: event.target.value })
-            }, Object.keys(READER_FONT_LABELS).map((key) => h15("option", { key, value: key }, READER_FONT_LABELS[key])))
+            }, Object.keys(READER_FONT_LABELS).map((key) => h16("option", { key, value: key }, READER_FONT_LABELS[key])))
           )
         ),
-        h15(
+        h16(
           "p",
           { className: "qmr-muted qmr-small", style: { marginTop: 8 } },
           "\u72EC\u7ACB\u5916\u89C2\u53EA\u5F71\u54CD AI \u4F34\u8BFB\u9762\u677F\uFF0C\u5168\u5C40\u751F\u6548\uFF1B\u91CD\u65B0\u6253\u5F00\u300C\u8DDF\u968F\u6B63\u6587\u300D\u6062\u590D\u4E0E\u4E66\u7C4D\u8BBE\u7F6E\u4E00\u81F4\u3002"
         )
       ) : null,
-      h15("div", { className: "qmr-divider" }),
-      h15(
+      h16("div", { className: "qmr-divider" }),
+      h16(
         "div",
         { className: "qmr-hl-tools" },
-        h15("button", {
+        h16("button", {
           type: "button",
           className: "qmr-btn qmr-btn-sm",
           onClick: () => update({ ...UI_SETTING_DEFAULTS })
         }, "\u6062\u590D\u9ED8\u8BA4")
       ),
-      h15(
+      h16(
         "p",
         { className: "qmr-muted qmr-small", style: { marginTop: 10 } },
         `\u4E3B\u9898\u5E94\u7528\u4E8E\u4E66\u9875\u3001\u9605\u8BFB\u5DE5\u5177\u680F\u4E0E AI \u4F34\u8BFB\uFF1B\u8BBE\u7F6E\u968F\u8FD9\u672C\u4E66\u4FDD\u5B58\u3002\u4F34\u8BFB\u9ED8\u8BA4\u8DDF\u968F\u8FD9\u91CC\u7684\u4E3B\u9898\u3002`
@@ -120557,20 +121012,20 @@ function SettingsPanel({ ui }) {
 }
 
 // src/ui/prompt-manager.js
-var React18 = __toESM(require("react"), 1);
-var h16 = React18.createElement;
+var React19 = __toESM(require("react"), 1);
+var h17 = React19.createElement;
 function PromptManager({ ui, onClose }) {
   const t = (key, fallback) => ui.t(`prompts.${key}`, fallback);
   const language = t("language", "zh");
-  const [items, setItems] = React18.useState(() => readQuickPrompts(language));
-  const [error, setError] = React18.useState("");
-  const [restored, setRestored] = React18.useState(false);
-  const dirty = React18.useRef(false), dialog = React18.useRef(null), pendingFocus = React18.useRef(null);
+  const [items, setItems] = React19.useState(() => readQuickPrompts(language));
+  const [error, setError] = React19.useState("");
+  const [restored, setRestored] = React19.useState(false);
+  const dirty = React19.useRef(false), dialog = React19.useRef(null), pendingFocus = React19.useRef(null);
   const keyDown = useDialogFocus(dialog, onClose);
-  React18.useEffect(() => {
+  React19.useEffect(() => {
     if (!dirty.current) setItems(readQuickPrompts(language));
   }, [language]);
-  React18.useLayoutEffect(() => {
+  React19.useLayoutEffect(() => {
     if (!pendingFocus.current) return;
     dialog.current?.querySelector(`[data-prompt-id="${pendingFocus.current}"] input`)?.focus();
     pendingFocus.current = null;
@@ -120602,46 +121057,46 @@ function PromptManager({ ui, onClose }) {
       setError(t("failed", "\u4FDD\u5B58\u5931\u8D25\uFF0C\u4FEE\u6539\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u91CD\u8BD5"));
     }
   };
-  return h16(
+  return h17(
     "div",
     { className: "qmr-prompt-backdrop", onClick: (event) => {
       if (event.target === event.currentTarget) onClose();
     } },
-    h16(
+    h17(
       "section",
       { className: "qmr-prompt-dialog", ref: dialog, role: "dialog", "aria-modal": "true", "aria-label": t("manage", "\u7BA1\u7406\u5FEB\u6377\u63D0\u793A\u8BCD"), onKeyDown: keyDown },
-      h16("header", null, h16("div", null, h16("h2", null, t("manage", "\u7BA1\u7406\u5FEB\u6377\u63D0\u793A\u8BCD")), h16("p", null, t("editorHint", "\u540D\u79F0\u663E\u793A\u5728\u6309\u94AE\u4E0A\uFF0C\u5B8C\u6574\u63D0\u793A\u8BCD\u53D1\u9001\u7ED9 AI\u3002"))), h16("button", { type: "button", className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED"), onClick: onClose }, h16(IconClose, { width: 18, height: 18 }))),
-      h16(
+      h17("header", null, h17("div", null, h17("h2", null, t("manage", "\u7BA1\u7406\u5FEB\u6377\u63D0\u793A\u8BCD")), h17("p", null, t("editorHint", "\u540D\u79F0\u663E\u793A\u5728\u6309\u94AE\u4E0A\uFF0C\u5B8C\u6574\u63D0\u793A\u8BCD\u53D1\u9001\u7ED9 AI\u3002"))), h17("button", { type: "button", className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED"), onClick: onClose }, h17(IconClose, { width: 18, height: 18 }))),
+      h17(
         "form",
         { className: "qmr-prompt-editor", onSubmit: save },
-        h16(
+        h17(
           "div",
           { className: "qmr-prompt-list" },
-          !items.length ? h16("div", { className: "qmr-prompt-empty" }, h16("p", null, t("empty", "\u8FD8\u6CA1\u6709\u5FEB\u6377\u63D0\u793A\u8BCD\u3002\u6DFB\u52A0\u4E00\u6761\uFF0C\u6216\u6062\u590D\u5185\u7F6E\u63D0\u793A\u8BCD\u3002"))) : null,
-          items.map((item, index) => h16(
+          !items.length ? h17("div", { className: "qmr-prompt-empty" }, h17("p", null, t("empty", "\u8FD8\u6CA1\u6709\u5FEB\u6377\u63D0\u793A\u8BCD\u3002\u6DFB\u52A0\u4E00\u6761\uFF0C\u6216\u6062\u590D\u5185\u7F6E\u63D0\u793A\u8BCD\u3002"))) : null,
+          items.map((item, index) => h17(
             "div",
             { className: "qmr-prompt-item", key: item.id, "data-prompt-id": item.id },
-            h16("label", null, h16("span", null, t("name", "\u540D\u79F0")), h16("input", { "data-autofocus": index === 0 ? true : void 0, maxLength: 60, value: item.title, onChange: (event) => change(item.id, "title", event.target.value) })),
-            h16("label", null, h16("span", null, t("body", "\u63D0\u793A\u8BCD")), h16("textarea", { rows: 3, maxLength: 5e3, value: item.body, onChange: (event) => change(item.id, "body", event.target.value) })),
-            h16("button", { type: "button", className: "qmr-prompt-delete", "aria-label": `${t("delete", "\u5220\u9664")} ${item.title || index + 1}`, onClick: () => {
+            h17("label", null, h17("span", null, t("name", "\u540D\u79F0")), h17("input", { "data-autofocus": index === 0 ? true : void 0, maxLength: 60, value: item.title, onChange: (event) => change(item.id, "title", event.target.value) })),
+            h17("label", null, h17("span", null, t("body", "\u63D0\u793A\u8BCD")), h17("textarea", { rows: 3, maxLength: 5e3, value: item.body, onChange: (event) => change(item.id, "body", event.target.value) })),
+            h17("button", { type: "button", className: "qmr-prompt-delete", "aria-label": `${t("delete", "\u5220\u9664")} ${item.title || index + 1}`, onClick: () => {
               dirty.current = true;
               setRestored(false);
               setItems((previous) => previous.filter((prompt) => prompt.id !== item.id));
-            } }, h16(IconTrash, { width: 14, height: 14 }), t("delete", "\u5220\u9664"))
+            } }, h17(IconTrash, { width: 14, height: 14 }), t("delete", "\u5220\u9664"))
           ))
         ),
-        error ? h16("div", { className: "qmr-prompt-error", role: "alert" }, error) : null,
-        h16(
+        error ? h17("div", { className: "qmr-prompt-error", role: "alert" }, error) : null,
+        h17(
           "footer",
           { className: "qmr-prompt-actions" },
-          h16("button", { type: "button", disabled: items.length >= 20, onClick: add }, h16(IconPlus, { width: 14, height: 14 }), t("add", "\u65B0\u589E\u63D0\u793A\u8BCD")),
-          h16("button", { type: "button", onClick: () => {
+          h17("button", { type: "button", disabled: items.length >= 20, onClick: add }, h17(IconPlus, { width: 14, height: 14 }), t("add", "\u65B0\u589E\u63D0\u793A\u8BCD")),
+          h17("button", { type: "button", onClick: () => {
             dirty.current = true;
             setItems(defaultQuickPrompts(language));
             setRestored(true);
             setError("");
           } }, t("reset", "\u6062\u590D\u5185\u7F6E")),
-          h16("div", { className: "qmr-prompt-submit" }, h16("button", { type: "button", onClick: onClose }, t("cancel", "\u53D6\u6D88")), h16("button", { type: "submit", className: "is-primary" }, t("save", "\u4FDD\u5B58")))
+          h17("div", { className: "qmr-prompt-submit" }, h17("button", { type: "button", onClick: onClose }, t("cancel", "\u53D6\u6D88")), h17("button", { type: "submit", className: "is-primary" }, t("save", "\u4FDD\u5B58")))
         )
       )
     )
@@ -120649,7 +121104,7 @@ function PromptManager({ ui, onClose }) {
 }
 
 // src/ui/reader.js
-var h17 = React19.createElement;
+var h18 = React20.createElement;
 var COLUMN_GAP = 56;
 function readerPageDirection(event) {
   if (event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.metaKey || event.ctrlKey || event.altKey) return null;
@@ -120784,7 +121239,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const promptManagerOpen = ui.useSel((state) => !!state.promptManagerOpen);
   const selection = ui.useSel((state) => state.selection);
   const lookupSelection = ui.useSel((state) => state.lookupSelection);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     ui.store.set({ lookupSelection: null });
   }, [bookId]);
   const searchQuery = ui.useSel((state) => state.searchQuery);
@@ -120792,8 +121247,9 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const searchResults = ui.useSel((state) => state.searchResults) || [];
   const restoreScroll = ui.useSel((state) => state.restoreScroll);
   const jumpToken = ui.useSel((state) => state.jumpToken);
+  const restoreAnchor = ui.useSel((state) => state.restoreAnchor);
   const jumpReturn = ui.useSel((state) => state.jumpReturn);
-  const lastRestoreRef = React19.useRef("");
+  const lastRestoreRef = React20.useRef("");
   const focusHighlightId = ui.useSel((state) => state.focusHighlightId);
   const focusToken = ui.useSel((state) => state.focusToken);
   const searchFocusToken = ui.useSel((state) => state.searchFocusToken);
@@ -120802,30 +121258,42 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const chapterBusy = ui.useSel((state) => state.chapterBusy);
   const bookState = ui.useSel((state) => (state.states || {})[bookId] || null);
   const narrow = useMediaQuery("(max-width: 900px)");
-  const workareaRef = React19.useRef(null);
-  const companionDragging = React19.useRef(false);
-  const [companionWidth, setCompanionWidth] = React19.useState(() => {
+  const workareaRef = React20.useRef(null);
+  const companionDragging = React20.useRef(false);
+  const [companionWidth, setCompanionWidth] = React20.useState(() => {
     const saved = Number(localStorage.getItem("qmr.companionWidth"));
     return Number.isFinite(saved) && saved >= 25 && saved <= 75 ? saved : 44;
   });
-  const companionWidthRef = React19.useRef(companionWidth);
-  const [chromeVisible, setChromeVisible] = React19.useState(true);
-  const chromeTimerRef = React19.useRef(null);
-  const showChrome = React19.useCallback(() => {
+  const companionWidthRef = React20.useRef(companionWidth);
+  const [chromeVisible, setChromeVisible] = React20.useState(true);
+  const chromeTimerRef = React20.useRef(null);
+  const showChrome = React20.useCallback(() => {
     setChromeVisible(true);
     clearTimeout(chromeTimerRef.current);
     chromeTimerRef.current = setTimeout(() => setChromeVisible(false), 2800);
   }, []);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     showChrome();
     return () => clearTimeout(chromeTimerRef.current);
   }, [showChrome]);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     ui.store.set({ companionSelection: null });
   }, [bookId, chapterIndex]);
   const book = ui.bookOf(bookId);
   const sectionUnit = book?.format === "pdf" ? "\u9875" : book?.format === "txt" ? "\u90E8\u5206" : "\u7AE0";
   const engine = ui.engineOf(bookId);
+  const [modelState, setModelState] = React20.useState(null);
+  const positionModel = modelState?.engine === engine ? modelState.model : null;
+  React20.useEffect(() => {
+    let active = true;
+    if (engine) readingPositionModel(engine).then((model) => {
+      if (active) setModelState({ engine, model });
+    }).catch(() => {
+    });
+    return () => {
+      active = false;
+    };
+  }, [engine]);
   const speech = useSpeech(ui, bookId, engine);
   const speechFocus = ui.useSel((state) => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
@@ -120833,29 +121301,31 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const themeVars = readerThemeVars(settings.theme);
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
   const companionLook = companionAppearance || { theme: settings.theme, fontFamily: settings.fontFamily, fontSize: settings.fontSize, lineHeight: settings.lineHeight };
-  const labels = React19.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
-  const [html, setHtml] = React19.useState("");
-  const [renderError, setRenderError] = React19.useState(null);
-  const [page, setPageState] = React19.useState(0);
-  const [pageCount, setPageCount] = React19.useState(1);
-  const viewportRef = React19.useRef(null);
-  const flowRef = React19.useRef(null);
-  const measureRef = React19.useRef({ pages: 1, perPage: 1, columnWidth: 320, gap: COLUMN_GAP });
-  const lastHtmlRef = React19.useRef(null);
-  const pendingLandLastRef = React19.useRef(false);
-  const lastFocusRef = React19.useRef("");
-  const lastSearchFocusRef = React19.useRef(null);
-  const scrollTimerRef = React19.useRef(null);
-  const highlights = React19.useMemo(
+  const labels = React20.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
+  const [html, setHtml] = React20.useState("");
+  const [renderError, setRenderError] = React20.useState(null);
+  const [page, setPageState] = React20.useState(0);
+  const [pageCount, setPageCount] = React20.useState(1);
+  const viewportRef = React20.useRef(null);
+  const flowRef = React20.useRef(null);
+  const textIndexRef = React20.useRef(null);
+  const anchorAppliedRef = React20.useRef("");
+  const measureRef = React20.useRef({ pages: 1, perPage: 1, columnWidth: 320, gap: COLUMN_GAP });
+  const lastHtmlRef = React20.useRef(null);
+  const pendingLandLastRef = React20.useRef(false);
+  const lastFocusRef = React20.useRef("");
+  const lastSearchFocusRef = React20.useRef(null);
+  const scrollTimerRef = React20.useRef(null);
+  const highlights = React20.useMemo(
     () => (bookState && bookState.highlights || []).filter(Boolean),
     [bookState]
   );
   const highlightSignature = highlights.map((item) => `${item.id}:${item.color}`).join("|");
-  const highlightsRef = React19.useRef(highlights);
+  const highlightsRef = React20.useRef(highlights);
   highlightsRef.current = highlights;
-  const searchResultsRef = React19.useRef(searchResults);
+  const searchResultsRef = React20.useRef(searchResults);
   searchResultsRef.current = searchResults;
-  const liveRef = React19.useRef({});
+  const liveRef = React20.useRef({});
   liveRef.current = {
     page,
     pageCount,
@@ -120870,19 +121340,20 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     searchIndex,
     searchResults,
     focusHighlightId,
-    restoreScroll
+    restoreScroll,
+    positionModel
   };
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     if (bookId != null) ui.loadState(bookId);
   }, [bookId, ui]);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     let cancelled = false;
     if (!engine || bookId == null) {
       setHtml("");
       return void 0;
     }
     ui.store.set({ chapterBusy: true });
-    Promise.resolve().then(() => engine.render(chapterIndex, ui.resourceResolver(bookId))).then((out) => {
+    Promise.resolve().then(() => engine.render(chapterIndex, ui.resourceResolver(bookId), { zoom: settings.pdfZoom })).then((out) => {
       if (cancelled) return;
       setHtml(typeof out === "string" ? out : "");
       setRenderError(null);
@@ -120897,8 +121368,8 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       cancelled = true;
     };
-  }, [engine, bookId, chapterIndex, engineVersion, imagesVersion, ui]);
-  const setPage = React19.useCallback((next) => {
+  }, [engine, bookId, chapterIndex, engineVersion, imagesVersion, settings.pdfZoom, ui]);
+  const setPage = React20.useCallback((next) => {
     setPageState((previous) => {
       const max = Math.max(0, (measureRef.current.pages || 1) - 1);
       const raw = typeof next === "function" ? next(previous) : next;
@@ -120906,7 +121377,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       return value;
     });
   }, []);
-  const measure = React19.useCallback(() => {
+  const measure = React20.useCallback(() => {
     const viewport = viewportRef.current;
     const flow = flowRef.current;
     if (!viewport || !flow) return measureRef.current;
@@ -120937,7 +121408,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         const columns = Math.max(1, Math.round((total + gap) / (columnWidth + gap)));
         pages = Math.max(1, Math.ceil(columns / perPage));
       }
-      measureRef.current = { pages, perPage, columnWidth, gap };
+      measureRef.current = { pages, perPage, columnWidth, gap, viewportWidth: viewport.clientWidth, viewportHeight: viewport.clientHeight };
       const currentPage = Math.min(liveRef.current.page || 0, pages - 1);
       flow.style.transition = "none";
       flow.style.transform = paginated ? `translateX(${-currentPage * perPage * (columnWidth + gap)}px)` : "none";
@@ -120949,7 +121420,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       return measureRef.current;
     }
   }, [settings.flow, settings.spread, setPage]);
-  const revealNode = React19.useCallback((node) => {
+  const revealNode = React20.useCallback((node) => {
     if (!node) return;
     if (settings.flow === "scroll") {
       node.scrollIntoView?.({ block: "center", inline: "nearest" });
@@ -120963,13 +121434,14 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     const column = Math.floor((x + 1) / (meta.columnWidth + meta.gap));
     setPage(Math.floor(column / meta.perPage));
   }, [settings.flow, setPage]);
-  React19.useLayoutEffect(() => {
+  React20.useLayoutEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
     const isNewHtml = lastHtmlRef.current !== html;
     lastHtmlRef.current = html;
     try {
       flow.innerHTML = html || "";
+      textIndexRef.current = null;
     } catch (error) {
       ui.reportError(error, true);
       return;
@@ -121027,7 +121499,42 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     setPage,
     ui
   ]);
-  React19.useLayoutEffect(() => {
+  React20.useLayoutEffect(() => {
+    const flow = flowRef.current;
+    if (!flow || !html || chapterBusy || !restoreAnchor) return;
+    const key = `${bookId}:${chapterIndex}:${jumpToken}`;
+    if (anchorAppliedRef.current === key) return;
+    if (restoreAnchor.contentFingerprint && restoreAnchor.contentFingerprint !== engine?.contentFingerprint) return;
+    const index = textIndexRef.current ||= buildTextIndex(flow);
+    let target = null;
+    if (restoreAnchor.fragment) target = [...flow.querySelectorAll("[id],a[name]")].find((node) => node.id === restoreAnchor.fragment || node.getAttribute("name") === restoreAnchor.fragment);
+    if (!target && Number.isFinite(restoreAnchor.textOffset)) {
+      let at2 = Math.max(0, Math.min(index.map.length - 1, restoreAnchor.textOffset));
+      if (restoreAnchor.textQuote) {
+        const matches = findRanges(index.text, restoreAnchor.textQuote, 1e3);
+        matches.sort((a3, b) => Math.abs(a3.start - at2) - Math.abs(b.start - at2));
+        if (matches[0]) at2 = matches[0].start;
+      }
+      const point = index.map[at2];
+      if (point) {
+        const range = document.createRange();
+        range.setStart(point.node, point.offset);
+        range.setEnd(point.node, Math.min(point.node.length, point.offset + 1));
+        target = range;
+      }
+    }
+    if (!target) return;
+    const frame = requestAnimationFrame(() => {
+      if (!flow.isConnected) return;
+      anchorAppliedRef.current = key;
+      if (settings.flow === "scroll") {
+        const viewport = viewportRef.current, rect = target.getBoundingClientRect();
+        if (viewport) viewport.scrollTop += rect.top - viewport.getBoundingClientRect().top - 8;
+      } else revealNode(target);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [html, chapterBusy, restoreAnchor, jumpToken, bookId, chapterIndex, settings.flow, engine, revealNode]);
+  React20.useLayoutEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
     try {
@@ -121094,7 +121601,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     chapterBusy,
     revealNode
   ]);
-  React19.useLayoutEffect(() => {
+  React20.useLayoutEffect(() => {
     if (!speechFocus?.text || speechFocus.chapterIndex !== chapterIndex || chapterBusy || !html) return;
     const flow = flowRef.current;
     if (!flow) return;
@@ -121111,7 +121618,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     if (settings.flow === "scroll") revealNode(node.parentElement);
     else revealNode(range);
   }, [speechFocus, chapterIndex, chapterBusy, html, revealNode, settings.flow]);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
     if (settings.flow === "scroll") {
@@ -121123,10 +121630,15 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     flow.style.transform = `translateX(${-offset}px)`;
     flow.style.transition = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "none" : "transform .18s ease";
   }, [page, settings.flow, pageCount, settings.spread, settings.fontSize, settings.margin]);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     const measureNow = () => {
       try {
-        measure();
+        const live = liveRef.current, prior = measureRef.current, saved = { ...ui.stateOr(live.bookId).locator };
+        const next = measure();
+        if ((prior.viewportWidth !== next.viewportWidth || prior.viewportHeight !== next.viewportHeight || prior.pages !== next.pages) && saved.chapterIndex === live.chapterIndex && Number.isFinite(saved.textOffset) && saved.textQuote) {
+          const current = ui.store.get();
+          ui.store.set({ restoreAnchor: saved, restoreScroll: saved.scroll, jumpToken: (current.jumpToken || 0) + 1 });
+        }
       } catch (_error) {
       }
     };
@@ -121154,7 +121666,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       }
     };
   }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify]);
-  const reportPosition = React19.useCallback(() => {
+  const reportPosition = React20.useCallback(() => {
     const live = liveRef.current;
     if (live.bookId == null) return;
     let scroll = 0;
@@ -121167,21 +121679,48 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       const pages = measureRef.current && measureRef.current.pages || 1;
       scroll = pages > 1 ? live.page / (pages - 1) : 0;
     }
-    let quote = "";
+    let textQuote = "", textOffset, originalPage = "";
     try {
-      const flow = flowRef.current;
-      if (flow) quote = String(flow.textContent || "").replace(/\s+/g, " ").trim().slice(0, 120);
-    } catch (_error) {
-      quote = "";
+      const flow = flowRef.current, viewport = viewportRef.current;
+      if (flow && viewport) {
+        const index = textIndexRef.current ||= buildTextIndex(flow), rect = viewport.getBoundingClientRect();
+        const caret = document.caretRangeFromPoint?.(rect.left + Math.min(8, rect.width / 2), rect.top + Math.min(8, rect.height / 2));
+        let at2 = -1;
+        if (caret && flow.contains(caret.startContainer)) at2 = index.map.findIndex((point) => point.node === caret.startContainer && point.offset >= caret.startOffset);
+        if (at2 < 0) at2 = Math.round(index.text.length * scroll);
+        textOffset = Math.max(0, Math.min(index.text.length, at2));
+        textQuote = index.text.slice(textOffset, textOffset + 120);
+        const current = index.map[Math.min(textOffset, Math.max(0, index.map.length - 1))]?.node;
+        if (current && live.positionModel?.pages?.length) {
+          for (const page2 of live.positionModel.pages) {
+            const chapter = chapterIndexForHref(live.engine, page2.href);
+            if (chapter < 0) continue;
+            if (chapter < live.chapterIndex) {
+              originalPage = page2.label;
+              continue;
+            }
+            if (chapter !== live.chapterIndex) continue;
+            let fragment = page2.href.split("#").slice(1).join("#");
+            try {
+              fragment = decodeURIComponent(fragment);
+            } catch {
+            }
+            if (!fragment) {
+              originalPage = page2.label;
+              continue;
+            }
+            const marker = [...flow.querySelectorAll("[id],a[name]")].find((node) => node.id === fragment || node.getAttribute("name") === fragment);
+            if (marker && (marker.contains(current) || marker.compareDocumentPosition(current) & Node.DOCUMENT_POSITION_FOLLOWING)) originalPage = page2.label;
+          }
+        }
+      }
+    } catch {
     }
-    ui.reportPosition(live.bookId, {
-      chapterIndex: live.chapterIndex,
-      chapterHref: chapterHrefOf(live.engine, live.chapterIndex),
-      scroll: Math.min(1, Math.max(0, scroll)),
-      textQuote: quote
-    });
+    const locator = { chapterIndex: live.chapterIndex, chapterHref: chapterHrefOf(live.engine, live.chapterIndex), scroll: Math.min(1, Math.max(0, scroll)), textQuote, ...Number.isFinite(textOffset) ? { textOffset } : {}, originalPage, contentFingerprint: live.engine?.contentFingerprint || "" };
+    ui.reportPosition(live.bookId, locator);
+    return locator;
   }, [ui]);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     ui.store.set({ page, pageCount });
     if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     scrollTimerRef.current = setTimeout(() => {
@@ -121191,8 +121730,8 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, ui, reportPosition]);
-  React19.useEffect(() => {
+  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
+  React20.useEffect(() => {
     const isScroll = () => {
       const live = liveRef.current;
       return !!(live.settings && live.settings.flow === "scroll");
@@ -121241,12 +121780,12 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         ui.toast("\u5DF2\u7ECF\u662F\u7B2C\u4E00\u9875");
       }
     };
-    ui.registerPager({ next, prev, jump: (fraction) => ui.goPercent(fraction) });
+    ui.registerPager({ next, prev, jump: (fraction) => ui.goPercent(fraction), capture: reportPosition });
     return () => {
-      ui.registerPager({ next: () => ui.goChapter((ui.store.get().chapterIndex || 0) + 1), prev: () => ui.goChapter((ui.store.get().chapterIndex || 0) - 1) });
+      ui.registerPager({ next: () => ui.goChapter((ui.store.get().chapterIndex || 0) + 1), prev: () => ui.goChapter((ui.store.get().chapterIndex || 0) - 1), capture: () => null });
     };
-  }, [ui, setPage]);
-  React19.useEffect(() => {
+  }, [ui, setPage, reportPosition]);
+  React20.useEffect(() => {
     const onKeyDown = (event) => {
       const state = ui.store.get();
       if (!state.visible || state.view !== "reader") return;
@@ -121266,7 +121805,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [ui]);
-  React19.useEffect(() => {
+  React20.useEffect(() => {
     const onMouseUp = () => {
       try {
         const flow = flowRef.current;
@@ -121352,6 +121891,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           } catch (_error) {
             index = null;
           }
+          if (ui.goHref(href)) return;
           if (typeof index === "number" && index >= 0) ui.goChapter(index);
           else ui.toast("\u65E0\u6CD5\u5B9A\u4F4D\u8FD9\u4E2A\u94FE\u63A5", "warn");
         }
@@ -121443,11 +121983,11 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     textAlign: settings.justify ? "justify" : "left",
     color: "var(--qmr-ink)"
   };
-  const panelNode = panel === "toc" ? h17(TocPanel, { ui }) : panel === "vocabulary" ? h17(VocabularyPanel, { ui, bookId }) : panel === "speech" ? h17(SpeechPanel, { ui, speech }) : panel === "search" ? h17(SearchPanel, { ui }) : panel === "highlights" || panel === "notes" ? h17(HighlightsPanel, { ui }) : panel === "companion" ? h17(CompanionPanel, { ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) : panel === "settings" ? h17(SettingsPanel, { ui }) : null;
+  const panelNode = panel === "toc" ? h18(TocPanel, { ui }) : panel === "vocabulary" ? h18(VocabularyPanel, { ui, bookId }) : panel === "speech" ? h18(SpeechPanel, { ui, speech }) : panel === "search" ? h18(SearchPanel, { ui }) : panel === "highlights" || panel === "notes" ? h18(HighlightsPanel, { ui }) : panel === "companion" ? h18(CompanionPanel, { ui, bookId, chapterIndex, engine, chatApi, SessionProvider, renderSlot }) : panel === "settings" ? h18(SettingsPanel, { ui }) : null;
   const title = book && book.title || "\u9605\u8BFB";
   const author = book && book.author || "";
   const chapterLabel2 = labels.get(chapterIndex) || `\u7B2C ${chapterIndex + 1} \u7AE0`;
-  const toolbarButton = (key, icon, label, onClick, active) => h17(
+  const toolbarButton = (key, icon, label, onClick, active) => h18(
     "button",
     {
       key,
@@ -121460,69 +122000,70 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     },
     icon
   );
-  const topBar = h17(
+  const stablePosition = positionModel ? positionForLocator(positionModel, bookState?.locator?.chapterIndex === chapterIndex ? bookState.locator : { chapterIndex }) : null;
+  const topBar = h18(
     "div",
     { className: `qmr-topbar${chromeVisible ? "" : " qmr-chrome-hidden"}` },
-    h17("button", {
+    h18("button", {
       type: "button",
       className: "qmr-btn qmr-btn-icon",
       "aria-label": "\u8FD4\u56DE\u4E66\u5E93",
       title: "\u8FD4\u56DE\u4E66\u5E93",
       onClick: () => ui.backToLibrary()
-    }, h17(IconBack, { width: 16, height: 16 })),
-    h17(
+    }, h18(IconBack, { width: 16, height: 16 })),
+    h18(
       "div",
       { className: "qmr-topbar-title", title: [title, author, chapterLabel2].filter(Boolean).join(" \xB7 ") },
-      h17("div", { className: "qmr-title" }, title),
-      h17(
+      h18("div", { className: "qmr-title" }, title),
+      h18(
         "div",
         { className: "qmr-subtitle" },
         [chapterLabel2 !== title ? chapterLabel2 : "", formatPercent(progress)].filter(Boolean).join(" \xB7 ")
       )
     ),
-    h17(
+    h18(
       "div",
       { className: "qmr-actions" },
-      toolbarButton("speech", h17(IconAudio, { width: 16, height: 16 }), ui.t("speech.title", "\u8FDE\u7EED\u6717\u8BFB"), () => ui.setPanel("speech"), panel === "speech"),
-      toolbarButton("vocabulary", h17(IconLanguages, { width: 16, height: 16 }), ui.t("lookup.vocabulary", "\u751F\u8BCD\u672C"), () => ui.setPanel("vocabulary"), panel === "vocabulary"),
-      toolbarButton("search", h17(IconSearch, { width: 16, height: 16 }), "\u641C\u7D22", () => ui.setPanel("search"), panel === "search"),
-      toolbarButton("hl", h17(IconHighlight, { width: 16, height: 16 }), "\u5212\u7EBF", () => ui.setPanel("highlights"), panel === "highlights" || panel === "notes"),
-      toolbarButton("ai", h17(IconSparkles, { width: 16, height: 16 }), "AI \u4F34\u8BFB", () => ui.setPanel("companion"), panel === "companion"),
-      toolbarButton("settings", h17(IconSettings, { width: 16, height: 16 }), "\u8BBE\u7F6E", () => ui.setPanel("settings"), panel === "settings"),
-      h17("button", {
+      toolbarButton("speech", h18(IconAudio, { width: 16, height: 16 }), ui.t("speech.title", "\u8FDE\u7EED\u6717\u8BFB"), () => ui.setPanel("speech"), panel === "speech"),
+      toolbarButton("vocabulary", h18(IconLanguages, { width: 16, height: 16 }), ui.t("lookup.vocabulary", "\u751F\u8BCD\u672C"), () => ui.setPanel("vocabulary"), panel === "vocabulary"),
+      toolbarButton("search", h18(IconSearch, { width: 16, height: 16 }), "\u641C\u7D22", () => ui.setPanel("search"), panel === "search"),
+      toolbarButton("hl", h18(IconHighlight, { width: 16, height: 16 }), "\u5212\u7EBF", () => ui.setPanel("highlights"), panel === "highlights" || panel === "notes"),
+      toolbarButton("ai", h18(IconSparkles, { width: 16, height: 16 }), "AI \u4F34\u8BFB", () => ui.setPanel("companion"), panel === "companion"),
+      toolbarButton("settings", h18(IconSettings, { width: 16, height: 16 }), "\u8BBE\u7F6E", () => ui.setPanel("settings"), panel === "settings"),
+      h18("button", {
         type: "button",
         className: "qmr-btn qmr-btn-icon",
         "aria-label": "\u5168\u5C4F",
         title: "\u5168\u5C4F",
         onClick: () => ui.toggleFullscreen()
-      }, h17(IconFullscreen, { width: 16, height: 16 })),
-      h17("button", {
+      }, h18(IconFullscreen, { width: 16, height: 16 })),
+      h18("button", {
         type: "button",
         className: "qmr-btn qmr-btn-icon",
         "aria-label": "\u5173\u95ED\u9605\u8BFB\u5668",
         title: "\u5173\u95ED\u9605\u8BFB\u5668",
         onClick: () => ui.closeOverlay()
-      }, h17(IconClose, { width: 16, height: 16 }))
+      }, h18(IconClose, { width: 16, height: 16 }))
     )
   );
-  const bottomBar = h17(
+  const bottomBar = h18(
     "div",
     { className: `qmr-bottombar${chromeVisible ? "" : " qmr-chrome-hidden"}` },
-    h17("button", {
+    h18("button", {
       type: "button",
       className: `qmr-icon-btn${panel === "toc" ? " is-active" : ""}`,
       "aria-label": "\u76EE\u5F55",
       "aria-pressed": panel === "toc",
       title: "\u76EE\u5F55",
       onClick: () => ui.setPanel("toc")
-    }, h17(IconToc, { width: 16, height: 16 })),
-    h17("button", {
+    }, h18(IconToc, { width: 16, height: 16 })),
+    h18("button", {
       type: "button",
       className: "qmr-icon-btn",
       "aria-label": "\u4E0A\u4E00\u9875",
       onClick: () => ui.turnPage(-1)
-    }, h17(IconPrev, { width: 16, height: 16 })),
-    h17(
+    }, h18(IconPrev, { width: 16, height: 16 })),
+    h18(
       "div",
       {
         className: "qmr-track",
@@ -121546,30 +122087,33 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           }
         }
       },
-      h17("div", { className: "qmr-track-rail" }),
-      h17("div", { className: "qmr-track-fill", style: { width: `${Math.round(progress * 100)}%` } }),
-      h17("div", { className: "qmr-track-knob", style: { left: `${Math.round(progress * 100)}%` } })
+      h18("div", { className: "qmr-track-rail" }),
+      h18("div", { className: "qmr-track-fill", style: { width: `${Math.round(progress * 100)}%` } }),
+      h18("div", { className: "qmr-track-knob", style: { left: `${Math.round(progress * 100)}%` } })
     ),
-    h17("span", { className: "qmr-bottom-text" }, `\u7B2C ${chapterIndex + 1} / ${chapterCount || "?"} ${sectionUnit}`),
-    h17("span", { className: "qmr-bottom-text" }, formatPercent(progress)),
-    jumpReturn ? h17("button", { className: "qmr-icon-btn", "aria-label": ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), title: ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), onClick: () => ui.returnFromJump() }, h17(IconBack, { width: 16, height: 16 })) : null,
-    h17("button", {
+    h18("button", { className: "qmr-bottom-text qmr-position-trigger", type: "button", "aria-label": ui.t("nav.positionJump", "\u4F4D\u7F6E\u8DF3\u8F6C"), onClick: () => {
+      if (panel !== "toc") ui.setPanel("toc");
+      ui.store.set({ navigationTab: "position" });
+    } }, positionModel ? `${ui.t(positionModel.kind === "location" ? "nav.location" : positionModel.kind === "original" ? "nav.originalPage" : "nav.pdfPage", positionModel.kind === "location" ? "\u4F4D\u7F6E" : "\u9875\u7801")} ${stablePosition.current || "\u2014"} / ${positionModel.total}` : `\u7B2C ${chapterIndex + 1} / ${chapterCount || "?"} ${sectionUnit}`),
+    h18("span", { className: "qmr-bottom-text" }, formatPercent(progress)),
+    jumpReturn ? h18("button", { className: "qmr-icon-btn", "aria-label": ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), title: ui.t("navigation.return", "\u56DE\u5230\u8DF3\u8F6C\u524D"), onClick: () => ui.returnFromJump() }, h18(IconBack, { width: 16, height: 16 })) : null,
+    h18("button", {
       type: "button",
       className: "qmr-icon-btn",
       "aria-label": "\u4E0B\u4E00\u9875",
       onClick: () => ui.turnPage(1)
-    }, h17(IconNext, { width: 16, height: 16 }))
+    }, h18(IconNext, { width: 16, height: 16 }))
   );
-  return h17(
+  return h18(
     "div",
     { className: "qmr-reader", "data-qmr-theme": settings.theme, style: themeVars },
-    h17(
+    h18(
       "div",
       { className: `qmr-reader-main${panel === "companion" ? " qmr-has-companion" : ""}`, ref: workareaRef, style: { "--qmr-companion-width": `${companionWidth}%` } },
-      h17(
+      h18(
         "div",
         {
-          className: `qmr-reader-content${settings.flow === "scroll" ? " qmr-flow-scroll" : ""}`,
+          className: `qmr-reader-content${settings.flow === "scroll" ? " qmr-flow-scroll" : ""}${book?.format === "pdf" ? " qmr-format-pdf" : ""}`,
           onPointerMoveCapture: showChrome,
           onPointerDownCapture: showChrome,
           onWheelCapture: () => {
@@ -121580,16 +122124,16 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           onKeyDownCapture: showChrome
         },
         topBar,
-        settings.flow !== "scroll" ? h17("button", {
+        settings.flow !== "scroll" ? h18("button", {
           type: "button",
           className: "qmr-page-zone qmr-page-zone-prev",
           "aria-label": "\u4E0A\u4E00\u9875",
           onClick: () => ui.turnPage(-1)
         }) : null,
-        h17(
+        h18(
           "div",
           { className: "qmr-page-frame", style: contentStyle },
-          h17("div", { className: viewportClass, ref: viewportRef }, h17("div", {
+          h18("div", { className: viewportClass, ref: viewportRef }, h18("div", {
             className: "qmr-page-flow qmr-paper-body",
             ref: flowRef,
             style: flowStyle,
@@ -121597,26 +122141,26 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
             onScroll: void 0
           }))
         ),
-        settings.flow !== "scroll" ? h17("button", {
+        settings.flow !== "scroll" ? h18("button", {
           type: "button",
           className: "qmr-page-zone qmr-page-zone-next",
           "aria-label": "\u4E0B\u4E00\u9875",
           onClick: () => ui.turnPage(1)
         }) : null,
-        settings.flow !== "scroll" ? h17("div", { className: "qmr-page-count" }, `\u7B2C ${page + 1} / ${pageCount} \u9875`) : null,
-        chapterBusy ? h17("div", { className: "qmr-chapter-loading" }, "\u6B63\u5728\u6392\u7248\u2026") : null,
-        renderError ? h17(
+        settings.flow !== "scroll" ? h18("div", { className: "qmr-page-count" }, `\u7B2C ${page + 1} / ${pageCount} \u9875`) : null,
+        chapterBusy ? h18("div", { className: "qmr-chapter-loading" }, "\u6B63\u5728\u6392\u7248\u2026") : null,
+        renderError ? h18(
           "div",
           { className: "qmr-errorbox" },
-          h17("div", { className: "qmr-errorbox-title" }, `\u8FD9\u4E00${sectionUnit}\u6E32\u67D3\u5931\u8D25`),
-          h17("div", { className: "qmr-errorbox-text" }, renderError),
-          h17("button", {
+          h18("div", { className: "qmr-errorbox-title" }, `\u8FD9\u4E00${sectionUnit}\u6E32\u67D3\u5931\u8D25`),
+          h18("div", { className: "qmr-errorbox-text" }, renderError),
+          h18("button", {
             type: "button",
             className: "qmr-btn qmr-btn-sm",
             onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 })
           }, "\u91CD\u8BD5")
         ) : null,
-        selection ? h17(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onSpeak: () => {
+        selection ? h18(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onSpeak: () => {
           const text = selection.text;
           if (panel !== "speech") ui.setPanel("speech");
           void speech.test(text, true);
@@ -121624,10 +122168,10 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           ui.store.set({ lookupSelection: { ...selection } });
           ui.clearSelection();
         } }) : null,
-        lookupSelection ? h17(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
+        lookupSelection ? h18(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
         bottomBar
       ),
-      panel === "companion" ? h17("div", {
+      panel === "companion" ? h18("div", {
         className: "qmr-companion-divider",
         role: "separator",
         tabIndex: 0,
@@ -121678,7 +122222,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           localStorage.setItem("qmr.companionWidth", "44");
         }
       }) : null,
-      panelNode ? h17("div", {
+      panelNode ? h18("div", {
         className: `qmr-panel${panel === "companion" ? " qmr-panel-companion" : ""}${narrow && panel !== "companion" ? " qmr-panel-overlay" : ""}`,
         style: panel === "companion" ? {
           ...readerThemeVars(companionLook.theme),
@@ -121689,12 +122233,12 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         "data-qmr-ai-appearance": panel === "companion" && companionAppearance ? "custom" : void 0
       }, panelNode) : null
     ),
-    promptManagerOpen ? h17(PromptManager, { ui, onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null
+    promptManagerOpen ? h18(PromptManager, { ui, onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null
   );
 }
 
 // src/ui/shell.js
-var h18 = React20.createElement;
+var h19 = React21.createElement;
 var INITIAL_STATE = Object.freeze({
   visible: false,
   view: "library",
@@ -121702,7 +122246,7 @@ var INITIAL_STATE = Object.freeze({
   panel: null,
   states: {}
 });
-var ReaderErrorBoundary = class extends React20.Component {
+var ReaderErrorBoundary = class extends React21.Component {
   constructor(props) {
     super(props);
     this.state = { error: null };
@@ -121724,23 +122268,23 @@ var ReaderErrorBoundary = class extends React20.Component {
     const error = this.state.error;
     if (error) {
       const text = String(error && error.message || error || "\u672A\u77E5\u9519\u8BEF");
-      return h18(
+      return h19(
         "div",
         { className: "qmr-root" },
-        h18(
+        h19(
           "div",
           { className: "qmr-errorbox", role: "alert" },
-          h18("div", { className: "qmr-errorbox-title" }, "\u9605\u8BFB\u5668\u754C\u9762\u51FA\u9519"),
-          h18("div", { className: "qmr-errorbox-text" }, text),
-          h18(
+          h19("div", { className: "qmr-errorbox-title" }, "\u9605\u8BFB\u5668\u754C\u9762\u51FA\u9519"),
+          h19("div", { className: "qmr-errorbox-text" }, text),
+          h19(
             "div",
             { className: "qmr-hl-tools" },
-            h18("button", {
+            h19("button", {
               type: "button",
               className: "qmr-btn qmr-btn-primary qmr-btn-sm",
               onClick: this.reset
-            }, h18(IconRetry, { width: 14, height: 14 }), "\u91CD\u8BD5"),
-            typeof this.props.onClose === "function" ? h18("button", {
+            }, h19(IconRetry, { width: 14, height: 14 }), "\u91CD\u8BD5"),
+            typeof this.props.onClose === "function" ? h19("button", {
               type: "button",
               className: "qmr-btn qmr-btn-sm",
               onClick: this.props.onClose
@@ -121757,13 +122301,13 @@ function looksLikeStore2(value) {
 }
 function ReaderOverlay(props) {
   const injectedStore = props && looksLikeStore2(props.store) ? props.store : null;
-  const fallbackStore = React20.useMemo(() => createUiStore({ ...INITIAL_STATE }), []);
+  const fallbackStore = React21.useMemo(() => createUiStore({ ...INITIAL_STATE }), []);
   const store = injectedStore || fallbackStore;
-  const propsRef = React20.useRef(props);
+  const propsRef = React21.useRef(props);
   propsRef.current = props;
-  const ui = React20.useMemo(() => createController(() => propsRef.current, store), [store]);
+  const ui = React21.useMemo(() => createController(() => propsRef.current, store), [store]);
   const injectedUseStore = props && typeof props.useStore === "function" ? props.useStore : null;
-  const useSel = React20.useCallback(
+  const useSel = React21.useCallback(
     (selector) => injectedUseStore ? injectedUseStore(selector) : useUiStore(store, selector),
     [injectedUseStore, store]
   );
@@ -121776,11 +122320,11 @@ function ReaderOverlay(props) {
   const lastError = useSel((state) => state.lastError);
   const openSignal = useSel((state) => state.openSignal);
   const jumpTarget = useSel((state) => state.jumpTarget);
-  const overlayRef = React20.useRef(null);
-  const lastSignalRef = React20.useRef(openSignal);
-  const handledBookRef = React20.useRef(null);
-  const initialHandledRef = React20.useRef(false);
-  const setOverlayNode = React20.useCallback((element) => {
+  const overlayRef = React21.useRef(null);
+  const lastSignalRef = React21.useRef(openSignal);
+  const handledBookRef = React21.useRef(null);
+  const initialHandledRef = React21.useRef(false);
+  const setOverlayNode = React21.useCallback((element) => {
     overlayRef.current = element;
     try {
       ui.attachOverlay(element);
@@ -121788,7 +122332,7 @@ function ReaderOverlay(props) {
     } catch (_error) {
     }
   }, [ui]);
-  React20.useEffect(() => {
+  React21.useEffect(() => {
     if (openSignal === void 0 || openSignal === null) return;
     if (lastSignalRef.current === openSignal) return;
     lastSignalRef.current = openSignal;
@@ -121801,7 +122345,7 @@ function ReaderOverlay(props) {
     handledBookRef.current = null;
     ui.openLibrary();
   }, [openSignal, store, ui]);
-  React20.useEffect(() => {
+  React21.useEffect(() => {
     if (initialHandledRef.current) return;
     const initialBookId = propsRef.current && propsRef.current.initialBookId;
     if (!initialBookId) {
@@ -121812,7 +122356,7 @@ function ReaderOverlay(props) {
     handledBookRef.current = String(initialBookId);
     ui.openBook(initialBookId);
   }, [ui]);
-  React20.useEffect(() => {
+  React21.useEffect(() => {
     if (!jumpTarget) return void 0;
     let cancelled = false;
     (async () => {
@@ -121824,7 +122368,7 @@ function ReaderOverlay(props) {
       cancelled = true;
     };
   }, [jumpTarget, store, ui]);
-  React20.useEffect(() => {
+  React21.useEffect(() => {
     const onKeyDown = (event) => {
       if (event.key !== "Escape") return;
       const state = store.get();
@@ -121856,19 +122400,19 @@ function ReaderOverlay(props) {
     return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [store, ui]);
   if (!visible && !props.embedded) return null;
-  const errorBar = lastError ? h18(
+  const errorBar = lastError ? h19(
     "div",
     { className: "qmr-errorbar", role: "alert" },
-    h18("span", null, String(lastError)),
-    h18("button", {
+    h19("span", null, String(lastError)),
+    h19("button", {
       type: "button",
       className: "qmr-icon-btn",
       "aria-label": "\u5173\u95ED\u9519\u8BEF\u63D0\u793A",
       onClick: () => ui.clearError()
-    }, h18(IconClose, { width: 14, height: 14 }))
+    }, h19(IconClose, { width: 14, height: 14 }))
   ) : null;
-  const content2 = view === "reader" && bookId != null ? h18(ReaderView, { ui, chatApi: props.chatApi, SessionProvider: props.SessionProvider, renderSlot: props.renderSlot }) : h18(LibraryView, { ui });
-  return h18(
+  const content2 = view === "reader" && bookId != null ? h19(ReaderView, { ui, chatApi: props.chatApi, SessionProvider: props.SessionProvider, renderSlot: props.renderSlot }) : h19(LibraryView, { ui });
+  return h19(
     "div",
     {
       className: props.embedded ? "qmr-overlay qmr-embedded" : "qmr-overlay",
@@ -121878,16 +122422,16 @@ function ReaderOverlay(props) {
       "aria-label": "\u4E54\u6728\u9605\u8BFB",
       "data-qmr-view": view
     },
-    h18(StyleSheet, null),
+    h19(StyleSheet, null),
     errorBar,
-    h18(
+    h19(
       ReaderErrorBoundary,
       { onError: (error) => ui.reportError(error, true), onClose: () => ui.closeOverlay() },
-      h18(
+      h19(
         "div",
         { className: "qmr-root" },
         content2,
-        notice ? h18("div", { className: `qmr-toast is-${noticeKind || "info"}` }, String(notice)) : null
+        notice ? h19("div", { className: `qmr-toast is-${noticeKind || "info"}` }, String(notice)) : null
       )
     )
   );
@@ -122034,7 +122578,7 @@ function pickComponent(module2, names, label) {
   for (const name of names) {
     if (typeof module2?.[name] === "function") return module2[name];
   }
-  const Missing = () => React21.createElement(
+  const Missing = () => React22.createElement(
     "div",
     { style: { padding: "16px", fontSize: "13px", color: "var(--dsw-alias-state-error-primary, #d33)" } },
     `\u4E54\u6728\u9605\u8BFB\uFF1A${label} \u6CA1\u6709\u5BFC\u51FA\u9884\u671F\u7684\u7EC4\u4EF6\uFF08\u627E\u8FC7 ${names.join(" / ")}\uFF09\u3002\u8BF7\u68C0\u67E5\u6784\u5EFA\u4EA7\u7269\u3002`
@@ -122192,11 +122736,11 @@ function apply(ctx) {
     return data.getEngine(bookId);
   }
   function ReaderPanel(props) {
-    React21.useEffect(() => {
+    React22.useEffect(() => {
       store.set({ visible: true });
       return () => store.set({ visible: false, panel: null, selection: null });
     }, []);
-    return React21.createElement(Overlay, { ...props, embedded: true });
+    return React22.createElement(Overlay, { ...props, embedded: true });
   }
   ctx.effect(
     () => ctx.slots.inject(
@@ -122321,16 +122865,16 @@ function apply(ctx) {
   }, "qiaomu-reader: \u9884\u8F7D\u4E66\u5E93");
 }
 function BookIcon({ size = 18 }) {
-  return React21.createElement(
+  return React22.createElement(
     "svg",
     { width: size, height: size, viewBox: "0 0 24 24", fill: "none", "aria-hidden": true, focusable: false, style: { display: "block", flexShrink: 0 } },
-    React21.createElement("path", {
+    React22.createElement("path", {
       d: "M12 6.5C10.2 5 7.6 4.4 4.6 4.7v13.6c3-.3 5.6.3 7.4 1.8 1.8-1.5 4.4-2.1 7.4-1.8V4.7c-3-.3-5.6.3-7.4 1.8Z",
       stroke: "currentColor",
       strokeWidth: 1.6,
       strokeLinejoin: "round"
     }),
-    React21.createElement("path", { d: "M12 6.5v13.6", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" })
+    React22.createElement("path", { d: "M12 6.5v13.6", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" })
   );
 }
 

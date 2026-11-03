@@ -196,14 +196,14 @@ export function chapterLabelMap(engine) {
 export function chapterIndexForHref(engine, href) {
   try {
     const chapters = (engine && engine.book && engine.book.chapters) || [];
-    const target = String(href || '');
+    const target = String(href || '').split('#')[0];
     if (!target) return -1;
     for (let i = 0; i < chapters.length; i += 1) {
-      if (chapters[i] && chapters[i].href === target) return i;
+      if (chapters[i] && String(chapters[i].href || '').split('#')[0] === target) return i;
     }
     const base = target.split('/').pop();
     for (let i = 0; i < chapters.length; i += 1) {
-      const chapterHref = String((chapters[i] && chapters[i].href) || '');
+      const chapterHref = String((chapters[i] && chapters[i].href) || '').split('#')[0];
       if (chapterHref.split('/').pop() === base) return i;
     }
   } catch (_error) {

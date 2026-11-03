@@ -12,6 +12,8 @@
 import {
   DEFAULT_READER_SETTINGS,
   addHighlight as coreAddHighlight,
+  addBookmark as coreAddBookmark,
+  removeBookmark as coreRemoveBookmark,
   progressOf as coreProgressOf,
   removeHighlight as coreRemoveHighlight,
   updateHighlightNote as coreUpdateHighlightNote,
@@ -340,8 +342,14 @@ export function createController(getProps, store) {
   function updateSettings(id, patch) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
+      const preservePosition = id === uiStore.get().bookId && ['fontSize','fontFamily','lineHeight','margin','flow','spread','justify','pdfZoom'].some(key => Object.hasOwn(patch || {}, key));
+      const anchor = preservePosition ? (pager.capture?.() || state.locator) : null;
       const merged = { ...(state.settings || {}), ...(patch || {}) };
       patchState(id, { settings: merged });
+      if (anchor && Number.isFinite(anchor.textOffset)) {
+        const current = uiStore.get();
+        uiStore.set({restoreAnchor:anchor,restoreScroll:anchor.scroll,jumpToken:(current.jumpToken||0)+1});
+      }
     });
   }
 
@@ -585,6 +593,7 @@ export function createController(getProps, store) {
         focusHighlightId: null,
         editingHighlightId: null,
         restoreScroll: Math.min(1, Math.max(0, Number(locator.scroll) || 0)),
+        restoreAnchor: Number.isFinite(locator.textOffset) ? {...locator} : null,
         engineVersion: (uiStore.get().engineVersion || 0) + 1,
         imagesVersion: 0,
         busyBookId: null,
@@ -620,6 +629,7 @@ export function createController(getProps, store) {
       if (typeof next.prev === 'function') pager.prev = next.prev;
       if (typeof next.goChapter === 'function') pager.goChapter = next.goChapter;
       if (typeof next.jump === 'function') pager.jump = next.jump;
+      if (typeof next.capture === 'function') pager.capture = next.capture;
     } catch (_error) {
       /* 忽略 */
     }
@@ -649,8 +659,8 @@ export function createController(getProps, store) {
     } catch (_error) {
       /* 忽略 */
     }
-    uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null });
-    updateLocator(state.bookId, { chapterIndex: target, scroll: 0 });
+    uiStore.set({ chapterIndex: target, page: 0, restoreScroll: null, restoreAnchor:null });
+    updateLocator(state.bookId, {chapterIndex:target,scroll:0,textOffset:0,textQuote:'',originalPage:'',chapterHref:engineOf(state.bookId)?.book?.chapters?.[target]?.href||''});
   }
 
   /** 跳到全书百分比位置 */
@@ -659,8 +669,8 @@ export function createController(getProps, store) {
     const count = Number(state.chapterCount) || chapterCountOf(state.bookId) || 1;
     if (!state.jumpReturn) uiStore.set({ jumpReturn: { ...stateOr(state.bookId).locator } });
     const location = percentLocation(fraction, count);
-    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, jumpToken: (state.jumpToken || 0) + 1 });
-    updateLocator(state.bookId, location);
+    uiStore.set({ chapterIndex: location.chapterIndex, restoreScroll: location.scroll, restoreAnchor:null, jumpToken: (state.jumpToken || 0) + 1 });
+    updateLocator(state.bookId, {...location,textOffset:undefined,textQuote:'',originalPage:''});
   }
 
   /** 更新 locator 并持久化 */
@@ -680,13 +690,43 @@ export function createController(getProps, store) {
       const locator = {
         ...(state.locator || {}),
         chapterIndex: clampInt(position.chapterIndex, 0, 100000),
+        fragment: '',
         scroll: Math.min(1, Math.max(0, Number(position.scroll) || 0)),
       };
       if (position.chapterHref) locator.chapterHref = String(position.chapterHref);
-      if (position.textQuote) locator.textQuote = String(position.textQuote).slice(0, 200);
+      if (typeof position.textQuote==='string') locator.textQuote = position.textQuote.slice(0,200);
+      if(Number.isFinite(position.textOffset))locator.textOffset=Math.max(0,Math.floor(position.textOffset));
+      if(typeof position.originalPage==='string')locator.originalPage=position.originalPage;
+      if(typeof position.contentFingerprint==='string')locator.contentFingerprint=position.contentFingerprint;
       patchState(id, { locator });
     });
   }
+
+  function goLocator(locator) {
+    const state=uiStore.get(),count=chapterCountOf(state.bookId)||1;
+    const chapterIndex=clampInt(locator.chapterIndex,0,count-1);
+    if(!state.jumpReturn)uiStore.set({jumpReturn:{...stateOr(state.bookId).locator}});
+    const target={...locator,chapterIndex,chapterHref:locator.chapterHref||engineOf(state.bookId)?.book?.chapters?.[chapterIndex]?.href||'',textOffset:Number.isFinite(locator.textOffset)?Math.max(0,Math.floor(locator.textOffset)):undefined,textQuote:locator.textQuote||'',originalPage:locator.originalPage||'',scroll:Math.min(1,Math.max(0,Number(locator.scroll)||0))};
+    uiStore.set({chapterIndex,page:0,restoreScroll:target.scroll,restoreAnchor:target,jumpToken:(state.jumpToken||0)+1});updateLocator(state.bookId,target);
+  }
+  function goHref(href) {
+    const state=uiStore.get(),engine=engineOf(state.bookId);let resolved=engine?.resolveLink?.(state.chapterIndex,href);
+    const chapterIndex=typeof resolved==='number'?resolved:resolved?.chapterIndex??chapterIndexForHref(engine,href);if(!(chapterIndex>=0))return false;
+    let fragment=String(href).split('#').slice(1).join('#');try{fragment=decodeURIComponent(fragment);}catch{}
+    goLocator({chapterIndex,chapterHref:engine.book?.chapters?.[chapterIndex]?.href||'',fragment,scroll:0});return true;
+  }
+  async function saveBookmark(input={}) {
+    const id=uiStore.get().bookId;if(!id)throw Error('没有打开的书籍');if(!input.id&&uiStore.get().chapterBusy)throw Error(t('nav.waitForPage','请等待当前页面加载完成'));const capturedLocator=input.locator||pager.capture?.()||stateOr(id).locator;await loadState(id);if(uiStore.get().bookId!==id)throw Error(t('nav.bookChanged','书籍已切换，请重试'));
+    const label=String(input.label||'').trim().slice(0,120);if(!label)throw Error(t('nav.bookmarkNameRequired','请填写书签名称'));
+    const state=stateOr(id);let bookmark,next;
+    if(input.id){bookmark=state.bookmarks.find(b=>b.id===input.id);if(!bookmark)throw Error(t('nav.bookmarkMissing','找不到这条书签'));bookmark={...bookmark,label};next={...state,bookmarks:state.bookmarks.map(b=>b.id===input.id?bookmark:b)};}
+    else {const locator=capturedLocator;const result=coreAddBookmark(state,{label,chapterHref:locator.chapterHref,percent:((Number(locator.chapterIndex)||0)+(Number(locator.scroll)||0))/Math.max(1,chapterCountOf(id)),locator});next=result.state;bookmark=result.bookmark;}
+    replaceState(id,next);clearTimeout(saveTimers.get(id));saveTimers.delete(id);const result=await callAction('saveState',id,stateOr(id));if(result?.ok===false)throw Object.assign(Error(result.error),{bookmarkId:bookmark.id});return bookmark;
+  }
+  async function deleteBookmark(bookmarkId) {
+    const id=uiStore.get().bookId;await loadState(id);if(uiStore.get().bookId!==id)throw Error(t('nav.bookChanged','书籍已切换，请重试'));const prior=stateOr(id).bookmarks;replaceState(id,coreRemoveBookmark(stateOr(id),bookmarkId));clearTimeout(saveTimers.get(id));saveTimers.delete(id);const result=await callAction('saveState',id,stateOr(id));if(result?.ok===false){patchState(id,{bookmarks:prior});throw Error(result.error);}
+  }
+  function openBookmark(bookmark) {if(bookmark.locator)goLocator(bookmark.locator);else goPercent(bookmark.percent);}
 
   // ---------------------------------------------------------------- 面板
 
@@ -1070,10 +1110,12 @@ export function createController(getProps, store) {
     turnPage,
     goChapter,
     goPercent,
+    goLocator, goHref, saveBookmark, deleteBookmark, openBookmark,
+    captureLocator: () => pager.capture?.() || stateOr(uiStore.get().bookId).locator,
     returnFromJump() {
       const state = uiStore.get();
       if (!state.jumpReturn) return;
-      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
+      uiStore.set({ chapterIndex: state.jumpReturn.chapterIndex, restoreScroll: state.jumpReturn.scroll, restoreAnchor:{...state.jumpReturn}, jumpReturn: null, jumpToken: (state.jumpToken || 0) + 1 });
       updateLocator(state.bookId, state.jumpReturn);
     },
     updateLocator,

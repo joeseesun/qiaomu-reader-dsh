@@ -19,6 +19,23 @@ export async function parsePdfBook(bytes, title = 'PDF') {
     href: `pdf/page-${index + 1}`, label: `第 ${index + 1} 页`, xhtml: '',
   }));
   const book = { title, author: '', format: 'pdf', chapters, toc: chapters.map((chapter) => ({ href: chapter.href, label: chapter.label })) };
+  const resolveDestination = async (destination) => {
+    const target = typeof destination === 'string' ? await document.getDestination(destination) : destination;
+    if (!Array.isArray(target) || !target.length) return null;
+    const index = typeof target[0] === 'number' ? target[0] : await document.getPageIndex(target[0]);
+    return Number.isInteger(index) && index >= 0 && index < chapters.length ? chapters[index].href : null;
+  };
+  const outlineItems = async (items) => {
+    const result = [];
+    for (const item of items || []) {
+      let href = null;
+      try { href = await resolveDestination(item.dest); } catch { /* Keep nested valid destinations. */ }
+      const children = await outlineItems(item.items);
+      if (href || children.length) result.push({ label: item.title || 'PDF', href: href || children[0].href, children });
+    }
+    return result;
+  };
+  try { const outline = await outlineItems(await document.getOutline()); if (outline.length) book.toc = outline; } catch { /* Page list remains available. */ }
   const textCache = new Map();
   const engine = {
     book,
@@ -32,11 +49,12 @@ export async function parsePdfBook(bytes, title = 'PDF') {
       textCache.set(index, text);
       return text;
     },
-    async render(index) {
+    async render(index, _resourceResolver, options = {}) {
       if (index < 0 || index >= chapters.length) return '';
       const page = await document.getPage(index + 1);
       const base = page.getViewport({ scale: 1 });
-      const scale = Math.min(1.6, 1000 / Math.max(1, base.width));
+      const zoom = Math.min(3, Math.max(0.5, Number(options.zoom) || 1));
+      const scale = Math.min(1.6, 1000 / Math.max(1, base.width)) * zoom;
       const viewport = page.getViewport({ scale });
       const content = await page.getTextContent();
       let image = '';
@@ -55,9 +73,9 @@ export async function parsePdfBook(bytes, title = 'PDF') {
         const top = matrix[5] - fontSize;
         return `<span style="left:${left / viewport.width * 100}%;top:${top / viewport.height * 100}%;font-size:${fontSize / viewport.width * 100}cqw;min-width:${Math.max(1, item.width * scale) / viewport.width * 100}%">${escapeHtml(item.str)}</span>`;
       }).join('');
-      return `<div class="qmr-pdf-sheet" style="width:${viewport.width}px;aspect-ratio:${viewport.width}/${viewport.height}">${image ? `<img src="${escapeAttr(image)}" alt="第 ${index + 1} 页">` : ''}<div class="qmr-pdf-text-layer">${spans}</div></div>`;
+      return `<div class="qmr-pdf-sheet" style="width:${viewport.width}px;max-width:${zoom > 1 ? 'none' : '100%'};aspect-ratio:${viewport.width}/${viewport.height}">${image ? `<img src="${escapeAttr(image)}" alt="第 ${index + 1} 页">` : ''}<div class="qmr-pdf-text-layer">${spans}</div></div>`;
     },
-    tocFor(index) { return index >= 0 && index < chapters.length ? [book.toc[index]] : []; },
+    tocFor(index) { return index >= 0 && index < chapters.length ? [{href:chapters[index].href,label:chapters[index].label}] : []; },
     resolveLink(_from, href) {
       const index = chapters.findIndex((chapter) => chapter.href === href);
       return index < 0 ? null : { chapterIndex: index, fragment: '' };
@@ -69,8 +87,11 @@ export async function parsePdfBook(bytes, title = 'PDF') {
       const limit = typeof options === 'number' ? options : options?.limit;
       for (let index = 0; index < chapters.length && hits.length < (limit || 80); index += 1) {
         const text = await this.plainTextOf(index);
-        const at = text.toLowerCase().indexOf(needle);
-        if (at >= 0) hits.push({ chapterIndex: index, chapterHref: chapters[index].href, snippet: text.slice(Math.max(0, at - 35), at + needle.length + 45), percent: index / chapters.length });
+        let at = 0;
+        while (hits.length < (limit || 80) && (at = text.toLowerCase().indexOf(needle, at)) >= 0) {
+          hits.push({ chapterIndex: index, chapterHref: chapters[index].href, textOffset: at, snippet: text.slice(Math.max(0, at - 35), at + needle.length + 45), percent: index / chapters.length });
+          at += needle.length;
+        }
       }
       return hits;
     },

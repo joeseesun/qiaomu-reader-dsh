@@ -415,11 +415,13 @@ function chapterLabel(xhtml) {
  * @param {string} navPath nav 文档的 zip 路径
  * @returns {object[]} 目录项
  */
-function parseNavDoc(text, navPath) {
+function parseNavDoc(text, navPath, kind = "toc") {
   const doc = parseMarkup(text);
   const navs = descendantsNamed(doc, "nav");
-  let target = navs.find((node) => String(attr(node, "type") || "").toLowerCase() === "toc") || null;
-  if (!target) target = navs[0] || null;
+  let target = navs.find((node) => String(attr(node, "type") || "").toLowerCase().split(/\s+/).includes(kind)) || null;
+  if (kind !== "toc" && !target) return [];
+  if (!target) target = navs.find(node => !String(attr(node, "type") || "").trim()) || null;
+  if (!target && navs.length) return [];
   if (!target) {
     // 有些 nav 文档干脆没有 <nav>，退而求其次找 ol。
     const ol = firstDescendant(doc, "ol");
@@ -583,20 +585,25 @@ export async function parseEpub(bytes) {
   if (!chapters.length) throw new Error("EPUB 解析失败：spine 里没有可读取的章节文件");
 
   // ── toc ────────────────────────────────────────────────────────────────
-  let toc = [];
+  let toc = [], pageList = [];
   const navItem = items.find((item) => /\bnav\b/.test(item.properties));
   if (navItem) {
     const navText = await zip.readText(navItem.href);
-    if (navText) toc = parseNavDoc(navText, navItem.href);
+    if (navText) { toc = parseNavDoc(navText, navItem.href); pageList = parseNavDoc(navText, navItem.href, "page-list"); }
   }
-  if (!toc.length) {
-    const ncxItem =
-      items.find((item) => item.mediaType === "application/x-dtbncx+xml") ||
-      items.find((item) => /\.ncx$/i.test(item.href)) ||
-      byId.get(attr(spineNode, "toc") || "");
-    if (ncxItem) {
-      const ncxText = await zip.readText(ncxItem.href);
-      if (ncxText) toc = parseNcxDoc(ncxText, ncxItem.href);
+  const ncxItem = items.find((item) => item.mediaType === "application/x-dtbncx+xml") || items.find((item) => /\.ncx$/i.test(item.href)) || byId.get(attr(spineNode, "toc") || "");
+  if (ncxItem && (!toc.length || !pageList.length)) {
+    const ncxText = await zip.readText(ncxItem.href);
+    if (ncxText) {
+      if (!toc.length) toc = parseNcxDoc(ncxText, ncxItem.href);
+      if (!pageList.length) {
+        const doc = parseMarkup(ncxText);
+        pageList = descendantsNamed(doc, "pageTarget").map(point => {
+          const label = cleanTextOf(firstDescendant(point, "navLabel"));
+          const src = attr(firstDescendant(point, "content"), "src");
+          return {label, href: src ? resolveFrom(dirOf(ncxItem.href), src) : ""};
+        }).filter(page => page.label && page.href);
+      }
     }
   }
   if (!toc.length) {
@@ -619,6 +626,7 @@ export async function parseEpub(bytes) {
     identifier,
     chapters,
     toc,
+    pageList,
     resources,
     coverHref,
     rootDir,

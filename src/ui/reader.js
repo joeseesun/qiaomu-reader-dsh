@@ -9,6 +9,7 @@ import {
   fontStackOf,
   readerThemeVars,
 } from './theme.js';
+import { readingPositionModel, positionForLocator } from '../core/reading-position.js';
 import { chapterIndexForHref, chapterLabelMap, formatPercent } from './format.js';
 import { useMediaQuery } from './hooks.js';
 import {
@@ -228,6 +229,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const searchResults = ui.useSel((state) => state.searchResults) || [];
   const restoreScroll = ui.useSel((state) => state.restoreScroll);
   const jumpToken = ui.useSel(state => state.jumpToken);
+  const restoreAnchor = ui.useSel(state=>state.restoreAnchor);
   const jumpReturn = ui.useSel(state => state.jumpReturn);
   const lastRestoreRef = React.useRef('');
   const focusHighlightId = ui.useSel((state) => state.focusHighlightId);
@@ -261,6 +263,9 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const book = ui.bookOf(bookId);
   const sectionUnit = book?.format === 'pdf' ? '页' : book?.format === 'txt' ? '部分' : '章';
   const engine = ui.engineOf(bookId);
+  const [modelState,setModelState]=React.useState(null);
+  const positionModel=modelState?.engine===engine?modelState.model:null;
+  React.useEffect(()=>{let active=true;if(engine)readingPositionModel(engine).then(model=>{if(active)setModelState({engine,model});}).catch(()=>{});return()=>{active=false;};},[engine]);
   const speech = useSpeech(ui, bookId, engine);
   const speechFocus = ui.useSel(state => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
@@ -279,6 +284,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
 
   const viewportRef = React.useRef(null);
   const flowRef = React.useRef(null);
+  const textIndexRef = React.useRef(null);
+  const anchorAppliedRef = React.useRef('');
   const measureRef = React.useRef({ pages: 1, perPage: 1, columnWidth: 320, gap: COLUMN_GAP });
   const lastHtmlRef = React.useRef(null);
   const pendingLandLastRef = React.useRef(false);
@@ -314,6 +321,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     searchResults,
     focusHighlightId,
     restoreScroll,
+    positionModel,
   };
 
   // ------------------------------------------------------------- 状态加载
@@ -332,7 +340,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     }
     ui.store.set({ chapterBusy: true });
     Promise.resolve()
-      .then(() => engine.render(chapterIndex, ui.resourceResolver(bookId)))
+      .then(() => engine.render(chapterIndex, ui.resourceResolver(bookId), {zoom: settings.pdfZoom}))
       .then((out) => {
         if (cancelled) return;
         setHtml(typeof out === 'string' ? out : '');
@@ -349,7 +357,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       cancelled = true;
     };
-  }, [engine, bookId, chapterIndex, engineVersion, imagesVersion, ui]);
+  }, [engine, bookId, chapterIndex, engineVersion, imagesVersion, settings.pdfZoom, ui]);
 
   // ------------------------------------------------------------- 设置页码
 
@@ -394,7 +402,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         const columns = Math.max(1, Math.round((total + gap) / (columnWidth + gap)));
         pages = Math.max(1, Math.ceil(columns / perPage));
       }
-      measureRef.current = { pages, perPage, columnWidth, gap };
+      measureRef.current = { pages, perPage, columnWidth, gap, viewportWidth:viewport.clientWidth,viewportHeight:viewport.clientHeight };
       // Resize can leave the page count unchanged; always realign the current page.
       const currentPage = Math.min(liveRef.current.page || 0, pages - 1);
       flow.style.transition = 'none';
@@ -437,6 +445,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     lastHtmlRef.current = html;
     try {
       flow.innerHTML = html || '';
+      textIndexRef.current=null;
     } catch (error) {
       ui.reportError(error, true);
       return;
@@ -496,6 +505,22 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     setPage,
     ui,
   ]);
+
+  React.useLayoutEffect(()=>{
+    const flow=flowRef.current;if(!flow||!html||chapterBusy||!restoreAnchor)return;
+    const key=`${bookId}:${chapterIndex}:${jumpToken}`;if(anchorAppliedRef.current===key)return;
+    if(restoreAnchor.contentFingerprint&&restoreAnchor.contentFingerprint!==engine?.contentFingerprint)return;
+    const index=textIndexRef.current ||= buildTextIndex(flow);let target=null;
+    if(restoreAnchor.fragment)target=[...flow.querySelectorAll('[id],a[name]')].find(node=>node.id===restoreAnchor.fragment||node.getAttribute('name')===restoreAnchor.fragment);
+    if(!target&&Number.isFinite(restoreAnchor.textOffset)){
+      let at=Math.max(0,Math.min(index.map.length-1,restoreAnchor.textOffset));
+      if(restoreAnchor.textQuote){const matches=findRanges(index.text,restoreAnchor.textQuote,1000);matches.sort((a,b)=>Math.abs(a.start-at)-Math.abs(b.start-at));if(matches[0])at=matches[0].start;}
+      const point=index.map[at];if(point){const range=document.createRange();range.setStart(point.node,point.offset);range.setEnd(point.node,Math.min(point.node.length,point.offset+1));target=range;}
+    }
+    if(!target)return;
+    const frame=requestAnimationFrame(()=>{if(!flow.isConnected)return;anchorAppliedRef.current=key;if(settings.flow==='scroll'){const viewport=viewportRef.current,rect=target.getBoundingClientRect();if(viewport)viewport.scrollTop+=rect.top-viewport.getBoundingClientRect().top-8;}else revealNode(target);});
+    return()=>cancelAnimationFrame(frame);
+  },[html,chapterBusy,restoreAnchor,jumpToken,bookId,chapterIndex,settings.flow,engine,revealNode]);
 
   /**
    * 轻效果：只切换「当前搜索命中 / 当前划线」的 class 与滚动位置，不重建 DOM。
@@ -613,9 +638,13 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   React.useEffect(() => {
     const measureNow = () => {
       try {
-        measure();
+        const live=liveRef.current,prior=measureRef.current,saved={...ui.stateOr(live.bookId).locator};
+        const next=measure();
+        if((prior.viewportWidth!==next.viewportWidth||prior.viewportHeight!==next.viewportHeight||prior.pages!==next.pages)&&saved.chapterIndex===live.chapterIndex&&Number.isFinite(saved.textOffset)&&saved.textQuote){
+          const current=ui.store.get();ui.store.set({restoreAnchor:saved,restoreScroll:saved.scroll,jumpToken:(current.jumpToken||0)+1});
+        }
       } catch (_error) {
-        /* 忽略 */
+        /* A failed measurement preserves the last valid reading position. */
       }
     };
     measureNow();
@@ -659,19 +688,20 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       const pages = (measureRef.current && measureRef.current.pages) || 1;
       scroll = pages > 1 ? live.page / (pages - 1) : 0;
     }
-    let quote = '';
+    let textQuote='',textOffset,originalPage='';
     try {
-      const flow = flowRef.current;
-      if (flow) quote = String(flow.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120);
-    } catch (_error) {
-      quote = '';
-    }
-    ui.reportPosition(live.bookId, {
-      chapterIndex: live.chapterIndex,
-      chapterHref: chapterHrefOf(live.engine, live.chapterIndex),
-      scroll: Math.min(1, Math.max(0, scroll)),
-      textQuote: quote,
-    });
+      const flow=flowRef.current,viewport=viewportRef.current;
+      if(flow&&viewport){
+        const index=textIndexRef.current ||= buildTextIndex(flow),rect=viewport.getBoundingClientRect();
+        const caret=document.caretRangeFromPoint?.(rect.left+Math.min(8,rect.width/2),rect.top+Math.min(8,rect.height/2));
+        let at=-1;if(caret&&flow.contains(caret.startContainer))at=index.map.findIndex(point=>point.node===caret.startContainer&&point.offset>=caret.startOffset);
+        if(at<0)at=Math.round(index.text.length*scroll);textOffset=Math.max(0,Math.min(index.text.length,at));textQuote=index.text.slice(textOffset,textOffset+120);
+        const current=index.map[Math.min(textOffset,Math.max(0,index.map.length-1))]?.node;
+        if(current&&live.positionModel?.pages?.length){for(const page of live.positionModel.pages){const chapter=chapterIndexForHref(live.engine,page.href);if(chapter<0)continue;if(chapter<live.chapterIndex){originalPage=page.label;continue;}if(chapter!==live.chapterIndex)continue;let fragment=page.href.split('#').slice(1).join('#');try{fragment=decodeURIComponent(fragment);}catch{}if(!fragment){originalPage=page.label;continue;}const marker=[...flow.querySelectorAll('[id],a[name]')].find(node=>node.id===fragment||node.getAttribute('name')===fragment);if(marker&&(marker.contains(current)||(marker.compareDocumentPosition(current)&Node.DOCUMENT_POSITION_FOLLOWING)))originalPage=page.label;}}
+      }
+    }catch{}
+    const locator={chapterIndex:live.chapterIndex,chapterHref:chapterHrefOf(live.engine,live.chapterIndex),scroll:Math.min(1,Math.max(0,scroll)),textQuote,...(Number.isFinite(textOffset)?{textOffset}:{}),originalPage,contentFingerprint:live.engine?.contentFingerprint||''};
+    ui.reportPosition(live.bookId,locator);return locator;
   }, [ui]);
 
   React.useEffect(() => {
@@ -684,7 +714,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, ui, reportPosition]);
+  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
 
   // ------------------------------------------------------------- pager 注册
 
@@ -737,11 +767,11 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         ui.toast('已经是第一页');
       }
     };
-    ui.registerPager({ next, prev, jump: (fraction) => ui.goPercent(fraction) });
+    ui.registerPager({ next, prev, jump: (fraction) => ui.goPercent(fraction),capture:reportPosition });
     return () => {
-      ui.registerPager({ next: () => ui.goChapter((ui.store.get().chapterIndex || 0) + 1), prev: () => ui.goChapter((ui.store.get().chapterIndex || 0) - 1) });
+      ui.registerPager({ next: () => ui.goChapter((ui.store.get().chapterIndex || 0) + 1), prev: () => ui.goChapter((ui.store.get().chapterIndex || 0) - 1),capture:()=>null });
     };
-  }, [ui, setPage]);
+  }, [ui, setPage, reportPosition]);
 
   // ------------------------------------------------------------- 键盘
 
@@ -858,6 +888,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           } catch (_error) {
             index = null;
           }
+          if (ui.goHref(href)) return;
           if (typeof index === 'number' && index >= 0) ui.goChapter(index);
           else ui.toast('无法定位这个链接', 'warn');
         }
@@ -1006,6 +1037,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     icon,
   );
 
+  const stablePosition=positionModel?positionForLocator(positionModel,bookState?.locator?.chapterIndex===chapterIndex?bookState.locator:{chapterIndex}):null;
   const topBar = h(
       'div',
       { className: `qmr-topbar${chromeVisible ? '' : ' qmr-chrome-hidden'}` },
@@ -1087,7 +1119,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         h('div', { className: 'qmr-track-fill', style: { width: `${Math.round(progress * 100)}%` } }),
         h('div', { className: 'qmr-track-knob', style: { left: `${Math.round(progress * 100)}%` } }),
       ),
-      h('span', { className: 'qmr-bottom-text' }, `第 ${chapterIndex + 1} / ${chapterCount || '?'} ${sectionUnit}`),
+      h('button', {className:'qmr-bottom-text qmr-position-trigger',type:'button','aria-label':ui.t('nav.positionJump','位置跳转'),onClick:()=>{if(panel!=='toc')ui.setPanel('toc');ui.store.set({navigationTab:'position'});}},positionModel?`${ui.t(positionModel.kind==='location'?'nav.location':positionModel.kind==='original'?'nav.originalPage':'nav.pdfPage',positionModel.kind==='location'?'位置':'页码')} ${stablePosition.current||'—'} / ${positionModel.total}`:`第 ${chapterIndex+1} / ${chapterCount||'?'} ${sectionUnit}`),
       h('span', { className: 'qmr-bottom-text' }, formatPercent(progress)),
       jumpReturn ? h('button', { className: 'qmr-icon-btn', 'aria-label': ui.t('navigation.return', '回到跳转前'), title: ui.t('navigation.return', '回到跳转前'), onClick: () => ui.returnFromJump() }, h(IconBack, { width: 16, height: 16 })) : null,
       h('button', {
@@ -1107,7 +1139,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
       h(
         'div',
         {
-          className: `qmr-reader-content${settings.flow === 'scroll' ? ' qmr-flow-scroll' : ''}`,
+          className: `qmr-reader-content${settings.flow === 'scroll' ? ' qmr-flow-scroll' : ''}${book?.format==='pdf'?' qmr-format-pdf':''}`,
           onPointerMoveCapture: showChrome,
           onPointerDownCapture: showChrome,
           onWheelCapture: () => { showChrome(); speech.browse(); },

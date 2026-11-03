@@ -10,13 +10,15 @@ import { createDataLayer } from '../src/client/bridge.js';
 import { STARTER_BOOKS, decodeStarterBook } from '../media/starter-books.js';
 
 function tinyPdf() {
-  const stream = 'BT /F1 18 Tf 40 100 Td (Hello PDF) Tj ET';
+  const stream = 'BT /F1 18 Tf 40 100 Td (Hello PDF Hello PDF) Tj ET';
   const objects = [
-    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Catalog /Pages 2 0 R /Outlines 6 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
     '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 240 150] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
     `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+    '<< /Type /Outlines /First 7 0 R /Last 7 0 R /Count 1 >>',
+    '<< /Title (Real PDF outline) /Parent 6 0 R /Dest [3 0 R /Fit] >>',
   ];
   let pdf = '%PDF-1.4\n';
   const offsets = [0];
@@ -43,6 +45,12 @@ test('PDF exposes selectable page text, page search and a rendered sheet', async
   const { engine } = await parsePdfBook(tinyPdf(), 'Sample PDF');
   try {
     assert.equal(engine.chapterCount(), 1);
+    assert.equal(engine.book.toc[0].label,'Real PDF outline');
+    const hits=await engine.search('Hello');
+    assert.equal(hits.length,2);assert.ok(hits[1].textOffset>hits[0].textOffset);
+    assert.equal((await engine.search('Hello',{limit:1})).length,1);
+    const normal=await engine.render(0),zoomed=await engine.render(0,null,{zoom:2});
+    assert.match(zoomed,/max-width:none/);assert.notEqual(normal,zoomed);
     assert.match(await engine.plainTextOf(0), /Hello PDF/);
     assert.equal((await engine.search('hello', 300))[0].chapterIndex, 0);
     assert.match(await engine.render(0), /qmr-pdf-text-layer/);

@@ -23652,11 +23652,13 @@ function chapterLabel(xhtml) {
   }
   return "";
 }
-function parseNavDoc(text2, navPath) {
+function parseNavDoc(text2, navPath, kind = "toc") {
   const doc = parseMarkup(text2);
   const navs = descendantsNamed(doc, "nav");
-  let target = navs.find((node) => String(attr2(node, "type") || "").toLowerCase() === "toc") || null;
-  if (!target) target = navs[0] || null;
+  let target = navs.find((node) => String(attr2(node, "type") || "").toLowerCase().split(/\s+/).includes(kind)) || null;
+  if (kind !== "toc" && !target) return [];
+  if (!target) target = navs.find((node) => !String(attr2(node, "type") || "").trim()) || null;
+  if (!target && navs.length) return [];
   if (!target) {
     const ol2 = firstDescendant(doc, "ol");
     return ol2 ? navListItems(ol2, navPath) : [];
@@ -23776,17 +23778,28 @@ async function parseEpub(bytes) {
     });
   }
   if (!chapters.length) throw new Error("EPUB \u89E3\u6790\u5931\u8D25\uFF1Aspine \u91CC\u6CA1\u6709\u53EF\u8BFB\u53D6\u7684\u7AE0\u8282\u6587\u4EF6");
-  let toc = [];
+  let toc = [], pageList = [];
   const navItem = items.find((item) => /\bnav\b/.test(item.properties));
   if (navItem) {
     const navText = await zip.readText(navItem.href);
-    if (navText) toc = parseNavDoc(navText, navItem.href);
+    if (navText) {
+      toc = parseNavDoc(navText, navItem.href);
+      pageList = parseNavDoc(navText, navItem.href, "page-list");
+    }
   }
-  if (!toc.length) {
-    const ncxItem = items.find((item) => item.mediaType === "application/x-dtbncx+xml") || items.find((item) => /\.ncx$/i.test(item.href)) || byId.get(attr2(spineNode, "toc") || "");
-    if (ncxItem) {
-      const ncxText = await zip.readText(ncxItem.href);
-      if (ncxText) toc = parseNcxDoc(ncxText, ncxItem.href);
+  const ncxItem = items.find((item) => item.mediaType === "application/x-dtbncx+xml") || items.find((item) => /\.ncx$/i.test(item.href)) || byId.get(attr2(spineNode, "toc") || "");
+  if (ncxItem && (!toc.length || !pageList.length)) {
+    const ncxText = await zip.readText(ncxItem.href);
+    if (ncxText) {
+      if (!toc.length) toc = parseNcxDoc(ncxText, ncxItem.href);
+      if (!pageList.length) {
+        const doc = parseMarkup(ncxText);
+        pageList = descendantsNamed(doc, "pageTarget").map((point) => {
+          const label = cleanTextOf(firstDescendant(point, "navLabel"));
+          const src = attr2(firstDescendant(point, "content"), "src");
+          return { label, href: src ? resolveFrom2(dirOf3(ncxItem.href), src) : "" };
+        }).filter((page) => page.label && page.href);
+      }
     }
   }
   if (!toc.length) {
@@ -23806,6 +23819,7 @@ async function parseEpub(bytes) {
     identifier,
     chapters,
     toc,
+    pageList,
     resources,
     coverHref,
     rootDir,
