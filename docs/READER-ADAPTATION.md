@@ -26,6 +26,15 @@ Hacker Books 只获取公共静态目录、主题、共现索引及所点书籍 
 - 截图：[中文详情](qa/discovery-detail.png)、[英文书单](qa/discovery-english.png)、[提示词](qa/discovery-prompts.png)、[英文提示词](qa/discovery-prompts-english.png)、[390px 模拟视口](qa/discovery-mobile.png)。均来自隔离 DSH Web，非设计预览；无真实模型回复或实体移动设备验证。
 - 本地候选、公开合并、Release 下载及全新安装分层记录；公开状态以对应 GitHub PR / v1.2.0 Release 为准。
 
+### 提交、公开发布与日用安装（2026-11-03 11:18，北京时间）
+
+- 功能提交 `9a3f47d` 已推送，[PR #8](https://github.com/joeseesun/qiaomu-reader-dsh/pull/8) 合入主线 `6a04a3cc5fbe37eab3ddc8367525ed3abd57baf9`；PR 与主线 CI 通过。此前最后核对发现 pnpm 复用同路径旧 tgz，改用唯一候选路径后 22 个打包文件全部匹配；没有等 Kindle 或模型条件才提交。
+- [v1.2.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.2.0) 已公开。tgz SHA256：`16087449f5aa0412e9c2254b7ddf76f1a56a063226557ed59c9dd85930af8598`。匿名下载（新资产缓存用查询参数刷新）与本地候选一致；第二独立 `public-reader` profile 安装、启动、实际打开书单，22 文件摘要匹配。
+- 日用 `desktop`：先备份原有 7 个 Reader 文件和包清单，退出应用后将开发链接替换为公开 tgz 安装副本；包长期保存到 `~/.dsh/plugin-packages/`，不用临时路径做依赖。22 个打包文件匹配；正常重启，原 6 本书、6% 进度和 1 条划线仍显示，备份的 7 文件摘要逐一不变；新版 Hacker Books 书单和详情实际打开。
+- 日用安装器提示已有 RSS 0.9.2 与 rc.5 不兼容；本次没有改动 RSS、升级其他插件或添加豁免。此警告不阻塞 Reader 实际运行，不能据此宣称整个 profile 无问题。bundled CLI 版本为 rc.3，不把安装器对 rc.5 的判断当作所有 rc.5 功能已测。
+- 最终候选的 macOS 朗读实际发出 `playing` 事件（readyState=4，currentTime 前进），跨章到第三章后可暂停；朗读 select 的实际 padding=9px 10px、高度约 39.5px。390px 布局稳定后文档宽度=390，书单控件越界数=0。
+- 未创建或接手临时 worktree；已有其他迁移 worktree 保留。原有未跟踪 `design-previews/` 未提交。
+
 ### 明确保留的差距（未称完成）
 
 可选乔木书库的激活 / 搜索 / 服务版本 / 下载进度；Edge / 云端 / Kokoro / MeloTTS / Windows 与 Linux 原生朗读；Kindle KOReader 与原生双模式、USB 首次配对、固定身份、Host 凭据及 Wi-Fi 回读、EPUB→AZW3；MOBI / FB2 / 漫画解析；全书稳定页码仍未迁移。真实模型回答及真实 Anki 写卡仍缺实机证据。缺 Kindle 硬件只阻塞实机验收，当前也仍缺 DSH 传输实现。以上继续作为 Reader 后续独立验收项，不混同本轮新书单闭环。
