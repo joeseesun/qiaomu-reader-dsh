@@ -301,6 +301,8 @@ export function createDataLayer(options = {}) {
         const { createReaderEngine } = await import('../core/reader.js');
         record = { book: parsed, engine: createReaderEngine(parsed), bytes };
       }
+      const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+      record.engine.contentFingerprint = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('');
       engines.set(bookId, record);
       while (engines.size > maxCacheBooks) {
         const oldest = engines.keys().next().value;

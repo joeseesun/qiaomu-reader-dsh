@@ -1,6 +1,6 @@
 {
   "name": "qiaomu-reader-dsh",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -27,6 +27,7 @@
     "docs/qa/ebook-*.png",
     "docs/READER-ADAPTATION.md",
     "THIRD_PARTY_NOTICES.md",
+    "licenses/*.txt",
     "docs/RELEASE-VALIDATION.md"
   ],
   "scripts": {
@@ -63,9 +64,11 @@
     }
   },
   "dependencies": {
+    "jszip": "3.10.1",
     "marked": "18.1.2",
     "parse5": "8.0.1",
-    "pdfjs-dist": "^6.2.108"
+    "pdfjs-dist": "^6.2.108",
+    "ws": "8.22.0"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5",

@@ -1,4 +1,7 @@
 import { createHostEbookLibrary, ebookCredentialDirectory, safeEbookError } from './ebook-library.js';
+import { translateSelection as googleTranslateSelection } from './translation.js';
+import { createSpeechService } from './speech-service.js';
+import { homedir } from 'node:os';
 import { bookMetadata } from '../core/book-metadata.js';
 import { normalizeShelfMarks, toggleShelfMark } from '../core/book-shelf.js';
 /**
@@ -411,6 +414,9 @@ export function apply(ctx, config = {}) {
    * 每个方法都返回可 JSON 序列化的结果，失败时抛带原因的 Error。
    */
   const shelfData = createShelfSource();
+  let speech = null;
+  const getSpeech = () => speech ||= createSpeechService({directory:path.join(ebookCredentialDirectory(pathsOf().base),'speech'),home:process.env.DSH_HOME || path.join(homedir(),'.dsh')});
+  ctx.effect(() => () => speech?.dispose());
   let ebook = null;
   const getEbook = () => ebook ||= createHostEbookLibrary({
     directory: ebookCredentialDirectory(pathsOf().base),
@@ -433,6 +439,7 @@ export function apply(ctx, config = {}) {
   });
   ctx.effect(() => () => ebook?.dispose());
   const api = {
+    translateSelection: request => googleTranslateSelection(request),
     async ebookAction(request) { try { return await getEbook().action(request); } catch (cause) { return { error: safeEbookError(cause) }; } },
     shelfData,
     async shelfMarks() {
@@ -449,8 +456,9 @@ export function apply(ctx, config = {}) {
         return next;
       });
     },
-    speechAudio,
-    speechVoices,
+    speechAudio: request => getSpeech().audio(request),
+    speechVoices: () => getSpeech().voices(),
+    speechAction: request => getSpeech().action(request),
     searchBooks: request => searchBooks(request.query),
     downloadBook: request => downloadBook(request.id),
     async sendToAnki({ bookId, entryId }) {
@@ -868,7 +876,9 @@ export default class ReaderService extends TypertRemoteService {
   restoreBook(request) { return this.api.restore(request.bookId); }
   speechVoices() { return this.api.speechVoices(); }
   speechAudio(request) { return this.api.speechAudio(request); }
+  speechAction(request) { return this.api.speechAction(request); }
   sendToAnki(request) { return this.api.sendToAnki(request); }
+  translateSelection(request) { return this.api.translateSelection(request); }
   ebookAction(request) { return this.api.ebookAction(request); }
   shelfData(request) { return this.api.shelfData(request); }
   shelfMarks() { return this.api.shelfMarks(); }
@@ -903,7 +913,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'speechAction', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'translateSelection', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

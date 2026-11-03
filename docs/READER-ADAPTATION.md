@@ -47,7 +47,7 @@ Host 独占 activate/refresh/me/search/covers/jobs/file 请求；Client 只接�
 |---|---|---|------|
 | B01 | EPUB 单/双页、滚动、跨章翻页、进度恢复 | 已有基础。D: `ui/reader.js`、`ui/controller.js`、`core/state.js` | 改字号/窗口宽度、跨章和重开后仍回到同段；不能仅以百分比近似冒充精确定位。  待逐项核验；静态发现不计运行完成 |
 | B02 | 稳定位置编号/出版页码输入跳转 | 缺失。O: `reader-position.js:1-26` 使用 pageList 与1500字符位置；D: `core/location.js` 只有 fraction×章节数 | 有 page-list/无 page-list 两类验证；改变布局不改变逻辑编号；PDF 用真实页码。  待逐项核验；静态发现不计运行完成 |
-| B03 | 目录、书内搜索、高亮结果、上下结果、返回原位置 | 已有主要实现。D: `panel-toc.js`、`panel-search.js`、controller jumpReturn | 键盘 Enter/Shift+Enter/Esc、跨章多个命中、结果定位与返回；PDF 当前每页只取第一个命中，须单独检查同页多处匹配。  待逐项核验；静态发现不计运行完成 |
+| B03 | 目录、书内搜索、高亮结果、上下结果、返回原位置 | 已有主要实现。D: `toc.js`、`panel-search.js`、controller jumpReturn | 键盘 Enter/Shift+Enter/Esc、跨章多个命中、结果定位与返回；PDF 当前每页只取第一个命中，须单独检查同页多处匹配。  待逐项核验；静态发现不计运行完成 |
 | B04 | 命名位置书签，创建/改名/删除/跳转 | 部分，底层有但 UI 缺失。O: `main.js:3932-3989`；D: `core/state.js:408-453`、`client/bridge.js:540`，UI 搜索无 bookmark 动作入口 | 提供可见入口和列表、重启持久化、改名/删除失败恢复；有 state 字段不能算功能完成。  待逐项核验；静态发现不计运行完成 |
 | B05 | PDF 独立缩放、页面布局和原生目录 | 部分。O: `pdf-zoom.js`、`pdf-page-mode.js`；D: `pdf-book.js:38-40` 固定渲染比例、TOC 只是每页，`reader.js:267` 强制 scroll | 补独立缩放且选择层对齐；核对单/双页行为和 PDF outline，不能只把“第N页”列表当原生目录。  待逐项核验；静态发现不计运行完成 |
 | B06 | 内链/脚注/插图行为 | 部分/待核验。D: reader 内链跳转、core 资源重写已有；O: reader 引擎及 figuresShownByDefault 设置 | 实测脚注/跨章内链与返回、插图显示开关、图片查看；不能因支持 img 就认定原版交互已迁。  待逐项核验；静态发现不计运行完成 |
@@ -262,3 +262,7 @@ Markdown 保存可读摘录与回跳链接；精确定位仍依赖结构化划�
 新增测试 `test/upgrades.test.mjs`（60 个用例全绿）：伴读外观归一化/持久化/容错、`readerPageDirection` 守卫矩阵（含 shadow DOM composedPath）、PDF 资源工厂（CMap 字节、wasm `\0asm` 魔数、未知资源报错、选项契约）。构建通过，`client.js` 5,782,813 字节。
 
 1.4.0日用验收补记：物理包已安装、重启；原生窗口实际显示三个书源和未激活的乔木书库输入框。候选39个文件匹配，七个既有数据文件摘要不变，备份 `/Users/joe/.dsh/backups/reader-1.4.0-20261103`。未把隔离夹具的凭据带入日用profile。恢复任务后结果行立即显示“已拥有 · 打开阅读”、待恢复列表清空，并从该按钮实际打开Alice正文，截图 `ebook-fixture-imported.png` / `ebook-fixture-reading.png`。完整原版对齐继续进行，未用本版发布代替其余入口验收。
+
+### 当前开发批次：1.5.0（未发布）
+
+已接入Host语音配置/私有密钥、原版Edge及8类云端协议、AVFoundation Mac音色、Kokoro/MeloTTS安装与合成管理；客户端增加服务/模型/音色管理、试听、段落前后、选文朗读、浏览暂停跟随和内容指纹恢复保护。关闭/切面板、切书/切服务的异步保护正在安装包内复验。Google免费查词/目标语言/AI不可用回退亦已接入Host和选文卡。135项本地测试通过；Edge实际生成21600字节MP3，Mac读到191音色并生成145220字节WAV；MeloTTS本机安装/合成已通过，Kokoro真实下载发现上游资产大小与旧manifest不同，正在校验完整成员摘要，未降低校验要求。以上仍需候选安装/真实UI及公开发布关卡，未标为全部对齐。

@@ -1110,7 +1110,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
           className: `qmr-reader-content${settings.flow === 'scroll' ? ' qmr-flow-scroll' : ''}`,
           onPointerMoveCapture: showChrome,
           onPointerDownCapture: showChrome,
-          onWheelCapture: showChrome,
+          onWheelCapture: () => { showChrome(); speech.browse(); },
           onFocusCapture: showChrome,
           onKeyDownCapture: showChrome,
         },
@@ -1156,7 +1156,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
               onClick: () => ui.store.set({ engineVersion: (ui.store.get().engineVersion || 0) + 1 }),
             }, '重试'))
           : null,
-        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onLookup: () => { ui.store.set({ lookupSelection: { ...selection } }); ui.clearSelection(); } }) : null,
+        selection ? h(SelectionMenu, { ui, selection, onHighlight, onNote, onAsk, onSpeak: () => { const text=selection.text; if(panel!=='speech')ui.setPanel('speech'); void speech.test(text,true); }, onLookup: () => { ui.store.set({ lookupSelection: { ...selection } }); ui.clearSelection(); } }) : null,
         lookupSelection ? h(LookupCard, { key: `${bookId}:${lookupSelection.text}:${lookupSelection.textOffset}`, ui, selection: lookupSelection, bookId, engine, chatApi, SessionProvider, renderSlot }) : null,
         bottomBar,
       ),
