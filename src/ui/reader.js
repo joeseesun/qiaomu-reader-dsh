@@ -9,6 +9,7 @@ import {
   fontStackOf,
   readerThemeVars,
 } from './theme.js';
+import { useReaderFont } from './use-reader-font.js';
 import { verticalPageOffset } from '../core/appearance.js';
 import { readingPositionModel, positionForLocator } from '../core/reading-position.js';
 import { chapterIndexForHref, chapterLabelMap, formatPercent } from './format.js';
@@ -280,6 +281,8 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const speech = useSpeech(ui, bookId, engine);
   const speechFocus = ui.useSel(state => state.speechFocus);
   const storedSettings = ui.settingsOf(bookId);
+  useReaderFont(ui,bookId,storedSettings.fontFamily);
+  const fontVersion=ui.useSel(state=>state.fontVersion||0);
   const settings = book?.format === 'pdf' ? { ...storedSettings, flow: 'scroll' } : storedSettings;
   const themeVars = readerThemeVars(settings.einkMode?'eink':settings.theme);
   React.useEffect(()=>{showChrome();},[settings.immersive,settings.einkMode,showChrome]);
@@ -287,6 +290,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const companionAppearance = ui.useSel((state) => state.companionAppearance);
   const companionLook = companionAppearance
     || { theme: settings.theme, fontFamily: settings.fontFamily, fontSize: settings.fontSize, lineHeight: settings.lineHeight };
+  useReaderFont(ui,bookId,companionAppearance?.fontFamily||'serif','companion');
   const labels = React.useMemo(() => chapterLabelMap(engine), [engine, engineVersion]);
 
   const [html, setHtml] = React.useState('');
@@ -682,7 +686,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         }
       }
     };
-  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify,settings.textAlign,settings.maxLineCh,settings.vAlign]);
+  }, [measure, html, settings.fontSize, settings.fontFamily, settings.lineHeight, settings.justify,settings.textAlign,settings.maxLineCh,settings.vAlign,fontVersion]);
 
   // ------------------------------------------------------------- 位置上报
 

@@ -4,12 +4,12 @@
  */
 import * as React from 'react';
 import {
-  READER_FONT_LABELS,
   readerThemeLabel,
   READER_THEMES,
   READER_THEME_IDS,
   UI_SETTING_DEFAULTS,
 } from './theme.js';
+import { ReaderFontOptions } from './settings-fonts.js';
 import { AppearanceOptions } from './settings-appearance.js';
 import { IconClose, IconSettings } from './icons.js';
 
@@ -117,20 +117,7 @@ export function SettingsPanel({ ui }) {
           })),
         h('span', { className: 'qmr-field-value' }, Number(settings.lineHeight).toFixed(2)),
       ),
-      h(
-        'div',
-        { className: 'qmr-field' },
-        h('span', { className: 'qmr-field-label' }, '字体'),
-        h('span', { className: 'qmr-field-ctl' },
-          h('select', {
-            className: 'qmr-select',
-            style: { flex: '1 1 auto' },
-            value: settings.fontFamily,
-            'aria-label': '字体',
-            onChange: (event) => update({ fontFamily: event.target.value }),
-          }, Object.keys(READER_FONT_LABELS).map((key) =>
-            h('option', { key, value: key }, READER_FONT_LABELS[key])))),
-      ),
+      h(ReaderFontOptions,{ui,bookId,settings,update}),
       h(
         'div',
         { className: 'qmr-field' },
@@ -254,20 +241,7 @@ export function SettingsPanel({ ui }) {
             })),
           h('span', { className: 'qmr-field-value' }, Number(companionAppearance.lineHeight).toFixed(2)),
         ),
-        h(
-          'div',
-          { className: 'qmr-field' },
-          h('span', { className: 'qmr-field-label' }, '字体'),
-          h('span', { className: 'qmr-field-ctl' },
-            h('select', {
-              className: 'qmr-select',
-              style: { flex: '1 1 auto' },
-              value: companionAppearance.fontFamily,
-              'aria-label': '伴读字体',
-              onChange: (event) => ui.setCompanionAppearance({ ...companionAppearance, fontFamily: event.target.value }),
-            }, Object.keys(READER_FONT_LABELS).map((key) =>
-              h('option', { key, value: key }, READER_FONT_LABELS[key])))),
-        ),
+        h(ReaderFontOptions,{ui,bookId,scope:'companion',settings:companionAppearance,update:patch=>ui.setCompanionAppearance({...companionAppearance,...patch})}),
         h('p', { className: 'qmr-muted qmr-small', style: { marginTop: 8 } },
           '独立外观只影响 AI 伴读面板，全局生效；重新打开「跟随正文」恢复与书籍设置一致。'),
       ) : null,

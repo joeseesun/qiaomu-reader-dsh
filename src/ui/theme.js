@@ -7,6 +7,7 @@
  * - 样式通过 <StyleSheet /> React 元素注入，随组件卸载自动移除，不写 document.head。
  */
 import * as React from 'react';
+import { READER_FONTS, safeFontFamily, importedFontFamily, readerFontStack } from '../core/reader-fonts.js';
 import { READER_THEMES as ORIGINAL_THEMES } from '../core/reader-themes.js';
 
 const h = React.createElement;
@@ -167,7 +168,7 @@ export const UI_SETTING_DEFAULTS = Object.freeze({
   theme: 'paper',
   fontSize: 18,
   lineHeight: 1.75,
-  fontFamily: 'serif',
+  fontFamily: 'zhuque',
   margin: 64,
   flow: 'paginated',
   justify: true,
@@ -192,7 +193,12 @@ export function highlightPaint(themeId, color) {
  * @returns {string}
  */
 export function fontStackOf(fontFamily) {
-  return READER_FONT_STACKS[fontFamily] || READER_FONT_STACKS.serif;
+  if(String(fontFamily).startsWith('custom:'))return readerFontStack(fontFamily.slice(7))||READER_FONT_STACKS.serif;
+  if(READER_FONT_STACKS[fontFamily])return READER_FONT_STACKS[fontFamily];
+  if(READER_FONTS[fontFamily])return READER_FONTS[fontFamily].stack;
+  if(String(fontFamily).startsWith('system:')&&safeFontFamily(fontFamily.slice(7)))return JSON.stringify(fontFamily.slice(7))+','+READER_FONT_STACKS.serif;
+  const family=String(fontFamily).startsWith('imported:')?importedFontFamily(fontFamily.slice(9)):'';
+  return family?JSON.stringify(family)+','+READER_FONT_STACKS.serif:READER_FONT_STACKS.serif;
 }
 
 /**
@@ -425,10 +431,12 @@ export const UI_CSS = `
 .qmr-page-zone{position:absolute;top:52px;bottom:44px;width:28px;padding:0;border:0;z-index:2;
   background:transparent;cursor:pointer;color:transparent}
 @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
+.qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
 .qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
 .qmr-page-zone::after{font-size:26px;color:var(--qmr-muted);opacity:0;transition:opacity .12s}
 .qmr-page-zone-prev::after{content:'‹'}.qmr-page-zone-next::after{content:'›'}
 .qmr-page-zone:hover::after,.qmr-page-zone:focus-visible::after,.qmr-page-buttons-always @container (max-width:240px){.qmr-field{flex-wrap:wrap}.qmr-field-label{flex-basis:100%}.qmr-field-ctl{width:100%}.qmr-theme-grid{grid-template-columns:1fr}.qmr-field .qmr-select{max-width:100%;min-width:0}}
+.qmr-font-options{display:flex;flex-direction:column;gap:10px;margin:12px 0}.qmr-font-options select{width:100%;min-width:0}.qmr-font-options summary{cursor:pointer;padding:6px 0;font-size:13px}.qmr-font-custom{display:flex;flex-direction:column;gap:12px;padding:8px 0}.qmr-font-custom input{width:100%;min-width:0;box-sizing:border-box}
 .qmr-appearance-advanced{margin:16px 0}.qmr-appearance-advanced summary{cursor:pointer;padding:8px 0}.qmr-appearance-options{display:flex;flex-direction:column;gap:16px;padding:12px 0}.qmr-appearance-option{display:flex;flex-direction:column;gap:8px;font-size:13px}.qmr-appearance-option .qmr-select{width:100%;min-width:0}
 .qmr-page-zone::after{opacity:1}
 .qmr-page-buttons-hidden .qmr-page-zone{display:none}

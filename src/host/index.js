@@ -1,3 +1,5 @@
+import bundledReaderFont from '../../media/fonts/QiaomuReadingFangsong.woff2';
+import { createReaderFontService } from './fonts.js';
 import { createHostEbookLibrary, ebookCredentialDirectory, safeEbookError } from './ebook-library.js';
 import { translateSelection as googleTranslateSelection } from './translation.js';
 import { createSpeechService } from './speech-service.js';
@@ -414,6 +416,8 @@ export function apply(ctx, config = {}) {
    * 每个方法都返回可 JSON 序列化的结果，失败时抛带原因的 Error。
    */
   const shelfData = createShelfSource();
+  let fonts = null;
+  const getFonts=()=>fonts ||= createReaderFontService({directory:path.join(process.env.DSH_HOME||path.join(homedir(),'.dsh'),'reader-fonts',createHash('sha256').update(pathsOf().base).digest('hex').slice(0,32)),bundledBase64:bundledReaderFont});
   let speech = null;
   const getSpeech = () => speech ||= createSpeechService({directory:path.join(ebookCredentialDirectory(pathsOf().base),'speech'),home:process.env.DSH_HOME || path.join(homedir(),'.dsh')});
   ctx.effect(() => () => speech?.dispose());
@@ -457,6 +461,7 @@ export function apply(ctx, config = {}) {
       });
     },
     speechAudio: request => getSpeech().audio(request),
+    fontAction: request => getFonts().action(request),
     speechVoices: () => getSpeech().voices(),
     speechAction: request => getSpeech().action(request),
     searchBooks: request => searchBooks(request.query),
@@ -874,6 +879,7 @@ export default class ReaderService extends TypertRemoteService {
   importBook(request) { return this.api.import(request); }
   removeBook(request) { return this.api.remove(request.bookId); }
   restoreBook(request) { return this.api.restore(request.bookId); }
+  fontAction(request) { return this.api.fontAction(request); }
   speechVoices() { return this.api.speechVoices(); }
   speechAudio(request) { return this.api.speechAudio(request); }
   speechAction(request) { return this.api.speechAction(request); }
@@ -913,7 +919,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'speechAction', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'translateSelection', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'fontAction', 'speechVoices', 'speechAudio', 'speechAction', 'sendToAnki', 'searchBooks', 'downloadBook', 'ebookAction', 'translateSelection', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'bookCover', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

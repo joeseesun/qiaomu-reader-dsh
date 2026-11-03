@@ -13,6 +13,7 @@ export function remoteHostApi(ctx) {
     import: (request) => call('importBook', request),
     remove: (bookId) => call('removeBook', { bookId }),
     restore: (bookId) => call('restoreBook', { bookId }),
+    fontAction: request => call('fontAction', request),
     speechVoices: () => call('speechVoices'),
     speechAudio: (request) => call('speechAudio', request),
     speechAction: (request) => call('speechAction', request),

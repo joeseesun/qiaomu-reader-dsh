@@ -12,7 +12,7 @@ export const DEFAULT_READER_SETTINGS = Object.freeze({
   theme: 'paper',
   fontSize: 18,
   lineHeight: 1.75,
-  fontFamily: 'serif',
+  fontFamily: 'zhuque',
   margin: 64,
   flow: 'paginated',
   justify: true,

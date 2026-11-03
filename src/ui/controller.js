@@ -23,6 +23,7 @@ import { UI_SETTING_DEFAULTS, READER_THEMES } from './theme.js';
 import { chapterIndexForHref, copyText, formatPercent, localId, normalizePercent, toMarkdown } from './format.js';
 import { readCompanionAppearance, saveCompanionAppearance } from './companion-appearance.js';
 import { vocabularyEntry, upsertVocabulary } from '../core/vocabulary.js';
+import { isReaderFontKey } from '../core/reader-fonts.js';
 import { normalizeAppearance } from '../core/appearance.js';
 import { percentLocation } from '../core/location.js';
 
@@ -332,7 +333,7 @@ export function createController(getProps, store) {
     merged.lineHeight = Math.min(2.2, Math.max(1.4, Number(merged.lineHeight) || base.lineHeight));
     merged.margin = clampInt(merged.margin || base.margin, 32, 120);
     if (!READER_THEMES[merged.theme]) merged.theme = base.theme;
-    if (!['serif', 'sans-serif', 'mono'].includes(merged.fontFamily)) merged.fontFamily = 'serif';
+    if (!isReaderFontKey(merged.fontFamily)) merged.fontFamily = 'serif';
     if (merged.flow !== 'scroll') merged.flow = 'paginated';
     merged.justify = merged.justify !== false;
     merged.spread = merged.spread === true;
