@@ -37,14 +37,14 @@
   "models": {
     "kokoro": {
       "label": "Kokoro",
-      "revision": "a3f4c73d043860e3",
+      "revision": "b78e1ac42b852e83",
       "license": "Apache-2.0",
-      "bytes": 364816464,
+      "bytes": 364855331,
       "archive": {
         "name": "kokoro-multi-lang-v1_1.tar.bz2",
         "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_1.tar.bz2",
-        "bytes": 364816464,
-        "sha256": "a3f4c73d043860e3fd2e5b06f36795eb81de0fc8e8de6df703245edddd87dbad"
+        "bytes": 364855331,
+        "sha256": "b78e1ac42b852e839cceaafbe88f66806bf5860992d1d7b9a3f2ad1198427aed"
       },
       "archiveRoot": "kokoro-multi-lang-v1_1",
       "files": [
@@ -1905,13 +1905,13 @@
         },
         {
           "path": "lexicon-zh.txt",
-          "bytes": 2119465,
-          "sha256": "11111d8cd695fba2ace1367a1d0a708b586e6ef5c1f9be91da5d7eef129b651c"
+          "bytes": 2120131,
+          "sha256": "fea060803db3e59193987f1a3436f56917bda09f3b3595b6588e46ae60cebf93"
         },
         {
           "path": "model.onnx",
-          "bytes": 325631784,
-          "sha256": "acc4adc175b9d9986106cd20060329673ad5a2e12ef3c557d2d3745b694f8b38"
+          "bytes": 325561476,
+          "sha256": "99db0bc8fd0c5033d249fe922db16768b71b4a6b26cfd93d206fbf66c76efb5f"
         },
         {
           "path": "number-zh.fst",

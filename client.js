@@ -110978,6 +110978,7 @@ Object.assign(SPEECH_COPY, {
   rate: ["\u8BED\u901F", "Speed"],
   requestPrivacy: ["\u5BC6\u94A5\u4EC5\u4FDD\u5B58\u5728 Host \u79C1\u6709\u6587\u4EF6\uFF1B\u4E0D\u5199\u5165\u4E66\u5E93\u6216\u5BFC\u51FA\u7B14\u8BB0\u3002", "Keys stay in Host-private files outside books and exported notes."]
 });
+Object.assign(SPEECH_COPY, { apiKey: SPEECH_COPY.key, baseUrl: SPEECH_COPY.url, resource: SPEECH_COPY.resourceId, keyConsole: SPEECH_COPY.getKey, docs: SPEECH_COPY.serviceDocs });
 
 // src/ui/library-locale.js
 var LIBRARY_MESSAGES = {
@@ -113600,6 +113601,7 @@ var UI_CSS = `
   background:var(--qmr-accent);box-shadow:0 0 0 2px var(--qmr-ui)}
 .qmr-panel{display:flex;flex-direction:column;flex:0 0 340px;width:340px;min-height:0;
   border-left:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1)}
+.qmr-panel:not(.qmr-panel-companion){--qmr-paper:var(--dsw-alias-bg-layer-1,#fff);--qmr-ink:var(--dsw-alias-label-primary,#252629);--qmr-muted:var(--dsw-alias-label-secondary,#686b70);--qmr-ui:var(--dsw-alias-bg-layer-2,#f4f4f4);--qmr-border:var(--dsw-alias-border-l1,#ddd);color:var(--qmr-ink)}
 .qmr-panel-overlay{position:absolute;inset:0;z-index:6;width:auto;flex:1 1 auto;border-left:0;
   background:var(--dsw-alias-bg-overlay,var(--dsw-alias-bg-base))}
 .qmr-panel-head{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:8px 10px;
@@ -113806,8 +113808,8 @@ var UI_CSS = `
 .qmr-feature-panel{display:flex;flex-direction:column;gap:14px;padding:14px;color:var(--qmr-ink)}
 .qmr-feature-panel label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}
 .qmr-feature-panel label:has(textarea){display:block}
-.qmr-feature-panel :is(select,textarea){width:100%;min-width:0;padding:9px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}
-.qmr-feature-panel select{appearance:none}
+.qmr-feature-panel :is(select,textarea,input[type=text],input[type=search],input[type=password],input[type=url]){width:100%;min-width:0;padding:9px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}
+.qmr-feature-panel select{appearance:auto}
 .qmr-feature-panel :is(select,textarea):focus{outline:1px solid var(--qmr-muted);outline-offset:1px;box-shadow:none}
 .qmr-feature-panel textarea{resize:vertical;margin-top:8px;line-height:1.5}
 .qmr-feature-panel input[type=range]{width:100%}
@@ -116833,14 +116835,14 @@ var tts_local_models_default = {
   models: {
     kokoro: {
       label: "Kokoro",
-      revision: "a3f4c73d043860e3",
+      revision: "b78e1ac42b852e83",
       license: "Apache-2.0",
-      bytes: 364816464,
+      bytes: 364855331,
       archive: {
         name: "kokoro-multi-lang-v1_1.tar.bz2",
         url: "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_1.tar.bz2",
-        bytes: 364816464,
-        sha256: "a3f4c73d043860e3fd2e5b06f36795eb81de0fc8e8de6df703245edddd87dbad"
+        bytes: 364855331,
+        sha256: "b78e1ac42b852e839cceaafbe88f66806bf5860992d1d7b9a3f2ad1198427aed"
       },
       archiveRoot: "kokoro-multi-lang-v1_1",
       files: [
@@ -118701,13 +118703,13 @@ var tts_local_models_default = {
         },
         {
           path: "lexicon-zh.txt",
-          bytes: 2119465,
-          sha256: "11111d8cd695fba2ace1367a1d0a708b586e6ef5c1f9be91da5d7eef129b651c"
+          bytes: 2120131,
+          sha256: "fea060803db3e59193987f1a3436f56917bda09f3b3595b6588e46ae60cebf93"
         },
         {
           path: "model.onnx",
-          bytes: 325631784,
-          sha256: "acc4adc175b9d9986106cd20060329673ad5a2e12ef3c557d2d3745b694f8b38"
+          bytes: 325561476,
+          sha256: "99db0bc8fd0c5033d249fe922db16768b71b4a6b26cfd93d206fbf66c76efb5f"
         },
         {
           path: "number-zh.fst",
@@ -119325,7 +119327,7 @@ function SpeechPanel({ ui, speech }) {
   return h10(
     "div",
     { className: "qmr-panel-content" },
-    h10("style", null, ".qmr-speech-settings{border-top:1px solid var(--qmr-border);padding-top:14px}.qmr-speech-settings summary{cursor:pointer;font-weight:600;margin-bottom:14px}.qmr-speech-settings form,.qmr-speech-local{display:flex;flex-direction:column;gap:12px}.qmr-speech-settings textarea{min-height:74px;resize:vertical}.qmr-speech-settings p,.qmr-speech-local p{font-size:12px;line-height:1.6;color:var(--qmr-text-muted);margin:6px 0}.qmr-speech-settings .qmr-feature-actions{flex-wrap:wrap}.qmr-speech-help{display:flex;gap:16px;flex-wrap:wrap}.qmr-speech-local progress{width:100%}.qmr-speech-settings>a{font-size:12px}"),
+    h10("style", null, ".qmr-speech-settings{border-top:1px solid var(--qmr-border);padding-top:14px}.qmr-speech-settings summary{cursor:pointer;font-weight:600;margin-bottom:14px}.qmr-speech-settings form,.qmr-speech-local{display:flex;flex-direction:column;gap:12px}.qmr-speech-settings textarea{min-height:74px;resize:vertical}.qmr-speech-settings p,.qmr-speech-local p{font-size:12px;line-height:1.6;color:var(--qmr-muted);margin:6px 0}.qmr-speech-settings .qmr-feature-actions{flex-wrap:wrap}.qmr-speech-help{display:flex;gap:16px;flex-wrap:wrap}.qmr-speech-local progress{width:100%}.qmr-speech-settings>a{font-size:12px}"),
     h10("div", { className: "qmr-panel-head" }, h10("strong", { className: "qmr-panel-title" }, t("title", "\u8FDE\u7EED\u6717\u8BFB")), h10("button", { className: "qmr-icon-btn", "aria-label": t("close", "\u5173\u95ED\u9762\u677F"), onClick: () => {
       speech.pause();
       speech.stopPreview();

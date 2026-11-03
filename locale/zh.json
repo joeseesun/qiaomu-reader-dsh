@@ -211,7 +211,12 @@
     "selectedPlaying": "正在朗读选文",
     "stopSelected": "停止选文朗读",
     "busy": "语音正忙，请稍后重试",
-    "requestPrivacy": "密钥仅保存在 Host 私有文件；不写入书库或导出笔记。"
+    "requestPrivacy": "密钥仅保存在 Host 私有文件；不写入书库或导出笔记。",
+    "apiKey": "API 密钥",
+    "baseUrl": "服务地址",
+    "resource": "语音资源 ID",
+    "keyConsole": "获取密钥",
+    "docs": "服务文档"
   },
   "lookup": {
     "title": "查词与翻译",

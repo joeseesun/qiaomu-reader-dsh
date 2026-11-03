@@ -211,7 +211,12 @@
     "selectedPlaying": "Reading selection",
     "stopSelected": "Stop selection",
     "busy": "Speech is busy. Retry shortly.",
-    "requestPrivacy": "Keys stay in Host-private files outside books and exported notes."
+    "requestPrivacy": "Keys stay in Host-private files outside books and exported notes.",
+    "apiKey": "API key",
+    "baseUrl": "Service URL",
+    "resource": "Speech resource ID",
+    "keyConsole": "Get a key",
+    "docs": "Service docs"
   },
   "lookup": {
     "title": "Dictionary and translation",

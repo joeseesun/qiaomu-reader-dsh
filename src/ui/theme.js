@@ -447,6 +447,7 @@ export const UI_CSS = `
   background:var(--qmr-accent);box-shadow:0 0 0 2px var(--qmr-ui)}
 .qmr-panel{display:flex;flex-direction:column;flex:0 0 340px;width:340px;min-height:0;
   border-left:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1)}
+.qmr-panel:not(.qmr-panel-companion){--qmr-paper:var(--dsw-alias-bg-layer-1,#fff);--qmr-ink:var(--dsw-alias-label-primary,#252629);--qmr-muted:var(--dsw-alias-label-secondary,#686b70);--qmr-ui:var(--dsw-alias-bg-layer-2,#f4f4f4);--qmr-border:var(--dsw-alias-border-l1,#ddd);color:var(--qmr-ink)}
 .qmr-panel-overlay{position:absolute;inset:0;z-index:6;width:auto;flex:1 1 auto;border-left:0;
   background:var(--dsw-alias-bg-overlay,var(--dsw-alias-bg-base))}
 .qmr-panel-head{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:8px 10px;
@@ -653,8 +654,8 @@ export const UI_CSS = `
 .qmr-feature-panel{display:flex;flex-direction:column;gap:14px;padding:14px;color:var(--qmr-ink)}
 .qmr-feature-panel label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}
 .qmr-feature-panel label:has(textarea){display:block}
-.qmr-feature-panel :is(select,textarea){width:100%;min-width:0;padding:9px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}
-.qmr-feature-panel select{appearance:none}
+.qmr-feature-panel :is(select,textarea,input[type=text],input[type=search],input[type=password],input[type=url]){width:100%;min-width:0;padding:9px 10px;border:1px solid var(--qmr-border);border-radius:5px;background:var(--qmr-paper);color:var(--qmr-ink);font:inherit;box-sizing:border-box}
+.qmr-feature-panel select{appearance:auto}
 .qmr-feature-panel :is(select,textarea):focus{outline:1px solid var(--qmr-muted);outline-offset:1px;box-shadow:none}
 .qmr-feature-panel textarea{resize:vertical;margin-top:8px;line-height:1.5}
 .qmr-feature-panel input[type=range]{width:100%}
