@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const result = await build({ entryPoints: ['src/host/index.js'], bundle: true, write: false, format: 'esm', platform: 'node',
-  external: ['pdfjs-dist/*'], plugins: [{ name: 'remote-contract', setup(b) {
+  external: ['pdfjs-dist/*'], loader: { '.py':'text' }, banner: {js:"import { createRequire as __qmrCreateRequire } from 'node:module'; const require = __qmrCreateRequire(process.cwd()+'/package.json');"}, plugins: [{ name: 'remote-contract', setup(b) {
     b.onResolve({ filter: /^@deepseek-ai\/dsh-typert-protocol$/ }, () => ({ path: 'remote', namespace: 'stub' }));
     b.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({ contents: 'export class TypertRemoteService {} export const Remote = () => () => {};' }));
   } }] });

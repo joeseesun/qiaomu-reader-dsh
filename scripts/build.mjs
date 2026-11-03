@@ -87,11 +87,12 @@ async function buildHost() {
     bundle: true,
     format: 'esm',
     platform: 'node',
+    loader: { '.py': 'text' },
     target: 'node20',
     external: HOST_EXTERNAL,
     legalComments: 'none',
     logLevel: 'info',
-    banner: { js: '/* 乔木阅读 · 宿主半 — 由 scripts/build.mjs 生成，请勿手改。 */' },
+    banner: { js: '/* 乔木阅读 · 宿主半 — 由 scripts/build.mjs 生成，请勿手改。 */\nimport { createRequire as __qmrCreateRequire } from "node:module"; const require = __qmrCreateRequire(import.meta.url);' },
     sourcemap: dev,
   });
   // 去掉产物里的 JSDoc 块注释：产物是可执行文件，不需要文档注释，
@@ -99,7 +100,7 @@ async function buildHost() {
   if (!dev) {
     const file = path.join(ROOT, 'index.js');
     const withComments = await readFile(file, 'utf8');
-    const stripped = withComments.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?\*\//g, '');
+    const stripped = withComments.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?\*\//g, '').replace(/^[ \t]+$/gm, '');
     if (stripped.length !== withComments.length) await writeFile(file, stripped, 'utf8');
   }
 }

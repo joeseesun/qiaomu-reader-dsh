@@ -1,3 +1,4 @@
+import { SPEECH_COPY } from './speech-locale.js';
 /** Shared client messages; kept in sync with locale/*.json. */
 export const LIBRARY_MESSAGES = {
   "zh": {
@@ -629,6 +630,8 @@ const EBOOK_MESSAGES = {
   ]
 };
 for (const [language,index] of [['zh',0],['en',1]]) LIBRARY_MESSAGES[language].ebook = Object.fromEntries(Object.entries(EBOOK_MESSAGES).map(([key,values])=>[key,values[index]]));
+
+for (const [language,index] of [['zh',0],['en',1]]) Object.assign(LIBRARY_MESSAGES[language].speech,Object.fromEntries(Object.entries(SPEECH_COPY).map(([key,values])=>[key,values[index]])));
 
 // DSH LocaleFace looks up literal keys; it does not traverse nested objects.
 export function flatMessages(messages, prefix = '') {

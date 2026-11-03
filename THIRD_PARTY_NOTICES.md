@@ -281,3 +281,9 @@ Redistributions in binary form must reproduce the above copyright notice, this l
 THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+## Speech adapters and local model setup
+
+Speech protocol/controller code is adapted from Qiaomu Reader4.9.4 under GPL-3.0-only. Edge interoperability follows rany2/edge-tts (LGPL-3.0); see `licenses/edge-tts-LGPL.txt`. Bundled `ws`8.22.0 uses MIT (`licenses/ws-MIT.txt`); JSZip3.10.1 is used under its MIT option (`licenses/jszip-license.txt`).
+
+Kokoro and MeloTTS model files, uv,managed Python,Sherpa and Python dependencies are downloaded separately into device-local application data; they are not bundled in this tgz. The fixed model registry records source URLs,content hashes and per-model licenses. Installing a local model displays its size/source/license before download. Model setup never modifies the book library or global Python.

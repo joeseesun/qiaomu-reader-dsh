@@ -1,5 +1,20 @@
 # Obsidian Reader → DeepSeek Harness 阅读流程
 
+
+## 2026-11-03 完整朗读与免费翻译：1.5.0
+
+实现提交16bf6c8、3a1f7f5及最终样式/验证提交。复用原版TTS协议、音色/模型选择、Mac显示名与本地运行脚本。Host私有配置与密钥，Client/书库/笔记/包不含密钥；保存密钥只标记已保存，不冒称服务已连接。支持Edge、Mac、OpenAI/兼容、通义、豆包、MiniMax、SiliconFlow、ElevenLabs、Azure及Kokoro/MeloTTS；自定义模型/音色ID、部分提供方远端目录、帮助链接、试听与独立取消。
+
+上一段/下一段跳过空章，选文菜单一键朗读保留选段且不写整书朗读书签；浏览时停跟随，章节边界可暂停；内容SHA256防旧位置用于变更后的书。切书/关闭或切换面板停止播放器/请求；跨服务目录及保存结果带服务身份检查，忽略过期回调。Host20MiB音频缓存、单Edge请求队列和429冷却，取消不换身份/端点。系统与云端分别处理倍速，Host音频按客户端倍速播放。
+
+免费Google查词/翻译默认可用，临时与默认目标隔离、自动语言识别/同语言换译、AI不可用回退、手写保护、重试、保存生词与关闭。原生模型会话/草稿保留。实际安装版Wonderland→“仙境”并保存Host生词状态，无模型密钥。
+
+137项Node测试及Python安装器回归通过。真实隔离DSH中Edge audio playing、readyState4、currentTime前进、暂停与关闭后全部paused；选文菜单可打开面板并实际播放，试听成功；390px控件越界0。深色宿主+纸白书页的面板前景/背景及输入框已配对，查词卡按钮/标签亦读纸张令牌。截图 `speech-*.png`、`lookup-google-installed.png`。
+
+Mac实读191音色；Edge生成21600字节MP3，Mac生成145220字节WAV。Kokoro/MeloTTS完整下载安装、校验和合成通过（144610/221634字节WAV），日用原生窗口两模型均完成试听成功。Kokoro上游同名资产2026-10-26被替换：官方GitHub资产677613419的SHA256 `b78e1ac42b852e839cceaafbe88f66806bf5860992d1d7b9a3f2ad1198427aed`匹配实际下载；核对377个成员，更新两项变更及固定清单，没有跳过校验。参考[官方模型说明](https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/kokoro.html)。模型与独立Python位于 `$DSH_HOME/reader-tts`，与书库分离，不改全局Python。
+
+日用候选43文件匹配、重启前七个原有Reader文件摘要不变，备份 `/Users/joe/.dsh/backups/reader-1.5.0-20261103`；后续主动试听设置写入是预期变化。包含聊天侧栏的日用截图仅存本地可视化目录。付费服务真实账号、Windows/Linux与实体移动设备未验收；乔木书库真实激活和Kindle设备边界保留。没有用无密钥阻塞协议与UI实现。其余60项继续执行，不能把本版称为原版已全部对齐。
+
 ## 2026-11-03 乔木书库：1.4.0
 
 已从原版 `ebook-library.js`、`ebook-library-ui.js`、`book-records.js` 和 `book-catalog.js` 核对并适配协议。入口为“公开书源 / 乔木书库 / Gutenberg”，不恢复“本地书库”页签。输入的是 `QM-…` 服务激活码，不是短信验证码。连接状态依赖真实 `/me` 校验，不能仅凭本地存在凭据显示已连接。
@@ -13,6 +28,104 @@ Host 独占 activate/refresh/me/search/covers/jobs/file 请求；Client 只接�
 证据：构建、111项测试与包守卫通过，含真实Host文件入库/重启、已有文件去重/状态保留、刷新合并、配额/取消/校验失败/入库重试。隔离安装包UI已验证未激活表单、无效码、三书源和390px布局；受控协议夹具验证搜索/版本/封面、取消/恢复、下载入库并实际打开Alice正文。`ebook-fixture-*.png`只代表该协议夹具；夹具从未打包或用于日用profile。真实服务无凭据GET `/me`返回401 unauthorized。日用DSH现有相关配置未找到激活状态，未读取或复制原版令牌；**真实服务的激活、配额和付费下载尚缺用户激活码，不能将夹具成功说成真实服务闭环**。用户可在日用Reader“浏览书库→乔木书库”内输入激活码，后续只需补这一层验收。
 
 后台下载与前台保存进度共用书库读改写队列，防止索引互相覆盖；并发六个导入与进度保存的测试确认七本书均在且进度保留。
+
+
+## 完整对齐执行矩阵（2026-11-03）
+
+用户已明确要求全部补齐并仔细对比原版。下表来自原版4.9.4 `b6f6340a097638fd02d7ff0433641ccd6e36d7ef` 与DSH `ed20976` 的只读静态审计；代码定位用于安排验证，不把静态发现当运行通过。当前DSH公开基线已为 `36db1f4` / [v1.4.0](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.4.0)，匿名SHA256 `12c1d98af65c2eb07d74296d53ff28d4ea7edd744f4406bd5eccdbaf910d1b12`，全新无夹具profile实际出现三书源/未激活表单，日用和全新profile40文件匹配。
+
+60项均保留验收关卡。当前先做E01–E06完整朗读，随后分批补格式/Calibre/元数据、稳定位置与书签/PDF/字体外观、笔记翻译复习与AI、Kindle、九语与数据维护；后续原版变化继续追加。缺账号或设备只阻塞该项外部实测，不阻塞独立实现。保留C列表、搜索右侧浏览入口与真实封面，不恢复重复本地书库页签。
+
+### A. 书库、导入和发现
+
+| ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
+|---|---|---|------|
+| A01 | EPUB 导入、章节、正文、封面 | 已有。O: `src/reader-engine.js`；D: `src/core/epub.js`、`src/core/reader.js`、`src/client/bridge.js`、`src/ui/library.js` | 真实 EPUB 导入→打开→重启→封面和进度保留；内嵌资源/恶意脚本夹具分别验证。  已有1.1–1.4测试和历史运行记录；按本行验收补齐特定边界 |
+| A02 | PDF 原始页面与文字层、离线 CJK 解码 | 已有基础。D: `src/client/pdf-book.js`、`pdf-resources.js`，原有离线资源回归记录 | 扫描页和文本页分别验收；扫描件无文字层不能宣称可查词或全文问答。缩放/目录另见 B。  已有1.1–1.4测试和历史运行记录；按本行验收补齐特定边界 |
+| A03 | TXT / Markdown / HTML | 已有。D: `src/client/text-book.js`、`text-formats.js` | 编码、长文拆章、标题、图片和导入后重启分别核对；不是只验证扩展名。  已有1.1–1.4测试和历史运行记录；按本行验收补齐特定边界 |
+| A04 | FB2/FBZ、MOBI/AZW/AZW3、CBZ | 缺失。O: README 格式说明、`src/calibre-library.js:3`；D: README 明确仍未覆盖 | 分格式真实夹具导入和打开，错误可恢复；乔木书库当前禁用的格式随解析能力同步开放。  待逐项核验；静态发现不计运行完成 |
+| A05 | 六本离线示例书与恢复 | 已有基础。O: README 离线示例书；D: 打包示例书及日用六书记录 | 核对六本封面、正文、许可；首次/升级/用户主动移除后不擅自反复添加，手动恢复入口需核验。  待逐项核验；静态发现不计运行完成 |
+| A06 | 搜索、排序、阅读状态、继续阅读、长列表 | 已有。D: `src/ui/library.js:126`、`VirtualBooks`、`core/library-window.js` | 搜索/状态交叉筛选、长书名、空库、大书库、键盘和重启状态核验；保留已接受的 C 列表。  待逐项核验；静态发现不计运行完成 |
+| A07 | 元数据编辑、分类标签、封面裁切偏好 | 部分。O: `src/main.js:10405`、`bookTagsOf`、`coverFits`；D: `book-metadata.js` 保存元数据，但 `library.js` 更多菜单只有笔记/划线/移除 | 不能把存储字段算编辑入口；核验并补齐书名作者/分类编辑、分类筛选及封面显示选择。  待逐项核验；静态发现不计运行完成 |
+| A08 | 移除、恢复、去重，保留阅读数据 | 已有基础。D: `bridge.js` remove/restore、Host 内容去重和导入队列 | 重导同一本不丢进度/划线/笔记；移除不得删原文件或无关笔记。内置书处理另核验。  已有1.1–1.4测试和历史运行记录；按本行验收补齐特定边界 |
+| A09 | Calibre 自动发现、搜索、格式选择、导入、原库定位 | 缺失。O: `calibre-library.js`、`calibre-modal.js`、`calibre-node.js`，原版命令注册 | Host 读取本机库并有手动路径恢复；复杂搜索和缺少工具反馈；只复制所选书，不改原库。移除“本地书库”页签不等于删除 Calibre 能力，可放添加图书/更多入口。  待逐项核验；静态发现不计运行完成 |
+| A10 | Hacker Books 榜单、主题、双语搜索、详情、评论/建议、相关书 | 已有。D: `host/discovery.js`、`ui/book-shelf.js`、`core/book-shelf.js`；1.2/1.3 有真实源站与 UI 记录 | 保留真实封面、原版布局和详情返回滚动/焦点；失败重试和空结果复验。  v1.2.0/v1.3.0已发布及日用安装；真实公开源/UI记录见上；完整复验仍逐项保留 |
+| A11 | 想读/读过清单、取消标记、本地推荐 | 已有。D: 1.2 验收与 `reading-lists.json` 持久化 | 重启保留；取消/互斥、损坏文件不覆盖、并发保存不丢数据。  v1.2.0/v1.3.0已发布及日用安装；真实公开源/UI记录见上；完整复验仍逐项保留 |
+| A12 | 外部查找链接和公开书源 | 部分/待核验。O: README 找书流程；D: 详情转 Gutenberg/Open Library 已有 | 对照原版实际列出的外部链接逐一确认，不把内部打开页当下载；所需外链可达与失败提示。  待逐项核验；静态发现不计运行完成 |
+| A13 | Gutenberg 搜索、下载、已拥有、打开 | 已有。D: `host/discovery.js`、`ui/book-discovery.js`，1.2 实际 Alice 下载记录 | 真实搜索→文件落地→打开→重启→已拥有；网络/格式失败可重试。  待逐项核验；静态发现不计运行完成 |
+| A14 | 乔木书库激活、/me、配额、版本/封面、任务下载恢复、校验入库 | 1.4 已实现，真实服务闭环待验。O: `ebook-library.js`、`ebook-library-ui.js`；D: `host/ebook-library.js`、`ebook-protocol.js`、`ui/ebook-library.js` | 受控协议夹具不等于真实激活下载；用户在 UI 输入激活码后核验配额、下载、本地文件和重启打开；不要读取或复制原版凭据。  36db1f4；111测试及夹具UI/重启入库；日用1.4和公开v1.4.0/40文件匹配；真实激活码待用户输入 |
+| A15 | 本地文件/拖放入口、下载目录可选、书库位置设置 | 部分/待核验。O: main 设置与导入命令；D: bridge 文件导入、Host 书库路径 | 区分本地 Client 文件与远程 Host 路径；导入入口可发现、目录错误可恢复。逐项核对原版拖放和目录选择。  待逐项核验；静态发现不计运行完成 |
+
+### B. 阅读、导航与外观
+
+| ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
+|---|---|---|------|
+| B01 | EPUB 单/双页、滚动、跨章翻页、进度恢复 | 已有基础。D: `ui/reader.js`、`ui/controller.js`、`core/state.js` | 改字号/窗口宽度、跨章和重开后仍回到同段；不能仅以百分比近似冒充精确定位。  待逐项核验；静态发现不计运行完成 |
+| B02 | 稳定位置编号/出版页码输入跳转 | 缺失。O: `reader-position.js:1-26` 使用 pageList 与1500字符位置；D: `core/location.js` 只有 fraction×章节数 | 有 page-list/无 page-list 两类验证；改变布局不改变逻辑编号；PDF 用真实页码。  待逐项核验；静态发现不计运行完成 |
+| B03 | 目录、书内搜索、高亮结果、上下结果、返回原位置 | 已有主要实现。D: `toc.js`、`panel-search.js`、controller jumpReturn | 键盘 Enter/Shift+Enter/Esc、跨章多个命中、结果定位与返回；PDF 当前每页只取第一个命中，须单独检查同页多处匹配。  待逐项核验；静态发现不计运行完成 |
+| B04 | 命名位置书签，创建/改名/删除/跳转 | 部分，底层有但 UI 缺失。O: `main.js:3932-3989`；D: `core/state.js:408-453`、`client/bridge.js:540`，UI 搜索无 bookmark 动作入口 | 提供可见入口和列表、重启持久化、改名/删除失败恢复；有 state 字段不能算功能完成。  待逐项核验；静态发现不计运行完成 |
+| B05 | PDF 独立缩放、页面布局和原生目录 | 部分。O: `pdf-zoom.js`、`pdf-page-mode.js`；D: `pdf-book.js:38-40` 固定渲染比例、TOC 只是每页，`reader.js:267` 强制 scroll | 补独立缩放且选择层对齐；核对单/双页行为和 PDF outline，不能只把“第N页”列表当原生目录。  待逐项核验；静态发现不计运行完成 |
+| B06 | 内链/脚注/插图行为 | 部分/待核验。D: reader 内链跳转、core 资源重写已有；O: reader 引擎及 figuresShownByDefault 设置 | 实测脚注/跨章内链与返回、插图显示开关、图片查看；不能因支持 img 就认定原版交互已迁。  待逐项核验；静态发现不计运行完成 |
+| B07 | 完整阅读主题、跟随宿主、电子墨水屏 | 部分。O: `reader-themes.js` auto及更多主题、main eink；D: `ui/theme.js` 仅 white/paper/warm/celadon/moon/night | 补原版遗漏主题和跟随 DSH；电子墨水屏对比度/动画模式单列。  待逐项核验；静态发现不计运行完成 |
+| B08 | 朱雀仿宋、系统字体枚举、自定义字体/文件导入 | 缺失。O: `bundled-fonts.js`、`reader-fonts.js`；D: theme/controller 只接受 serif/sans-serif/mono | 离线朱雀、中文回退、导入TTF/OTF/WOFF/WOFF2、持久化与失败反馈；不能用三个通用字体栈替代。  待逐项核验；静态发现不计运行完成 |
+| B09 | 字号、行距、对齐、页边距、行宽、垂直对齐 | 部分。D: `panel-settings.js` 有字号行距边距/两端对齐；O: main maxLineCh/vAlign/textAlign | 对照滑杆范围和全部对齐选项，窄窗不溢出；高级项折叠，保留可见数值。  待逐项核验；静态发现不计运行完成 |
+| B10 | 沉浸/全屏、翻页按钮策略、动画、键盘保护 | 部分。D: reader 自动工具栏/全屏/键盘保护；O: `reader-keyboard.js`、main navMode/pageButtonsVisibility/pageTurnAnimation | 原版用户可控选项逐项核对；输入法、菜单、滑杆、AI输入时不误翻页；不加多余 tooltip。  待逐项核验；静态发现不计运行完成 |
+| B11 | 阅读计时、每日目标、累计/日记录 | 缺失。O: `main.js:162,2676,13858`；D: 未找到计时/目标 UI 与状态链路 | 只计实际阅读，后台/失焦合理暂停，跨日和重启保存，用户能关闭。  待逐项核验；静态发现不计运行完成 |
+| B12 | 分设备外观与同步偏好 | 缺失/需宿主适配。O: main DEVICE_KEYS/perDevice/deviceProfiles；D: 本书settings+客户端localStorage | 明确设备本地和 Host 共享范围；多设备同步不互相覆盖字号/外观，不能用“DSH宿主差异”略过用户需求。  待逐项核验；静态发现不计运行完成 |
+
+### C. 划线、笔记与复习
+
+| ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
+|---|---|---|------|
+| C01 | 多色划线、批注、编辑/删除、章节列表与回跳 | 已有。D: `selection-menu.js`、`panel-highlights.js`、`core/state.js` | 跨行/跨页、重复文本、重启、编辑失败；沿用轻背景不描边的既有设计。  已有1.1–1.4测试和历史运行记录；按本行验收补齐特定边界 |
+| C02 | 选文动作配置：顺序、显隐、标签、更多/右键 | 缺失。O: `selection-preferences.js`、main 14023/14035；D: selection-menu 固定动作 | 隐藏动作仍能从更多/右键到达；重排持久化、键盘可操作、无多余提示。  待逐项核验；静态发现不计运行完成 |
+| C03 | 自动关联每书 Markdown 笔记并保留手写内容 | 已有基础/部分。O: `reading-note.js`；D: `core/markdown-notes.js`、Host `exportNotes` | 核验首次打开/首次划线是否自动建立和更新，而不只是手动导出；手写内容与无关同名笔记保护。  已有1.1–1.4测试和历史运行记录；按本行验收补齐特定边界 |
+| C04 | 摘录单独成笔记、标题/模板、保存到当前/今日/本书笔记 | 缺失原版完整流程。O: main 笔记设置14602-14664；D: 当前主要是固定每书导出/下载 | 用 DSH/本地 Markdown 可实现的目标替代 Vault API；缺“当前/今日”概念时给明确替代，保留用户选择。  待逐项核验；静态发现不计运行完成 |
+| C05 | 笔记文件夹、与书同目录、每书模板、引用模板/颜色/回链设置 | 部分。D: Host `notes/<bookId>.md` 固定形状，已有回链/颜色；O: main DEFAULT_SHELF与notes设置 | 可配置路径/模板、颜色和回链选项；更换路径不丢旧内容、不覆盖其他文件。  待逐项核验；静态发现不计运行完成 |
+| C06 | 阅读进度写入笔记 frontmatter、打开笔记模式 | 缺失/需适配。O: main progressToFrontmatter/noteOpenMode；D: 未找到对应入口 | 更新托管字段不覆盖用户 frontmatter；DSH采用可用的编辑器/打开方式。  待逐项核验；静态发现不计运行完成 |
+| C07 | 默认免费 Google 翻译、AI 上下文翻译及不可用回退 | 1.5已实现默认Google免费路径及原生AI可选解释。D: `host/translation.js`、`ui/panel-vocabulary.js` | 16bf6c8；14项新回归，实际DSH无模型Wonderland→仙境并保存；更完整集中词库/九语另列 |
+| C08 | 自动识别语言、默认目标、同语言反向、临时目标 | 1.5已实现自动识别、默认/临时目标与同语种换译。D: `core/lookup.js`、`host/translation.js`、`ui/lookup-locale.js` | 16bf6c8；协议及组件目标隔离/回退验证，真实中文/英文例与安装版Google通过；更多语言端到端仍逐项补 |
+| C09 | 跨书集中生词本、同词合并多个例句、位置链接 | 部分。D: `core/vocabulary.js` 按 bookId+term+context 生成ID，每书列表/导出 | 对齐集中词库与多例句去重，保留编辑释义和多个来源；不要简单覆盖同词。  待逐项核验；静态发现不计运行完成 |
+| C10 | Spaced Repetition Markdown 格式、保留复习进度 | 缺失。O: `vocabulary.js`；D: vocabularyMarkdown仅普通标题/引文 | 导出兼容卡片，重复更新保留 SR metadata；DSH不运行Obsidian插件也应保留可移植格式。  待逐项核验；静态发现不计运行完成 |
+| C11 | Anki自动同步、全量补同步、牌组/接口设置 | 部分。D: `host/anki.js` 固定Default/Basic/8765，UI逐条发送 | 自定义牌组和连接、自动/批量开关、重复检测、离线恢复；真实Anki落卡单独验收。  待逐项核验；静态发现不计运行完成 |
+
+### D. AI 伴读
+
+| ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
+|---|---|---|------|
+| D01 | 本书独立对话、选文/当前页上下文、草稿保护 | 已有主要实现。D: `ui/companion.js`、`client/native-chat.js`，按workspace+bookId恢复session | 真实模型回答、切书隔离、选文不自动发送、旧问题来源不随翻页改变；本轮未实机验证。  待逐项核验；静态发现不计运行完成 |
+| D02 | PDF全文上下文及超长均匀采样 | 缺失。O: README AI上下文、相关PDF逻辑；D: companion只取当前chapter，Host `setReadingContext` page最多12000字符 | 文本PDF首轮全文、超180000均匀取页标明范围；扫描页不伪造OCR。  待逐项核验；静态发现不计运行完成 |
+| D03 | EPUB完整附件/拖入内容边界 | 待核验，当前Reader层未见等价实现。O: `ai-book-attachment.js`、`epub-context.js`；D: native composer可收附件不代表懂EPUB | 用真实EPUB验证提取及限长、来源标识，保留宿主已有附件和草稿。  待逐项核验；静态发现不计运行完成 |
+| D04 | AI完整回答保存为独立/本书笔记、可改标题、防重复 | 缺失Reader等价入口。O: `ai-note.js`、`ai-note-title.js`、`reading-workflow.js`；D: companion仅原生会话嵌入 | 保存正式完整回答而非推理；本地标题提取不多调用模型；成功可打开、失败保留内容、不抢阅读焦点。  待逐项核验；静态发现不计运行完成 |
+| D05 | 快捷Prompt新增/编辑/删除/恢复、空列表和语言 | 已有。D: `prompt-manager.js`、`quick-prompts.js`，1.2/1.3验证记录 | 保留草稿式保存/取消、20条约束、写失败重试；标题和正文分开。  v1.3.0批量草稿编辑；已有默认/保存失败/空列表测试，跨语言及新版回归保留 |
+| D06 | 快捷Prompt与slash共用配置 | 缺失宿主接入。D: READER-ADAPTATION明确未注册原生slash | 优先宿主正式扩展接口，不篡改输入框；无接口需提供证据和相同快捷入口，不能直接写永久不支持。  待逐项核验；静态发现不计运行完成 |
+| D07 | 历史管理、删除确认、每书草稿重启恢复 | 宿主适配待核验。O: `ai-drafts.js`、README；D: Host session复用/原生composer | 切书/新对话/关闭/重启/删除后不复活；删除权限与确认由宿主提供时验证实际行为。  待逐项核验；静态发现不计运行完成 |
+| D08 | AI主题/字体独立、服务/模型/语言/思考设置 | 部分等价。D: `companion-appearance.js`和原生DSH服务/模型；O: main AI设置 | 不另造认证体系；确认原生功能在嵌入槽仍可见可用，Reader独立外观确实影响正文；字体缺口见B08。  待逐项核验；静态发现不计运行完成 |
+| D09 | Agent/Home读取书库、导入/导出/搜索、继续阅读集成 | 部分等价。O: `home.js`、`qiaomu-home.js`、`agent-bridge.js`；D: Host `reader_library`与`/reader`命令已有 | 对照命令能力实际调用；Obsidian ribbon/leaf不硬搬，但不能漏掉“继续阅读/查书/取笔记”的结果。  待逐项核验；静态发现不计运行完成 |
+
+### E. 朗读与Kindle
+
+| ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
+|---|---|---|------|
+| E01 | 系统/Mac朗读、暂停继续、倍速、跟随、跨章与位置保存 | 已有基础。D: `client/tts.js`、`ui/panel-speech.js`、`host/speech.js` | 实际发声、停止取消、切书释放、跨章/空PDF页、恢复位置；当前两服务不等于全部朗读。  v1.2已见实际playing/跨章/暂停；当前开始完整朗读批次 |
+| E02 | 上一段/下一段、只读选文、浏览暂停跟随、书内容变化使旧位置失效 | 部分/缺失。D: controller公开play/pause/dispose，面板无段落前后及选文入口；O: `tts-controller.js`、`tts-progress.js`、README | 选文不覆盖整书朗读书签；首次从当前页；翻页与恢复策略逐一对照。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E03 | Edge免密朗读 | 缺失。O: `tts-edge.js`、`tts-edge-client.js`；D: 仅browser/macOS | Host侧接入，主动播放才请求、取消/超时/音频缓存上限；实际试听。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E04 | OpenAI/兼容、通义、豆包、MiniMax、硅基流动、ElevenLabs、Azure | 缺失。O: `tts-providers.js`、`tts-choices.js`；D: 无对应provider | 逐服务模型/音色/自定义ID/密钥/帮助链接/请求协议；凭据Host保护，真实账号试听与协议测试分开。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E05 | Kokoro/MeloTTS本地模型安装、声音切换与试听 | 缺失。O: `tts-local.js`、`tts-local-ui.js`、runtime与models JSON | 本机目录、进度/取消/重试、平台限制；只迁当前两模型，不恢复原版已淘汰克隆模型。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E06 | 音色搜索/预览、远端声音列表、试听不改阅读进度 | 部分。D: voice下拉已有，但无完整试听管理；O: tts-ui/tts-mac-voices | 搜索声音、预览独立取消、切服务保留段落、选择和试听分离。  1.5.0：实现/137项测试；Edge真实安装版播放与日用两本地模型试听通过；付费账号/其他OS仍待实测 |
+| E07 | Kindle KOReader无线配对/传书 | 缺失。O: `kindle.js`、`kindle-config.js`、`kindle-transport.js`、`kindle-ui.js` | Host适配、身份和凭据分离、局域网传输完整回读、冲突不覆盖、失败恢复；实体Kindle另验。  待逐项核验；静态发现不计运行完成 |
+| E08 | Kindle原生接收、EPUB本地AZW3转换及原格式直传 | 缺失。O: `kindle-native.js`、`kindle-converter.js`、`kindle-epub.js` | 两模式配对独立；原文件不动；转换/文件送达/刷新请求/真机可阅读分别记证据，不自动运行外部接收端安装。  待逐项核验；静态发现不计运行完成 |
+
+### F. 数据、国际化与质量
+
+| ID | 用户能力 | 当前结论及代码依据 | 补齐/验收要求  执行证据与剩余关卡 |
+|---|---|---|------|
+| F01 | 九种界面语言与完整新增文案 | 部分。O: `i18n-languages.js` zh/en/ru/ja/es/fr/de/ko/pt；D: `library-locale.js` zh/en且reader/settings/AI仍有硬编码中文 | 九语切换、插值/日期/空文案回退；不改用户原文/Prompt内容；逐屏扫硬编码。  待逐项核验；静态发现不计运行完成 |
+| F02 | 进度/划线/笔记存储、离线迁移、损坏恢复、备份 | 已有部分。D: core合并、bridge离线→Host迁移、原子写和下载并发队列；O: storage和main备份设置 | 明确可迁数据/凭据除外；断网重连、进程中断、同书并发保存、损坏JSON、手工笔记保护。日用备份存在不等于产品提供备份恢复入口。  待逐项核验；静态发现不计运行完成 |
+| F03 | 缓存清理、进度/划线重置、示例书恢复、版本变化/引导 | 部分/待核验。O: main存储设置14955-15022/onboarding；D: 当前UI未见完整对应 | 低频设置折叠；破坏性项明确作用范围并确认；迁移不清空旧状态。  待逐项核验；静态发现不计运行完成 |
+| F04 | 无多余tooltip、键盘/焦点、窄窗/深色、加载失败恢复 | 部分。1.3 discovery有实测；D: `library.js`、`companion.js`、reader jumpReturn仍有重复title | 保留可访问名称、移除重复title，不全局隐藏宿主tooltip；所有新增表单/弹窗均验键盘闭环与390px，真实日用与隔离状态分开。  待逐项核验；静态发现不计运行完成 |
+| F05 | 打包、安装运行、公开发版和数据不变 | 每批必验，不能以test数量代替。D: `docs/RELEASE-VALIDATION.md`、package scripts | check→唯一tgz→隔离安装→真实UI→备份日用→安装/重启→数据摘要→push/CI/release→公开下载摘要和安装文件比对；缺服务/真机独立列明。  v1.3/v1.4均已公开及匿名SHA校验/独立安装；各批继续此关卡，不代替功能验收 |
+
 
 ## 2026-11-03 原版界面还原：1.3.0
 
