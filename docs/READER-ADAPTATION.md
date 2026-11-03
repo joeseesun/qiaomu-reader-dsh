@@ -11,7 +11,7 @@
 
 137项Node测试及Python安装器回归通过。真实隔离DSH中Edge audio playing、readyState4、currentTime前进、暂停与关闭后全部paused；选文菜单可打开面板并实际播放，试听成功；390px控件越界0。深色宿主+纸白书页的面板前景/背景及输入框已配对，查词卡按钮/标签亦读纸张令牌。截图 `speech-*.png`、`lookup-google-installed.png`。
 
-Mac实读191音色；Edge生成21600字节MP3，Mac生成145220字节WAV。Kokoro/MeloTTS完整下载安装、校验和合成通过（144610/221634字节WAV），日用原生窗口两模型均完成试听成功。Kokoro上游同名资产2026-10-26被替换：官方GitHub资产677613419的SHA256 `b78e1ac42b852e839cceaafbe88f66806bf5860992d1d7b9a3f2ad1198427aed`匹配实际下载；核对377个成员，更新两项变更及固定清单，没有跳过校验。参考[官方模型说明](https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/kokoro.html)。模型/独立Python在DSH home之外的书库目录以外，不改全局Python。
+Mac实读191音色；Edge生成21600字节MP3，Mac生成145220字节WAV。Kokoro/MeloTTS完整下载安装、校验和合成通过（144610/221634字节WAV），日用原生窗口两模型均完成试听成功。Kokoro上游同名资产2026-10-26被替换：官方GitHub资产677613419的SHA256 `b78e1ac42b852e839cceaafbe88f66806bf5860992d1d7b9a3f2ad1198427aed`匹配实际下载；核对377个成员，更新两项变更及固定清单，没有跳过校验。参考[官方模型说明](https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/kokoro.html)。模型与独立Python位于 `$DSH_HOME/reader-tts`，与书库分离，不改全局Python。
 
 日用候选43文件匹配、重启前七个原有Reader文件摘要不变，备份 `/Users/joe/.dsh/backups/reader-1.5.0-20261103`；后续主动试听设置写入是预期变化。包含聊天侧栏的日用截图仅存本地可视化目录。付费服务真实账号、Windows/Linux与实体移动设备未验收；乔木书库真实激活和Kindle设备边界保留。没有用无密钥阻塞协议与UI实现。其余60项继续执行，不能把本版称为原版已全部对齐。
 
@@ -83,8 +83,8 @@ Host 独占 activate/refresh/me/search/covers/jobs/file 请求；Client 只接�
 | C04 | 摘录单独成笔记、标题/模板、保存到当前/今日/本书笔记 | 缺失原版完整流程。O: main 笔记设置14602-14664；D: 当前主要是固定每书导出/下载 | 用 DSH/本地 Markdown 可实现的目标替代 Vault API；缺“当前/今日”概念时给明确替代，保留用户选择。  待逐项核验；静态发现不计运行完成 |
 | C05 | 笔记文件夹、与书同目录、每书模板、引用模板/颜色/回链设置 | 部分。D: Host `notes/<bookId>.md` 固定形状，已有回链/颜色；O: main DEFAULT_SHELF与notes设置 | 可配置路径/模板、颜色和回链选项；更换路径不丢旧内容、不覆盖其他文件。  待逐项核验；静态发现不计运行完成 |
 | C06 | 阅读进度写入笔记 frontmatter、打开笔记模式 | 缺失/需适配。O: main progressToFrontmatter/noteOpenMode；D: 未找到对应入口 | 更新托管字段不覆盖用户 frontmatter；DSH采用可用的编辑器/打开方式。  待逐项核验；静态发现不计运行完成 |
-| C07 | 默认免费 Google 翻译、AI 上下文翻译及不可用回退 | 缺失免费路径。O: `lookup.js`、README；D: `panel-vocabulary.js` 只有原生模型会话/手写释义 | 无模型可直接查词/翻译；AI未就绪时正确回退，错误可重试。  待逐项核验；静态发现不计运行完成 |
-| C08 | 自动识别语言、默认目标、同语言反向、临时目标 | 缺失。D: LookupCard prompt硬编码中文；O: lookup/translateTo | 中英及非英语样例；临时切换不改默认，翻译保存保留原文与回链。  待逐项核验；静态发现不计运行完成 |
+| C07 | 默认免费 Google 翻译、AI 上下文翻译及不可用回退 | 1.5已实现默认Google免费路径及原生AI可选解释。D: `host/translation.js`、`ui/panel-vocabulary.js` | 16bf6c8；14项新回归，实际DSH无模型Wonderland→仙境并保存；更完整集中词库/九语另列 |
+| C08 | 自动识别语言、默认目标、同语言反向、临时目标 | 1.5已实现自动识别、默认/临时目标与同语种换译。D: `core/lookup.js`、`host/translation.js`、`ui/lookup-locale.js` | 16bf6c8；协议及组件目标隔离/回退验证，真实中文/英文例与安装版Google通过；更多语言端到端仍逐项补 |
 | C09 | 跨书集中生词本、同词合并多个例句、位置链接 | 部分。D: `core/vocabulary.js` 按 bookId+term+context 生成ID，每书列表/导出 | 对齐集中词库与多例句去重，保留编辑释义和多个来源；不要简单覆盖同词。  待逐项核验；静态发现不计运行完成 |
 | C10 | Spaced Repetition Markdown 格式、保留复习进度 | 缺失。O: `vocabulary.js`；D: vocabularyMarkdown仅普通标题/引文 | 导出兼容卡片，重复更新保留 SR metadata；DSH不运行Obsidian插件也应保留可移植格式。  待逐项核验；静态发现不计运行完成 |
 | C11 | Anki自动同步、全量补同步、牌组/接口设置 | 部分。D: `host/anki.js` 固定Default/Basic/8765，UI逐条发送 | 自定义牌组和连接、自动/批量开关、重复检测、离线恢复；真实Anki落卡单独验收。  待逐项核验；静态发现不计运行完成 |
