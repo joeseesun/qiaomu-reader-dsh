@@ -111084,7 +111084,7 @@ for (const [language, index] of [["zh", 0], ["en", 1]]) {
   const messages = LIBRARY_MESSAGES[language];
   messages.shelf = Object.fromEntries(Object.entries(shelfMessages).map(([key, values]) => [key, values[index]]));
   messages.prompts = Object.fromEntries(Object.entries(promptMessages).map(([key, values]) => [key, values[index]]));
-  messages.discover.title = index ? "Find books" : "\u627E\u4E66";
+  messages.discover.title = index ? "Browse library" : "\u6D4F\u89C8\u4E66\u5E93";
 }
 var DISCOVERY_MESSAGES = {
   "shelf": {
@@ -113378,7 +113378,13 @@ var UI_CSS = `
   .qmr-reader-content>.qmr-topbar,.qmr-reader-content>.qmr-bottombar{transition:none}
 }
 .qmr-book-list-window .qmr-book-row{height:80px;min-height:80px;box-sizing:border-box}
-.qmr-discovery-entry{display:flex;margin:0 0 18px}.qmr-discovery-entry .qmr-btn{gap:7px}
+.qmr-library-search-group{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.qmr-library-search-group .qmr-library-search{margin:0;flex:1;min-width:120px}
+.qmr-discovery-entry{display:flex;flex:none;margin:0}
+.qmr-discovery-entry .qmr-btn{gap:7px;height:42px;min-height:42px;padding:0 14px;white-space:nowrap;border:1px solid var(--qmr-lib-line);background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary)}
+.qmr-library-tools{gap:8px}
+@media(max-width:700px){.qmr-library-tools{flex-wrap:wrap;justify-content:flex-end}.qmr-library-search-group{flex-basis:100%}.qmr-discovery-entry .qmr-btn{height:44px;min-height:44px}}
+
 .qmr-removed-books{margin:0 0 18px;font-size:13px}.qmr-removed-books summary{cursor:pointer;padding:10px 0;color:var(--qmr-lib-muted)}
 .qmr-feature-panel{display:flex;flex-direction:column;gap:14px;padding:14px;color:var(--qmr-ink)}
 .qmr-feature-panel label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}
@@ -114924,7 +114930,7 @@ function useDialogFocus(ref, onClose) {
 // src/ui/discovery-style.js
 var DISCOVERY_CSS = `
 .qmr-discovery-backdrop{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:28px;background:rgba(0,0,0,.32);box-sizing:border-box}
-.qmr-discovery-dialog{--qd-bg:var(--dsw-alias-bg-base,#fff);--qd-ink:var(--dsw-alias-label-primary,#252629);--qd-muted:var(--dsw-alias-label-secondary,#686b70);--qd-line:color-mix(in srgb,var(--qd-ink) 12%,transparent);--qd-tint:color-mix(in srgb,var(--qd-ink) 5%,var(--qd-bg));--qd-danger:var(--dsw-alias-status-danger,#b44134);position:relative;box-sizing:border-box;display:flex;flex-direction:column;width:min(800px,100%);height:86dvh;min-height:0;overflow:hidden;border:1px solid var(--qd-line);border-radius:16px;background:var(--qd-bg);color:var(--qd-ink);box-shadow:0 18px 70px rgba(0,0,0,.17);font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;text-align:left;color-scheme:inherit}
+.qmr-discovery-dialog{--qd-bg:var(--dsw-alias-bg-base,#fff);--qd-ink:var(--dsw-alias-label-primary,#252629);--qd-muted:var(--dsw-alias-label-secondary,#686b70);--qd-line:color-mix(in srgb,var(--qd-ink) 12%,transparent);--qd-tint:color-mix(in srgb,var(--qd-ink) 5%,var(--qd-bg));--qd-danger:var(--dsw-alias-status-danger,#b44134);position:relative;box-sizing:border-box;display:flex;flex-direction:column;width:min(800px,100%);height:min(820px,calc(100dvh - 48px));max-height:calc(100dvh - 24px);min-height:0;overflow:hidden;border:1px solid var(--qd-line);border-radius:16px;background:var(--qd-bg);color:var(--qd-ink);box-shadow:0 18px 70px rgba(0,0,0,.17);font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;text-align:left;color-scheme:inherit}
 .qmr-discovery-dialog *{box-sizing:border-box}
 .qmr-discovery-dialog :is(h1,h2,h3,p,blockquote){margin:0}
 .qmr-discovery-header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:36px 28px 18px;flex:none}
@@ -114944,10 +114950,11 @@ var DISCOVERY_CSS = `
 .qmr-discovery-footer{flex:none;border-top:1px solid var(--qd-line);padding:12px 28px;color:var(--qd-muted);font-size:11px;background:var(--qd-bg)}
 .qmr-discovery-search{display:flex;gap:10px;margin-bottom:20px;align-items:flex-end}
 .qmr-discovery-search-label{display:flex;flex-direction:column;flex:1;min-width:0;gap:6px;font-weight:600}
-.qmr-discovery-search>.qmr-discovery-button{min-height:44px;padding:8px 18px}
-.qmr-discovery-search-field{font-weight:400;display:flex;align-items:center;gap:10px;flex:1;min-width:0;height:44px;padding:0 13px;border:1px solid var(--qd-line);border-radius:8px;background:var(--qd-bg);color:var(--qd-muted)}
+.qmr-discovery-search>.qmr-discovery-button{height:44px;min-height:44px;max-height:44px;flex:none;box-sizing:border-box;padding:8px 18px}
+.qmr-discovery-search-field{font-weight:400;display:flex;align-items:center;gap:10px;flex:0 0 44px;flex-shrink:0;min-width:0;width:100%;height:44px;min-height:44px;max-height:44px;padding:0 12px;box-sizing:border-box;border:1px solid var(--qd-line);border-radius:8px;background:var(--qd-bg);color:var(--qd-muted)}
+.qmr-discovery-search>.qmr-discovery-search-field{flex:1 1 auto}
 .qmr-discovery-search-field:focus-within{border-color:var(--qd-muted);box-shadow:none}
-.qmr-discovery-search-field input{width:100%;min-width:0;border:0;background:transparent;outline:none!important;padding:0;height:100%;box-shadow:none}
+.qmr-discovery-search-field input{width:100%;min-width:0;border:0;background:transparent;outline:none!important;padding:0;margin:0;height:42px;min-height:42px;max-height:42px;line-height:22px;box-sizing:border-box;box-shadow:none}
 .qmr-discovery-search-field input::placeholder{color:var(--qd-muted)}
 .qmr-discovery-views{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .qmr-discovery-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:3px;background:var(--qd-tint);border-radius:9px;max-width:100%}
@@ -115019,6 +115026,7 @@ var DISCOVERY_CSS = `
 .qmr-discovery-result-info p{margin-top:5px}
 .qmr-discovery-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:620px){.qmr-discovery-backdrop{padding:12px}.qmr-discovery-dialog{height:calc(100dvh - 24px);border-radius:10px}.qmr-discovery-header{padding:34px 18px 12px;flex-wrap:wrap;gap:12px}.qmr-discovery-source-nav{margin:0;gap:2px}.qmr-discovery-source-nav button{padding:8px;font-size:12px}.qmr-discovery-scroll{padding:18px}.qmr-discovery-footer{padding:10px 18px}.qmr-discovery-grid{grid-template-columns:1fr}.qmr-discovery-tabs button{min-height:40px;padding:0 10px}.qmr-discovery-detail-top{gap:16px}.qmr-discovery-detail-top .qmr-discovery-cover{width:84px}.qmr-discovery-detail-info h2{font-size:19px}.qmr-discovery-button{min-height:40px}.qmr-discovery-result{flex-wrap:wrap;gap:12px}.qmr-discovery-result-info{flex-basis:calc(100% - 76px)}.qmr-discovery-result>.qmr-discovery-button{margin-left:76px}.qmr-discovery-icon{width:40px;height:40px}}
+@media(max-height:560px){.qmr-discovery-backdrop{padding:12px}.qmr-discovery-dialog{height:calc(100dvh - 24px)}.qmr-discovery-header{padding:14px 28px 8px}.qmr-discovery-header h1{font-size:20px}.qmr-discovery-header>.qmr-discovery-icon{top:8px}.qmr-discovery-source-nav{margin-right:22px}.qmr-discovery-scroll{padding:12px 28px 18px}.qmr-discovery-search{margin-bottom:12px}.qmr-discovery-view-hint{margin:8px 0 12px!important}}
 @media(prefers-reduced-motion:reduce){.qmr-discovery-dialog *{scroll-behavior:auto}}
 `;
 
@@ -115130,19 +115138,15 @@ function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
     h5("style", null, DISCOVERY_CSS),
     h5(
       "section",
-      { className: "qmr-discovery-dialog", ref: dialog, role: "dialog", "aria-modal": "true", "aria-label": ui.t("discover.title", "\u627E\u4E66"), onKeyDown: keyDown },
+      { className: "qmr-discovery-dialog", ref: dialog, role: "dialog", "aria-modal": "true", "aria-label": ui.t("discover.title", "\u6D4F\u89C8\u4E66\u5E93"), onKeyDown: keyDown },
       h5(
         "header",
         { className: "qmr-discovery-header" },
-        h5("h1", null, ui.t("discover.title", "\u627E\u4E66")),
+        h5("h1", null, ui.t("discover.title", "\u6D4F\u89C8\u4E66\u5E93")),
         h5(
           "div",
           { className: "qmr-discovery-source-nav", role: "group", "aria-label": ui.t("discover.sources", "\u4E66\u6E90") },
           h5("button", { type: "button", "aria-pressed": source === "shelf", onClick: () => setSource("shelf") }, ui.t("discover.publicSource", "\u516C\u5F00\u4E66\u6E90")),
-          h5("button", { type: "button", onClick: () => {
-            close();
-            requestAnimationFrame(() => document.querySelector(".qmr-library-search input")?.focus());
-          } }, ui.t("discover.localSource", "\u672C\u5730\u4E66\u5E93")),
           h5("button", { type: "button", "aria-pressed": source === "gutenberg", onClick: () => {
             if (source === "shelf" && !memory.current.inDetail) memory.current.scroll = scrollRef.current?.scrollTop || 0;
             setSource("gutenberg");
@@ -115155,8 +115159,7 @@ function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
         null,
         query ? h5("button", { type: "button", className: "qmr-discovery-text-button", onClick: () => setSource("shelf") }, h5(IconArrowLeft, { width: 15, height: 15 }), ui.t("shelf.back", "\u8FD4\u56DE\u4E66\u5355")) : null,
         h5(Gutenberg, { ui, initialQuery: query, memory: gutenbergMemory })
-      )),
-      h5("footer", { className: "qmr-discovery-footer" }, ui.t("discover.localHint", "\u4E66\u5E93\u548C\u6E05\u5355\u7559\u5728\u672C\u5730\uFF1B\u516C\u5F00\u76EE\u5F55\u4EC5\u63D0\u4F9B\u627E\u4E66\u7EBF\u7D22\u3002"))
+      ))
     )
   ), document.body);
 }
@@ -115166,7 +115169,7 @@ function BookDiscovery({ ui }) {
   return h5(
     "div",
     { className: "qmr-discovery-entry" },
-    h5("button", { className: "qmr-btn", type: "button", onClick: () => setOpen(true) }, h5(IconSearch, { width: 16, height: 16 }), ui.t("discover.title", "\u627E\u4E66")),
+    h5("button", { className: "qmr-btn", type: "button", onClick: () => setOpen(true) }, h5(IconSearch, { width: 16, height: 16 }), ui.t("discover.title", "\u6D4F\u89C8\u4E66\u5E93")),
     open ? h5(DiscoveryDialog, { ui, memory, gutenbergMemory, onClose: () => setOpen(false) }) : null
   );
 }
@@ -115441,13 +115444,18 @@ function LibraryView({ ui }) {
         h6(
           "div",
           { className: "qmr-library-tools" },
-          h6("label", { className: "qmr-library-search" }, h6(IconSearch, { width: 17, height: 17 }), h6("input", {
-            type: "search",
-            value: query,
-            placeholder: tr(ui, "searchPlaceholder", "\u641C\u7D22\u4E66\u540D\u6216\u4F5C\u8005"),
-            "aria-label": tr(ui, "search", "\u641C\u7D22\u4E66\u5E93"),
-            onChange: (event) => ui.store.set({ libraryQuery: event.target.value })
-          })),
+          h6(
+            "div",
+            { className: "qmr-library-search-group" },
+            h6("label", { className: "qmr-library-search" }, h6(IconSearch, { width: 17, height: 17 }), h6("input", {
+              type: "search",
+              value: query,
+              placeholder: tr(ui, "searchPlaceholder", "\u641C\u7D22\u4E66\u540D\u6216\u4F5C\u8005"),
+              "aria-label": tr(ui, "search", "\u641C\u7D22\u4E66\u5E93"),
+              onChange: (event) => ui.store.set({ libraryQuery: event.target.value })
+            })),
+            h6(BookDiscovery, { ui })
+          ),
           iconButton(IconRefresh, "refresh", "\u5237\u65B0\u4E66\u5E93", () => ui.refreshLibrary(), !!loading),
           iconButton(IconFullscreen, "fullscreen", "\u5168\u5C4F", () => ui.toggleFullscreen()),
           iconButton(IconClose, "close", "\u5173\u95ED\u9605\u8BFB\u5668", () => ui.closeOverlay())
@@ -115456,7 +115464,6 @@ function LibraryView({ ui }) {
       h6(
         "div",
         { className: "qmr-lib-scroll", tabIndex: 0 },
-        h6(BookDiscovery, { ui }),
         ui.removedBooks().length ? h6(
           "details",
           { className: "qmr-removed-books" },

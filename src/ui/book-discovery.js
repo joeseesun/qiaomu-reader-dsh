@@ -63,7 +63,6 @@ function DiscoveryDialog({ ui, onClose, memory, gutenbergMemory }) {
       h('header', { className: 'qmr-discovery-header' }, h('h1', null, ui.t('discover.title', '浏览书库')),
         h('div', { className: 'qmr-discovery-source-nav', role: 'group', 'aria-label': ui.t('discover.sources', '书源') },
           h('button', { type: 'button', 'aria-pressed': source === 'shelf', onClick: () => setSource('shelf') }, ui.t('discover.publicSource', '公开书源')),
-          h('button', { type: 'button', onClick: () => { close(); requestAnimationFrame(() => document.querySelector('.qmr-library-search input')?.focus()); } }, ui.t('discover.localSource', '本地书库')),
           h('button', { type: 'button', 'aria-pressed': source === 'gutenberg', onClick: () => { if (source === 'shelf' && !memory.current.inDetail) memory.current.scroll = scrollRef.current?.scrollTop || 0; setSource('gutenberg'); } }, 'Gutenberg')),
         h('button', { className: 'qmr-discovery-icon', type: 'button', 'aria-label': ui.t('prompts.close', '关闭'), onClick: close }, h(IconClose, { width: 20, height: 20 }))),
       h('div', { className: 'qmr-discovery-scroll', ref: scrollRef }, source === 'shelf' ? h(BookShelf, { ui, scrollRef, memory, searchGutenberg }) : h(React.Fragment, null,
