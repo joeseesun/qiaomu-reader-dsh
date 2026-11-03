@@ -9,6 +9,7 @@
 图：1.1.0 预构建发布包，macOS 上的隔离 DSH Web profile；生词释义由测试人员输入，截图不代表模型回答已验收。
 
 - EPUB、PDF、TXT、Markdown / HTML 导入；UTF-8、UTF-16 BOM 与 GB18030 文本解码。
+- 命名书签与出版页码/稳定位置跳转；字号和窗口变化保持文本锚点，PDF支持真实目录、独立缩放及同页多次命中。
 - 从书库移除后保留原副本、进度、划线、生词和 Markdown 笔记，可恢复或重新导入。
 - 系统、Mac 本地、Edge、OpenAI/兼容、通义、豆包、MiniMax、硅基流动、ElevenLabs、Azure 语音；模型/音色配置、独立试听、段落前后、选文、跨章与位置恢复。
 - Kokoro/MeloTTS 一键安装、进度/取消/重试；模型和 Python 环境独立于书库及系统 Python。
@@ -30,6 +31,10 @@
 ![真实安装版免费查词](docs/qa/lookup-google-installed.png)
 
 图：DSH Host 实际请求 Google，Wonderland→仙境；无需配置模型。朗读付费服务的协议测试不代表真实账号试听。
+
+![命名书签](docs/qa/parity-navigation-bookmarks.png)
+
+图：1.6.0 独立 DSH 安装版；EPUB 出版页码夹具和持久化书签，完整边界见适配记录。
 
 ## 安装预构建发布包
 
