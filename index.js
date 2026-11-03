@@ -1706,8 +1706,8 @@ var init_preprocessor = __esm({
           this._err(ERR.noncharacterInInputStream);
         }
       }
-      retreat(count) {
-        this.pos -= count;
+      retreat(count2) {
+        this.pos -= count2;
         while (this.pos < this.lastGapPos) {
           this.lastGapPos = this.gapStack.pop();
           this.pos--;
@@ -1817,10 +1817,10 @@ function decodeTrieDict(input, resultLength, atomCount, dict1AtomCount, ngramCou
   single.fill(-1, dictSize + dict2AtomCount, slotCount);
   const start = new Int32Array(slotCount);
   const length = new Int32Array(slotCount);
-  function decodeDelta(count, off) {
+  function decodeDelta(count2, off) {
     let previous = 0;
     let slot = off;
-    const end = off + count;
+    const end = off + count2;
     while (slot < end) {
       const code = BASE91_INVERSE[input.charCodeAt(pos++)];
       if (code < 89) {
@@ -1843,8 +1843,8 @@ function decodeTrieDict(input, resultLength, atomCount, dict1AtomCount, ngramCou
   const references = new Int32Array(ngramCount * 2);
   let poolSize = 0;
   let ngramIndex = 0;
-  function readNgramReferences(count, startSlot) {
-    for (let index = 0; index < count; index++) {
+  function readNgramReferences(count2, startSlot) {
+    for (let index = 0; index < count2; index++) {
       const slot = startSlot + index;
       const a3 = readSlotCode();
       const b = readSlotCode();
@@ -3089,9 +3089,9 @@ var init_tokenizer = __esm({
         this.consumedAfterSnapshot++;
         return this.preprocessor.advance();
       }
-      _advanceBy(count) {
-        this.consumedAfterSnapshot += count;
-        for (let i = 0; i < count; i++) {
+      _advanceBy(count2) {
+        this.consumedAfterSnapshot += count2;
+        for (let i = 0; i < count2; i++) {
           this.preprocessor.advance();
         }
       }
@@ -11268,6 +11268,74 @@ var init_epub = __esm({
   }
 });
 
+// src/core/book-shelf.js
+var SHELF_ORIGIN = "https://hackerbooks.qiaomu.ai";
+var SHELF_ID = /^OL\d+W$/;
+function shelfDataUrl(name2) {
+  if (!["books", "books-top", "topics", "paths", "co-index"].includes(name2)) throw new Error("Unknown shelf data");
+  return `${SHELF_ORIGIN}/data/${name2}.json`;
+}
+function shelfBookUrl(id) {
+  if (!SHELF_ID.test(String(id))) throw new Error("Invalid shelf book ID");
+  return `${SHELF_ORIGIN}/data/book/${id}.json`;
+}
+var count = (value) => Number.isFinite(value) && value > 0 ? value : 0;
+function normalizeShelfBooks(data) {
+  if (!Array.isArray(data)) throw new Error("Invalid shelf response");
+  return data.filter((book) => book && SHELF_ID.test(book.id) && typeof book.t === "string" && book.t.trim()).map((book) => ({
+    ...book,
+    t: book.t.slice(0, 500),
+    ...Object.fromEntries(["tz", "st", "sz", "w"].map((key) => [key, typeof book[key] === "string" ? book[key].slice(0, 4e3) : ""])),
+    k: Array.isArray(book.k) ? book.k.filter((value) => typeof value === "string") : [],
+    q: Number.isFinite(book.q) ? book.q : null,
+    s: count(book.s),
+    y: Number.isFinite(book.y) ? book.y : null,
+    a: Array.isArray(book.a) ? book.a.filter((name2) => typeof name2 === "string") : [],
+    tp: Array.isArray(book.tp) ? book.tp.filter((slug) => typeof slug === "string") : [],
+    u: count(book.u),
+    ru: count(book.ru),
+    cu: count(book.cu),
+    lr: count(book.lr)
+  }));
+}
+function normalizeShelfTopics(data) {
+  if (!Array.isArray(data)) return [];
+  return data.filter((topic) => topic && typeof topic.slug === "string" && typeof topic.name === "string" && topic.slug !== "other").map((topic) => ({ slug: topic.slug, zh: topic.name, en: typeof topic.en === "string" ? topic.en : topic.name, n: count(topic.n) }));
+}
+function normalizeShelfDetail(data, id) {
+  if (!data || data.id !== id) throw new Error("Invalid shelf detail");
+  const stance = data.stance && typeof data.stance === "object" ? { r: count(data.stance.r), n: count(data.stance.n), c: count(data.stance.c) } : null;
+  const why = data.why && typeof data.why === "object" ? {
+    points: Array.isArray(data.why.why) ? data.why.why.filter((item) => typeof item === "string" && item).slice(0, 4) : [],
+    fit: typeof data.why.fit === "string" ? data.why.fit : "",
+    warn: typeof data.why.warn === "string" ? data.why.warn : ""
+  } : null;
+  const comments = (Array.isArray(data.comments) ? data.comments : []).filter((item) => item && Number.isSafeInteger(item.id) && typeof item.x === "string" && item.x.trim()).map((item) => ({ id: item.id, by: typeof item.by === "string" ? item.by : "", ts: item.ts, x: item.x, zh: typeof item.zh === "string" ? item.zh : "", stance: ["r", "n", "c"].includes(item.sv) ? item.sv : "" }));
+  return {
+    description: { zh: typeof data.dz === "string" ? data.dz : "", en: typeof data.desc === "string" ? data.desc : "" },
+    stance,
+    why,
+    comments,
+    related: (Array.isArray(data.related) ? data.related : []).filter((related) => SHELF_ID.test(related) && related !== id).slice(0, 8)
+  };
+}
+var SHELF_MARKS = ["wish", "read"];
+var MAX_SHELF_MARKS = 5e3;
+function normalizeShelfMarks(value) {
+  const marks = {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) return marks;
+  const rows = Object.entries(value).filter(([id, mark]) => SHELF_ID.test(id) && SHELF_MARKS.includes(mark?.s)).map(([id, mark]) => [id, { s: mark.s, at: Number.isFinite(mark.at) ? mark.at : 0 }]).sort((a3, b) => b[1].at - a3[1].at).slice(0, MAX_SHELF_MARKS);
+  for (const [id, mark] of rows) marks[id] = mark;
+  return marks;
+}
+function toggleShelfMark(marks, id, status, now = Date.now()) {
+  if (!SHELF_ID.test(String(id)) || !SHELF_MARKS.includes(status)) return marks;
+  const next = { ...marks };
+  if (next[id]?.s === status) delete next[id];
+  else next[id] = { s: status, at: now };
+  return next;
+}
+
 // src/host/index.js
 import { createHash } from "node:crypto";
 import { mkdir, readFile as readFile2, readdir, rename, rm as rm2, stat, writeFile, copyFile } from "node:fs/promises";
@@ -11505,6 +11573,34 @@ async function downloadBook(id, request = globalThis.fetch) {
   const book = await parseEpub(bytes);
   if (!book.chapters.length) throw new Error("\u4E0B\u8F7D\u6587\u4EF6\u6CA1\u6709\u53EF\u8BFB\u7AE0\u8282");
   return { base64: bytes.toString("base64"), filename: `Gutenberg-${id}.epub`, identifier: `gutenberg:${id}` };
+}
+function createShelfSource(request = globalThis.fetch) {
+  const cached = /* @__PURE__ */ new Map(), pending = /* @__PURE__ */ new Map();
+  async function json(url, normalize) {
+    if (cached.has(url)) return cached.get(url);
+    if (pending.has(url)) return pending.get(url);
+    const work = (async () => {
+      const response = await request(url, { signal: AbortSignal.timeout(3e4), redirect: "error" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const bytes = await readResponse(response, 12 * 1024 * 1024);
+      const result = normalize(JSON.parse(bytes.toString("utf8")));
+      if (cached.size >= 100) cached.delete(cached.keys().next().value);
+      cached.set(url, result);
+      return result;
+    })().finally(() => pending.delete(url));
+    pending.set(url, work);
+    return work;
+  }
+  return async ({ kind = "books", id } = {}) => {
+    if (kind === "detail") return json(shelfBookUrl(id), (data) => normalizeShelfDetail(data, id));
+    if (kind === "books") return json(shelfDataUrl("books"), normalizeShelfBooks);
+    if (kind === "topics") return json(shelfDataUrl("topics"), normalizeShelfTopics);
+    if (kind === "co-index") return json(shelfDataUrl("co-index"), (data) => {
+      if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid recommendation data");
+      return Object.fromEntries(Object.entries(data).filter(([id2, rows]) => /^OL\d+W$/.test(id2) && Array.isArray(rows)).map(([id2, rows]) => [id2, rows.filter((value) => /^OL\d+W$/.test(value)).slice(0, 200)]));
+    });
+    throw new Error("Unknown shelf request");
+  };
 }
 
 // src/host/index.js
@@ -11754,7 +11850,23 @@ function apply(ctx, config = {}) {
     ]);
     return paths;
   };
+  const shelfData = createShelfSource();
   const api = {
+    shelfData,
+    async shelfMarks() {
+      const raw = await readJson(path2.join(pathsOf().base, "reading-lists.json"), {});
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Invalid reading lists; original file preserved");
+      return normalizeShelfMarks(raw);
+    },
+    async markShelf({ id, status }) {
+      if (!/^OL\d+W$/.test(String(id)) || !["wish", "read"].includes(status)) throw new Error("Invalid reading list entry");
+      return serializeLibrary(pathsOf().base, async () => {
+        const marks = await api.shelfMarks();
+        const next = normalizeShelfMarks(toggleShelfMark(marks, id, status));
+        await writeTextAtomic(path2.join(pathsOf().base, "reading-lists.json"), JSON.stringify(next, null, 2));
+        return next;
+      });
+    },
     speechAudio,
     speechVoices,
     searchBooks: (request) => searchBooks(request.query),
@@ -12146,6 +12258,15 @@ var ReaderService = class extends TypertRemoteService {
   sendToAnki(request) {
     return this.api.sendToAnki(request);
   }
+  shelfData(request) {
+    return this.api.shelfData(request);
+  }
+  shelfMarks() {
+    return this.api.shelfMarks();
+  }
+  markShelf(request) {
+    return this.api.markShelf(request);
+  }
   searchBooks(request) {
     return this.api.searchBooks(request);
   }
@@ -12191,7 +12312,7 @@ ${JSON.stringify(material)}
     return { ok: true };
   }
 };
-for (const name2 of ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "sendToAnki", "searchBooks", "downloadBook", "loadState", "saveState", "readBookBytes", "highlights", "exportNotes", "setReadingContext"]) {
+for (const name2 of ["info", "library", "importBook", "removeBook", "restoreBook", "speechVoices", "speechAudio", "sendToAnki", "searchBooks", "downloadBook", "shelfData", "shelfMarks", "markShelf", "loadState", "saveState", "readBookBytes", "highlights", "exportNotes", "setReadingContext"]) {
   Remote(name2)(ReaderService.prototype[name2], {
     name: name2,
     private: false,

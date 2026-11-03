@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.1.2：DeepSeek Harness **0.2.1-rc.3** 兼容更新。[本次验证范围](docs/RC3-COMPATIBILITY.md)。
+> v1.2.0：Hacker Books 书单、想读 / 读过、本地推荐；快捷提示词恢复内置与失败重试。[适配与验证范围](docs/READER-ADAPTATION.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -12,15 +12,21 @@
 - 从书库移除后保留原副本、进度、划线、生词和 Markdown 笔记，可恢复或重新导入。
 - 浏览器系统语音与 macOS 宿主语音：跨章朗读、暂停续读、音色/速度、跟随和回到朗读处。
 - 选区查词卡复用 Harness 原生会话；生词保留上下文与原文回跳，可导出 Markdown，可选 AnkiConnect。
+- Hacker Books 榜单、主题、搜索、中文简介和 HN 评论；想读 / 读过与本地推荐。
 - Gutenberg 搜索、EPUB 下载校验、已拥有提示；大书库窗口渲染。
+- 快捷提示词可恢复内置；默认文案跟随语言，保存失败保留草稿。
+
+![真实 DSH 中的 Hacker Books 英文书单](docs/qa/discovery-english.png)
+
+图：1.2.0 隔离 DSH 0.2.1-rc.3，书单、读过标记与既有书库共存。
 
 ## 安装预构建发布包
 
-从 [v1.1.2 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.1.2) 下载 `qiaomu-reader-dsh-1.1.2.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
+从 [v1.2.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.2.0) 下载 `qiaomu-reader-dsh-1.2.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
 
 ```sh
 shasum -a 256 -c SHA256SUMS
-dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.1.2.tgz
+dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.2.0.tgz
 ```
 
 `YOUR_PROFILE` 需要替换为目标 profile。macOS 桌面版请使用应用自带 CLI：`/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh`。不要把隔离测试配置直接覆盖日用配置。
@@ -57,7 +63,7 @@ npm pack --pack-destination /tmp
 
 ## English
 
-Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.1.2 GitHub Release; no npm publication is provided.
+Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.2.0 GitHub Release; no npm publication is provided.
 
 Tested on macOS with bundled DSH 0.2.1-rc.3 in an isolated Web profile. The regular desktop process, Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Kindle, activated Qiaomu Library, additional TTS engines, MOBI/FB2/comics and stable whole-book pagination are outside this candidate.
 

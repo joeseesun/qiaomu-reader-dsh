@@ -1,3 +1,4 @@
+import { normalizeShelfMarks, toggleShelfMark } from '../core/book-shelf.js';
 /**
  * 乔木阅读 · 宿主半
  *
@@ -19,7 +20,7 @@ import { parseTextBook } from '../client/text-book.js';
 import { speechAudio, speechVoices } from './speech.js';
 import { sendAnkiEntry } from './anki.js';
 import { vocabularyMarkdown } from '../core/vocabulary.js';
-import { searchBooks, downloadBook } from './discovery.js';
+import { searchBooks, downloadBook, createShelfSource } from './discovery.js';
 import { TypertRemoteService, Remote } from '@deepseek-ai/dsh-typert-protocol';
 
 /** 书库相对工作区根目录的文件夹名。 */
@@ -402,7 +403,23 @@ export function apply(ctx, config = {}) {
    * 数据面 API：客户端半边通过它读写书库与状态。
    * 每个方法都返回可 JSON 序列化的结果，失败时抛带原因的 Error。
    */
+  const shelfData = createShelfSource();
   const api = {
+    shelfData,
+    async shelfMarks() {
+      const raw = await readJson(path.join(pathsOf().base, 'reading-lists.json'), {});
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('Invalid reading lists; original file preserved');
+      return normalizeShelfMarks(raw);
+    },
+    async markShelf({ id, status }) {
+      if (!/^OL\d+W$/.test(String(id)) || !["wish", "read"].includes(status)) throw new Error("Invalid reading list entry");
+      return serializeLibrary(pathsOf().base, async () => {
+        const marks = await api.shelfMarks();
+        const next = normalizeShelfMarks(toggleShelfMark(marks, id, status));
+        await writeTextAtomic(path.join(pathsOf().base, "reading-lists.json"), JSON.stringify(next, null, 2));
+        return next;
+      });
+    },
     speechAudio,
     speechVoices,
     searchBooks: request => searchBooks(request.query),
@@ -796,6 +813,9 @@ export default class ReaderService extends TypertRemoteService {
   speechVoices() { return this.api.speechVoices(); }
   speechAudio(request) { return this.api.speechAudio(request); }
   sendToAnki(request) { return this.api.sendToAnki(request); }
+  shelfData(request) { return this.api.shelfData(request); }
+  shelfMarks() { return this.api.shelfMarks(); }
+  markShelf(request) { return this.api.markShelf(request); }
   searchBooks(request) { return this.api.searchBooks(request); }
   downloadBook(request) { return this.api.downloadBook(request); }
   loadState(request) { return this.api.loadState(request.bookId); }
@@ -825,7 +845,7 @@ export default class ReaderService extends TypertRemoteService {
   }
 }
 
-for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
+for (const name of ['info', 'library', 'importBook', 'removeBook', 'restoreBook', 'speechVoices', 'speechAudio', 'sendToAnki', 'searchBooks', 'downloadBook', 'shelfData', 'shelfMarks', 'markShelf', 'loadState', 'saveState', 'readBookBytes', 'highlights', 'exportNotes', 'setReadingContext']) {
   Remote(name)(ReaderService.prototype[name], {
     name, private: false, static: false,
     addInitializer(fn) { fn.call(Object.create(ReaderService.prototype)); },

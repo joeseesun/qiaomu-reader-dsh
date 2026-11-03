@@ -1201,7 +1201,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
         }, panelNode)
         : null,
     ),
-    promptManagerOpen ? h(PromptManager, { onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null,
+    promptManagerOpen ? h(PromptManager, { ui, onClose: () => ui.store.set({ promptManagerOpen: false }) }) : null,
 
   );
 }

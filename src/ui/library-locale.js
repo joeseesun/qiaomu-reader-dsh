@@ -220,6 +220,25 @@ export const LIBRARY_MESSAGES = {
   }
 };
 
+const shelfMessages = {
+  language: ['zh', 'en'], offline: ['请连接宿主后重试', 'Connect the host and retry'],
+  privacy: ['Hacker Books 书单；搜索和推荐在本地计算，书库与清单不上传。', 'Hacker Books lists. Search and recommendations run locally; your library and lists are never uploaded.'],
+  best: ['值得读', 'Worth reading'], top: ['最多人提', 'Most mentioned'], lindy: ['经典常青', 'Enduring classics'], foryou: ['为你推荐', 'For you'], wish: ['想读', 'Want to read'], read: ['读过', 'Read'], views: ['书单', 'Lists'],
+  query: ['书名或作者', 'Title or author'], topics: ['全部主题', 'All topics'], loading: ['正在加载书单…', 'Loading books…'], loadFailed: ['书单加载失败，请重试', 'Unable to load books; retry'], saveFailed: ['保存失败，原清单已保留，请重试', 'Save failed; your previous list is preserved. Retry.'],
+  retry: ['重试', 'Retry'], back: ['返回书单', 'Back to books'], owned: ['已拥有', 'In library'], advice: ['阅读建议', 'Reading advice'], comments: ['HN 读者评论', 'HN reader comments'], related: ['相关书籍', 'Related books'], more: ['显示更多', 'Show more'], seeds: ['先加入想读清单，或导入书籍以获取推荐。', 'Add books to your lists or library for recommendations.'], empty: ['暂无书籍', 'No books yet'],
+};
+const promptMessages = {
+  send: ['直接发送：{title}', 'Send: {title}'],
+  language: ['zh', 'en'], manage: ['管理快捷提示词', 'Manage quick prompts'], title: ['快捷提示词', 'Quick prompts'], close: ['关闭', 'Close'], hint: ['显示在伴读输入框上方。点击后直接发送；已有手写草稿时会保留草稿。', 'Shown above the chat input. Click to send; existing drafts are preserved.'],
+  edit: ['编辑', 'Edit'], delete: ['删除', 'Delete'], name: ['名称', 'Name'], body: ['提示词', 'Prompt'], cancel: ['取消', 'Cancel'], save: ['保存', 'Save'], add: ['+ 新增提示词', '+ Add prompt'], reset: ['恢复内置', 'Restore defaults'], failed: ['保存失败，修改已保留，请重试', 'Save failed; your edits are preserved. Retry.'],
+};
+for (const [language, index] of [['zh', 0], ['en', 1]]) {
+  const messages = LIBRARY_MESSAGES[language];
+  messages.shelf = Object.fromEntries(Object.entries(shelfMessages).map(([key, values]) => [key, values[index]]));
+  messages.prompts = Object.fromEntries(Object.entries(promptMessages).map(([key, values]) => [key, values[index]]));
+  messages.discover.title = index ? 'Find books' : '找书';
+}
+
 // DSH LocaleFace looks up literal keys; it does not traverse nested objects.
 export function flatMessages(messages, prefix = '') {
   return Object.fromEntries(Object.entries(messages).flatMap(([key, value]) => {
