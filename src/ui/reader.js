@@ -693,6 +693,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const reportPosition = React.useCallback(() => {
     const live = liveRef.current;
     if (live.bookId == null) return;
+    if(ui.store.get().chapterBusy)return ui.stateOr(live.bookId).locator;
     let scroll = 0;
     if (live.settings && live.settings.flow === 'scroll') {
       const viewport = viewportRef.current;
@@ -729,7 +730,7 @@ export function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
+  }, [page, pageCount, chapterIndex, jumpToken, chapterBusy, ui, reportPosition]);
 
   // ------------------------------------------------------------- pager 注册
 

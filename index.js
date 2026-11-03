@@ -24032,7 +24032,7 @@ function parseSystemFonts(stdout, platform) {
   return [...new Set(names.filter(safeFontFamily).map((name2) => name2.trim()))].sort((a3, b) => a3.localeCompare(b)).slice(0, 1e4);
 }
 async function systemReaderFonts({ platform = process.platform, run = exec } = {}) {
-  const spec = platform === "darwin" ? ["/usr/sbin/system_profiler", ["SPFontsDataType", "-json", "-detailLevel", "mini"]] : platform === "win32" ? ["powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", "Add-Type -AssemblyName System.Drawing; @((New-Object System.Drawing.Text.InstalledFontCollection).Families | ForEach-Object {$_.Name}) | ConvertTo-Json -Compress"]] : platform === "linux" ? ["fc-list", ["--format", "%{family}\\n"]] : null;
+  const spec = platform === "darwin" ? ["/usr/sbin/system_profiler", ["SPFontsDataType", "-json", "-detailLevel", "mini"]] : platform === "win32" ? ["powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; @((New-Object System.Drawing.Text.InstalledFontCollection).Families | ForEach-Object {$_.Name}) | ConvertTo-Json -Compress"]] : platform === "linux" ? ["fc-list", ["--format", "%{family}\\n"]] : null;
   if (!spec) throw Error("\u5F53\u524D\u5BBF\u4E3B\u4E0D\u652F\u6301\u7CFB\u7EDF\u5B57\u4F53\u679A\u4E3E\uFF0C\u53EF\u76F4\u63A5\u586B\u5199\u5B57\u4F53\u540D\u79F0\u6216\u5BFC\u5165\u6587\u4EF6");
   try {
     const { stdout } = await run(spec[0], spec[1], { timeout: 2e4, maxBuffer: 24 * 1024 * 1024, encoding: "utf8", windowsHide: true });

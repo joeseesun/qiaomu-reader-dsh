@@ -114677,7 +114677,7 @@ function createController(getProps, store) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
       const preservePosition = id === uiStore.get().bookId && ["fontSize", "fontFamily", "lineHeight", "margin", "flow", "spread", "justify", "pdfZoom", "textAlign", "maxLineCh", "vAlign"].some((key) => Object.hasOwn(patch || {}, key));
-      const anchor = preservePosition ? pager.capture?.() || state.locator : null;
+      const anchor = preservePosition ? uiStore.get().chapterBusy ? state.locator : pager.capture?.() || state.locator : null;
       const merged = { ...state.settings || {}, ...patch || {} };
       patchState(id, { settings: merged });
       if (anchor && Number.isFinite(anchor.textOffset)) {
@@ -116811,7 +116811,6 @@ function useReaderFont(ui, bookId, key, scope = "book") {
   const retry = ui.useSel((state) => state.fontRetry || 0), host = ui.props().data?.getHost();
   React10.useEffect(() => {
     let active = true;
-    const anchor = ui.store.get().restoreAnchor || ui.stateOr(bookId).locator;
     const status = (value) => ui.store.set({ fontStatuses: { ...ui.store.get().fontStatuses, [key]: value } });
     status({ loading: key === "zhuque" || key?.startsWith("imported:"), error: null });
     loadReaderFont(host, key).then((loaded) => {
@@ -116819,7 +116818,10 @@ function useReaderFont(ui, bookId, key, scope = "book") {
       if (!active || ui.store.get().bookId !== bookId || selected !== key) return;
       status({ loading: false, error: null });
       const state = ui.store.get();
-      if (loaded) ui.store.set({ fontVersion: (state.fontVersion || 0) + 1, restoreAnchor: anchor, restoreScroll: anchor.scroll, jumpToken: (state.jumpToken || 0) + 1 });
+      if (loaded) {
+        const anchor = ui.stateOr(bookId).locator;
+        ui.store.set({ fontVersion: (state.fontVersion || 0) + 1, ...scope === "book" ? { restoreAnchor: anchor, restoreScroll: anchor.scroll, jumpToken: (state.jumpToken || 0) + 1 } : {} });
+      }
     }, (cause) => {
       if (active) status({ loading: false, error: cause.message });
     });
@@ -122145,6 +122147,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
   const reportPosition = React23.useCallback(() => {
     const live = liveRef.current;
     if (live.bookId == null) return;
+    if (ui.store.get().chapterBusy) return ui.stateOr(live.bookId).locator;
     let scroll = 0;
     if (live.settings && live.settings.flow === "scroll") {
       const viewport = viewportRef.current;
@@ -122206,7 +122209,7 @@ function ReaderView({ ui, chatApi, SessionProvider, renderSlot }) {
     return () => {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
-  }, [page, pageCount, chapterIndex, jumpToken, ui, reportPosition]);
+  }, [page, pageCount, chapterIndex, jumpToken, chapterBusy, ui, reportPosition]);
   React23.useEffect(() => {
     const isScroll = () => {
       const live = liveRef.current;

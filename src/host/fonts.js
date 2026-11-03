@@ -18,7 +18,7 @@ export function parseSystemFonts(stdout,platform){
  return [...new Set(names.filter(safeFontFamily).map(name=>name.trim()))].sort((a,b)=>a.localeCompare(b)).slice(0,10000);
 }
 export async function systemReaderFonts({platform=process.platform,run=exec}={}){
- const spec=platform==='darwin'?['/usr/sbin/system_profiler',['SPFontsDataType','-json','-detailLevel','mini']]:platform==='win32'?['powershell.exe',['-NoProfile','-NonInteractive','-Command',"Add-Type -AssemblyName System.Drawing; @((New-Object System.Drawing.Text.InstalledFontCollection).Families | ForEach-Object {$_.Name}) | ConvertTo-Json -Compress"]]:platform==='linux'?['fc-list',['--format','%{family}\\n']]:null;
+ const spec=platform==='darwin'?['/usr/sbin/system_profiler',['SPFontsDataType','-json','-detailLevel','mini']]:platform==='win32'?['powershell.exe',['-NoProfile','-NonInteractive','-Command',"[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; @((New-Object System.Drawing.Text.InstalledFontCollection).Families | ForEach-Object {$_.Name}) | ConvertTo-Json -Compress"]]:platform==='linux'?['fc-list',['--format','%{family}\\n']]:null;
  if(!spec)throw Error('当前宿主不支持系统字体枚举，可直接填写字体名称或导入文件');
  try{const {stdout}=await run(spec[0],spec[1],{timeout:20000,maxBuffer:24*1024*1024,encoding:'utf8',windowsHide:true});const families=parseSystemFonts(stdout,platform);if(!families.length)throw Error('empty');return {families,platform};}
  catch{throw Error('系统字体读取失败，可直接填写字体名称或导入字体文件');}

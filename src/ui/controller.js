@@ -345,7 +345,7 @@ export function createController(getProps, store) {
     whenLoaded(id, () => {
       const state = stateOfBook(id) || emptyState(id);
       const preservePosition = id === uiStore.get().bookId && ['fontSize','fontFamily','lineHeight','margin','flow','spread','justify','pdfZoom','textAlign','maxLineCh','vAlign'].some(key => Object.hasOwn(patch || {}, key));
-      const anchor = preservePosition ? (pager.capture?.() || state.locator) : null;
+      const anchor = preservePosition ? (uiStore.get().chapterBusy?state.locator:(pager.capture?.() || state.locator)) : null;
       const merged = { ...(state.settings || {}), ...(patch || {}) };
       patchState(id, { settings: merged });
       if (anchor && Number.isFinite(anchor.textOffset)) {
