@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.9.1：PDF 伴读关联全文，超过 180000 字符均匀摘取并标注范围；恢复命名目的地、页内坐标和可点击内链。保留离线朱雀、完整主题、书签、翻译与朗读。[适配与验证范围](docs/READER-ADAPTATION.md)。
+> v1.9.1：支持 DeepSeek Harness 0.2.2-rc.1；[本次兼容验证](docs/DSH-0.2.2-RC1.md)。保留 v1.9.0 的 PDF 伴读关联全文，超过 180000 字符均匀摘取并标注范围；恢复命名目的地、页内坐标和可点击内链。保留离线朱雀、完整主题、书签、翻译与朗读。[适配与验证范围](docs/READER-ADAPTATION.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -49,16 +49,16 @@
 
 ## 安装预构建发布包
 
-从 [v1.8.0 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.8.0) 下载 `qiaomu-reader-dsh-1.8.0.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
+从 [v1.9.1 Release](https://github.com/joeseesun/qiaomu-reader-dsh/releases/tag/v1.9.1) 下载 `qiaomu-reader-dsh-1.9.1.tgz` 和 `SHA256SUMS`，校验后安装到你选择的 profile：
 
 ```sh
 shasum -a 256 -c SHA256SUMS
-dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.8.0.tgz
+dsh plugin --profile YOUR_PROFILE add /absolute/path/qiaomu-reader-dsh-1.9.1.tgz
 ```
 
 `YOUR_PROFILE` 需要替换为目标 profile。macOS 桌面版请使用应用自带 CLI：`/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh`。不要把隔离测试配置直接覆盖日用配置。
 
-实测环境：macOS、应用自带 DSH 0.2.1-rc.5、独立 Web profile；日用桌面已安装预构建包并重启，原有六本书、进度与划线保留。其他系统、实体手机和平板未验收。详细记录在 [适配状态](docs/READER-ADAPTATION.md)。
+此前 1.9.0 基线：macOS、应用自带 DSH 0.2.1-rc.5、独立 Web profile；日用桌面已安装预构建包并重启，原有六本书、进度与划线保留。其他系统、实体手机和平板未验收。详细记录在 [适配状态](docs/READER-ADAPTATION.md)。
 
 ## 使用
 
@@ -90,9 +90,9 @@ npm pack --pack-destination /tmp
 
 ## English
 
-Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.8.0 GitHub Release; no npm publication is provided.
+Read EPUB, PDF, TXT, Markdown and HTML inside DeepSeek Harness, with Hacker Books discovery, local reading lists and recommendations, recoverable library removal, speech, vocabulary, Markdown backlinks and native AI sessions. Quick prompts support localized defaults, reset and retryable saves. Install the **prebuilt Release tgz** with `dsh plugin --profile YOUR_PROFILE add /absolute/path/package.tgz`, then reload the selected profile. Download the prebuilt tgz and SHA256SUMS from the v1.9.1 GitHub Release; no npm publication is provided.
 
-Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and installed in the ordinary desktop profile with existing books preserved. Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Qiaomu Library activation/search/download is implemented and fixture-tested; real activated service downloads still require the user’s activation code. Speech providers and Kokoro/MeloTTS setup are implemented. Edge/Mac synthesis and both local-model auditions passed; paid provider accounts still require user keys. Kindle, MOBI/FB2/comics and stable whole-book pagination remain separate parity tasks.
+Previous 1.9.0 baseline: Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and installed in the ordinary desktop profile with existing books preserved. Windows/Linux and physical mobile devices are not verified. AI replies require the user's native Harness model configuration. AnkiConnect is optional. Qiaomu Library activation/search/download is implemented and fixture-tested; real activated service downloads still require the user’s activation code. Speech providers and Kokoro/MeloTTS setup are implemented. Edge/Mac synthesis and both local-model auditions passed; paid provider accounts still require user keys. Kindle, MOBI/FB2/comics and stable whole-book pagination remain separate parity tasks.
 
 Books, notes and state are stored locally. Qiaomu Library optionally contacts ebook-mcp.qiaomu.ai; refresh credentials stay in permission-controlled Host files outside the book library. Reference covers use Open Library. Gutenberg search/download contacts Gutenberg; AI context goes to the configured Harness provider; explicit Anki export uses localhost port 8765. Mac speech uses AVFoundation with legacy say compatibility. Google receives only the selected lookup text. Online speech uses the selected provider; local models use an independently installed runtime outside the book library. Uninstall the plugin through Harness while keeping its library files; back up the library before rollback. Licensed GPL-3.0-only.
 
