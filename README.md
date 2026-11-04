@@ -1,6 +1,6 @@
 # 乔木阅读 · DeepSeek Harness
 
-> v1.9.0：PDF 伴读关联全文，超过 180000 字符均匀摘取并标注范围；恢复命名目的地、页内坐标和可点击内链。保留离线朱雀、完整主题、书签、翻译与朗读。[适配与验证范围](docs/READER-ADAPTATION.md)。
+> v1.9.1：PDF 伴读关联全文，超过 180000 字符均匀摘取并标注范围；恢复命名目的地、页内坐标和可点击内链。保留离线朱雀、完整主题、书签、翻译与朗读。[适配与验证范围](docs/READER-ADAPTATION.md)。
 
 在 Harness 中阅读、划线、听书、记生词，使用宿主原生 AI 会话讨论正文。
 
@@ -96,4 +96,4 @@ Tested on macOS with bundled DSH 0.2.1-rc.5 in an isolated Web profile and insta
 
 Books, notes and state are stored locally. Qiaomu Library optionally contacts ebook-mcp.qiaomu.ai; refresh credentials stay in permission-controlled Host files outside the book library. Reference covers use Open Library. Gutenberg search/download contacts Gutenberg; AI context goes to the configured Harness provider; explicit Anki export uses localhost port 8765. Mac speech uses AVFoundation with legacy say compatibility. Google receives only the selected lookup text. Online speech uses the selected provider; local models use an independently installed runtime outside the book library. Uninstall the plugin through Harness while keeping its library files; back up the library before rollback. Licensed GPL-3.0-only.
 
-本次 Harness rc.5 支持范围与实测边界见 [兼容验证记录](docs/RC5-COMPATIBILITY.md)。
+Harness 0.2.2-rc.1 适配与实测边界见 [兼容验证记录](docs/DSH-0.2.2-RC1.md)。
