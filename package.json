@@ -1,10 +1,10 @@
 {
   "name": "qiaomu-reader-dsh",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "private": true,
   "type": "module",
   "engines": {
-    "dsh": "0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.4 || 0.2.1-rc.5 || 0.2.2-rc.1"
+    "dsh": "0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.4 || 0.2.1-rc.5 || 0.2.2-rc.1 || 0.2.2-rc.2"
   },
   "description": "乔木阅读：DSH 的 EPUB、PDF、TXT、Markdown、HTML 阅读器，支持朗读、生词本、阅读笔记与原生 AI 伴读。",
   "exports": {
@@ -74,7 +74,7 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5 || 4.1.0",
-    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.4 || 0.2.1-rc.5 || 0.2.2-rc.1"
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.4 || 0.2.1-rc.5 || 0.2.2-rc.1 || 0.2.2-rc.2"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": {
